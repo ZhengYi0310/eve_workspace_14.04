@@ -1,0 +1,16 @@
+<launch>
+	<arg name="model" />
+	<arg name="gui" default="True" />
+	
+    <!-- Launchfile Arguments (optional)-->
+    <arg name="robot_name" default="wam"/>
+    <param name="root_link" value="$(arg robot_name)/FixedLink"/>
+    <param name="tip_link" value="$(arg robot_name)/LowerWristYawLink"/>
+
+  <!-- Component Configuration -->
+    
+	<param name="robot_description_yi" command="$(find xacro)/xacro.py '$(find
+barrett_model)/robots/wam7_bhand.urdf.xacro'" />
+	<param name="use_gui" value="$(arg gui)"/>
+	
+</launch>

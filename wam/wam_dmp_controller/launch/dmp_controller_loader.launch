@@ -1,0 +1,5 @@
+<launch>
+  <include file="$(find wam_dmp_controller)/launch/dmp_joint_position_controller_loader.launch" /> 
+  <!-- <include file="$(find wam_dmp_controller)/launch/dmp_ik_controller_loader.launch" /> -->
+</launch>
+

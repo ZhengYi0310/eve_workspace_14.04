@@ -1,0 +1,64 @@
+joint_names: [left_wam/base_yaw_joint, left_wam/shoulder_pitch_joint, left_wam/shoulder_yaw_joint, left_wam/elbow_pitch_joint, left_wam/wrist_yaw_joint, left_wam/wrist_pitch_joint, left_wam/palm_yaw_joint]
+
+left_wam/base_yaw_joint:
+   joint: "left_wam/base_yaw_joint"
+   goal_reached_threshold: 0.01
+   pid:
+     p: 900
+     i: 2.5
+     d: 2
+     i_clamp: 2
+
+left_wam/shoulder_pitch_joint:
+  joint: left_wam/shoulder_pitch_joint
+  goal_reached_threshold: 0.01
+  pid:
+    p: 2500
+    i: 5
+    d: 2
+    i_clamp: 4
+
+left_wam/shoulder_yaw_joint:
+  joint: left_wam/shoulder_yaw_joint
+  goal_reached_threshold: 0.01
+  pid:
+    p: 600
+    i: 2.5
+    d: 0.5
+    i_clamp: 2
+
+left_wam/elbow_pitch_joint:
+  joint: left_wam/elbow_pitch_joint
+  goal_reached_threshold: 0.01
+  pid:
+    p: 500
+    i: 0.5
+    d: 0.8
+    i_clamp: 0.5
+
+left_wam/wrist_yaw_joint:
+  joint: left_wam/wrist_yaw_joint
+  goal_reached_threshold: 0.01
+  pid:
+    p: 40
+    i: 0.0
+    d: 0.8
+    i_clamp: 0.0
+
+left_wam/wrist_pitch_joint:
+  joint: left_wam/wrist_pitch_joint
+  goal_reached_threshold: 0.01
+  pid:
+    p: 20
+    i: 0
+    d: 0.1
+    i_clamp: 0.0
+
+left_wam/palm_yaw_joint:
+  joint: left_wam/palm_yaw_joint
+  goal_reached_threshold: 0.01
+  pid:
+    p: 5
+    i: 0
+    d: 0.01
+    i_clamp: 0.0

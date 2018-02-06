@@ -1,0 +1,6 @@
+string action
+---
+int32 success
+float64 response
+string status
+int32[1000] hmmInput

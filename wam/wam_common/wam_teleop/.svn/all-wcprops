@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/barrett-ros-pkg/!svn/ver/15/trunk/wam_common/wam_teleop
+END
+CMakeLists.txt
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/barrett-ros-pkg/!svn/ver/15/trunk/wam_common/wam_teleop/CMakeLists.txt
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/barrett-ros-pkg/!svn/ver/15/trunk/wam_common/wam_teleop/Makefile
+END
+manifest.xml
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/barrett-ros-pkg/!svn/ver/15/trunk/wam_common/wam_teleop/manifest.xml
+END

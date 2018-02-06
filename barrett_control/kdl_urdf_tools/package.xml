@@ -1,0 +1,42 @@
+<package>
+  <name>kdl_urdf_tools</name>
+  <version>0.2.0</version>
+  <description>
+    This package contains utilities and helper libraries for using KDL with ROS
+    URDF structures.
+    See the C++ API for more details.
+  </description>
+
+  <maintainer email="jbo@jhu.edu">Jonathan Bohren</maintainer>
+
+  <license>BSD</license>
+
+  <author>Jonathan Bohren</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- Dependencies needed to compile this pacakge. -->
+  <build_depend>roscpp</build_depend>
+  <build_depend>orocos_kdl</build_depend>
+  <build_depend>kdl_parser</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>trajectory_msgs</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>tf_conversions</build_depend>
+  <build_depend>angles</build_depend>
+
+  <!-- Dependencies needed after this package is compiled. -->
+  <run_depend>roscpp</run_depend>
+  <run_depend>orocos_kdl</run_depend>
+  <run_depend>kdl_parser</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>trajectory_msgs</run_depend>
+  <run_depend>tf</run_depend>
+  <run_depend>tf_conversions</run_depend>
+  <run_depend>angles</run_depend>
+
+</package>

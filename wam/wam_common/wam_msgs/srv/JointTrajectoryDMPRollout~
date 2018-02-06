@@ -1,0 +1,3 @@
+string trajectory_bag_file_name
+---
+int64 status

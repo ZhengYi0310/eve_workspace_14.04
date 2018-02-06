@@ -1,0 +1,4 @@
+wam_dmp_joint_position_controller:
+    type: wam_dmp_controller/DMPJointPositionController
+    dmp_implementation: NC2010DMPControllerImplementation
+   

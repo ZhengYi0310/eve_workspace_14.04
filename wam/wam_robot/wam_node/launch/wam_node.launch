@@ -1,0 +1,4 @@
+<launch>
+  <node name="wam_node" launch-prefix="xterm -e gdb --args" type="wam_node_l" pkg="wam_node" output="screen" />
+</launch>
+

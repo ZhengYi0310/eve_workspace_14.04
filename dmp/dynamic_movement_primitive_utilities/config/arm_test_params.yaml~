@@ -1,0 +1,2 @@
+rel_bag_file_name: /test/data/joint_states_wam.bag
+robot_part_names: ["left_arm"]

@@ -1,0 +1,24 @@
+<package>
+  <name>ops_wbc</name>
+  <version>0.1.0</version>
+  <description>
+    Metapackage that contains ROS packages for whole body control/operational space control/task space control
+  </description>
+  <license>BSD</license>
+
+  <url>http://wiki.ros.org/biotac_driver</url>
+
+  <author email="robot@todo.com">Iancc1plus: warning: unrecognized command line option "-Wno-unused-local-typedefs" McMahon</author>
+  <maintainer email="robot@todo.com">Yi Zheng</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>ops_wbc_robot</run_depend>
+
+  
+
+
+  <export>
+    <metapackage/>
+  </export>
+</package>

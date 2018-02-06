@@ -1,0 +1,4 @@
+- git:
+    local-name: wam_common
+    uri: https://github.com/BarrettTechnology/wam_common.git
+    version: master

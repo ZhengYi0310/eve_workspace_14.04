@@ -1,0 +1,9 @@
+int32 period_us
+int32 duration
+int32 min
+int32 max
+int64 sum
+int64 sumSq
+int32 loopCount
+int32 overruns
+int32 missedReleasePoints

@@ -1,0 +1,19 @@
+<package>
+  <description brief="wam_teleop">
+
+     This package contains a joystick and keyboard teleoperation for the Barrett WAM and BarrettHand.
+
+  </description>
+  <author>Barrett Technology Inc., Kyle Maroney</author>
+  <license>BSD</license>
+  <url>http://ros.org/wiki/wam_teleop</url>
+  <depend package="roscpp"/>
+  <depend package="sensor_msgs"/>
+  <depend package="std_srvs"/>
+  <depend package="joy"/>
+  <depend package="wam_srvs"/>
+  <depend package="wam_msgs"/>
+
+</package>
+
+

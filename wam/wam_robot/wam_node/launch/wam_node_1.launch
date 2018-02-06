@@ -1,0 +1,4 @@
+<launch>
+  <node name="wam_node_1" type="wam_node_1" pkg="wam_node" output="screen" />
+</launch>
+

@@ -1,0 +1,6 @@
+Header header
+string hand_id
+biotac_sensors/BioTacData[] bt_data
+biotac_sensors/BioTacTime bt_time
+time header_from_controller_start
+time frame_collection_from_header

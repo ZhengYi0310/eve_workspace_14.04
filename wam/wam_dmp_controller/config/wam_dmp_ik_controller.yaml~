@@ -1,0 +1,73 @@
+cartesian_pose_twist_gains: &cartesian_pose_twist_gains
+  ff_trans: 0.0
+  fb_trans:
+    p: 80
+    i: 0.0
+    d: 10
+    i_clamp: 0.0
+  ff_rot: 0.0
+  fb_rot:
+    p: 8
+    i: 0.0
+    d: 2
+    i_clamp: 0.0
+    
+nullspace_gains: &nullspace_gains
+  nullspace_controller_names: fb_nullspace_base_yaw fb_nullspace_shoulder_pitch fb_nullspace_shoulder_yaw fb_nullspace_elbow_pitch fb_nullspace_wrist_yaw fb_nullspace_wrist_pitch fb_nullspace_palm_yaw
+  fb_nullspace_base_yaw:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 0.0
+  fb_nullspace_shoulder_pitch:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 0.0
+  fb_nullspace_shoulder_yaw:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 0.0
+  fb_nullspace_elbow_pitch:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 0.0
+  fb_nullspace_wrist_yaw:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 0.0
+  fb_nullspace_wrist_pitch:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 0.0
+  fb_nullspace_palm_yaw:
+    p: 0.0
+    i: 0.0
+    d: 0.0
+    i_clamp: 0.0
+
+pose_filter: &pose_filter_parameters
+  name: pose_filter
+  type: TransferFunctionFilter<double>
+  params:
+    a: [1.0, -0.98]
+    b: [0.02]
+
+wam_dmp_ik_controller:
+  type: wam_dmp_controller/DMPIKController
+  dmp_implementation: NC2010DMPControllerImplementation
+  robot_parts: [left_arm]
+  root_name: "left_wam/base_link"
+  tip_name: "left_wam/wrist_palm_link"
+  keep_restposture_fixed_for_testing: false
+  keep_endeffector_fixed_for_testing: false
+  publisher_buffer_size: 1000
+  publisher_rate: 20
+  damping: 0.01
+  <<: *cartesian_pose_twist_gains
+  <<: *nullspace_gains
+  pose_filter: *pose_filter_parameters

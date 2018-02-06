@@ -1,0 +1,26 @@
+<package>
+  <name>ops_wbc_robot</name>
+  <version>1.0.0</version>
+  <description>The ops_wbc_robot package</description>
+  <maintainer email="hczhengcq@gmail.com"> Yi Zheng</maintainer>
+  <license>BSD</license>
+  <url type="website">http://wiki.ros.org/ahl_robot</url>
+  <author email="hczhengcq@gmail.com">Yi Zheng</author>
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- <build_depend>ahl_digital_filter</build_depend> -->
+  <!-- <build_depend>ahl_utils</build_depend> -->
+  <build_depend>cmake_modules</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>tf2</build_depend>
+  <build_depend>tf2_ros</build_depend>
+  <!-- <build_depend>yaml-cpp</build_depend> -->
+
+  <!-- <run_depend>ahl_digital_filter</run_depend> -->
+  <!-- <run_depend>ahl_utils</run_depend> -->
+  <run_depend>cmake_modules</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>tf2</run_depend>
+  <run_depend>tf2_ros</run_depend>
+  <!-- <run_depend>yaml-cpp</run_depend> -->
+</package>

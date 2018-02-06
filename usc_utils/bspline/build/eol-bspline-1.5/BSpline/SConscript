@@ -1,0 +1,11 @@
+
+Import('env')
+
+sources = Split('''
+BSplineLib.cpp
+''')
+
+bsplinelib = env.Library('bspline', sources)
+
+env.Default(bsplinelib)
+

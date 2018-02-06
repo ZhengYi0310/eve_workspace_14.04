@@ -1,0 +1,3 @@
+sensor_msgs/JointState joint_state
+biotac_sensors/BioTacHand biotac_hand
+

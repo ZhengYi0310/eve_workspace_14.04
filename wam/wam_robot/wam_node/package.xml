@@ -1,0 +1,78 @@
+<package>
+  <name>wam_node</name>
+  <version>1.0.0</version>
+  <description>Barrett Technology ROS node for 4-DOF and 7-DOF WAM to be run on WAM robot PC or external PC via CAN.</description>
+  <maintainer email="hm@barrett.com">robot</maintainer>
+
+  <license>GPL</license>
+
+  <url type="website">http://barrett.com/robot/index.htm</url>
+
+  <author>Kyle Maroney</author>
+  <author>Hariharasudan Malaichamee</author>
+
+  <!-- Dependencies which this package needs to build itself. -->
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- Dependencies needed to compile this package. -->
+  <build_depend>std_msgs</build_depend>
+  <build_depend>std_srvs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>trajectory_msgs</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>roslib</build_depend>
+  <build_depend>bullet</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>wam_msgs</build_depend>
+  <build_depend>wam_srvs</build_depend>
+  <build_depend>rosbag</build_depend>
+  <build_depend>biotac_sensors</build_depend>
+  <build_depend>cheetah_lib</build_depend>
+  <build_depend>xenomai_ros</build_depend>
+  
+  <build_depend>barrett</build_depend>
+  <build_depend>hardware_interface</build_depend>
+  <!-- <build_depend>barrett_model</build_depend> --> 
+  <!-- <build_depend>kdl_urdf_tools</build_depend> -->
+  <build_depend>terse_roscpp</build_depend>
+  <build_depend>controller_manager</build_depend>
+  <build_depend>control_toolbox</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>urdf</build_depend>
+  <build_depend>angles</build_depend>
+  <build_depend>kdl_parser</build_depend> 
+  <build_depend>tf_conversions</build_depend>
+  <!-- <build_depend>robot_state_publisher</build_depend>  -->
+
+  <!-- Dependencies needed after this package is compiled. -->
+  <run_depend>std_msgs</run_depend>
+  <run_depend>std_srvs</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>trajectory_msgs</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>roslib</run_depend>
+  <run_depend>bullet</run_depend>
+  <run_depend>tf</run_depend>
+  <run_depend>wam_msgs</run_depend>
+  <run_depend>wam_srvs</run_depend>
+  <run_depend>rosbag</run_depend>
+  <run_depend>biotac_sensors</run_depend>
+  <run_depend>cheetah_lib</run_depend>
+
+  <run_depend>barrett</run_depend>
+  <run_depend>hardware_interface</run_depend>
+  <!-- <run_depend>barrett_model</run_depend> -->
+  <!-- <run_depend>kdl_urdf_tools</run_depend> --> 
+  <run_depend>terse_roscpp</run_depend> 
+  <run_depend>controller_manager</run_depend>
+  <run_depend>control_toolbox</run_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>urdf</run_depend>
+  <run_depend>angles</run_depend>
+  <run_depend>kdl_parser</run_depend> 
+  <run_depend>tf_conversions</run_depend>
+  <!-- <run_depend>robot_state_publisher</run_depend> -->
+
+</package>

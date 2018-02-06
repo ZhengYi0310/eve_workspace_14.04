@@ -1,0 +1,26 @@
+<package>
+  <name>barrett_control</name>
+  <version>0.1.0</version>
+  <description>
+    This package is developed to enable the control of a Barrett Wam via ROS control package
+  </description>
+  <license>BSD</license>
+
+  <url>http://wiki.ros.org/biotac_driver</url>
+
+  <author email="robot@todo.com">Iancc1plus: warning: unrecognized command line option "-Wno-unused-local-typedefs" McMahon</author>
+  <maintainer email="robot@todo.com">Francisco Vina</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>barrett_model</run_depend>
+  <run_depend>barrett_control_msgs</run_depend>
+  <run_depend>terse_roscpp</run_depend>
+  <run_depend>kdl_urdf_tools</run_depend>
+  <run_depend>barrett_hw</run_depend> 
+
+
+  <export>
+    <metapackage/>
+  </export>
+</package>

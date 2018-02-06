@@ -1,0 +1,7 @@
+<library path="lib/librobot_states_publisher">
+  <class name="barrett_hw/RobotStatesPublisher" type="robot_states_publisher::RobotStatesPublisher" base_class_type="controller_interface::ControllerBase">
+  <description>
+    publishes the state of the robot arm
+  </description>
+  </class>
+</library>

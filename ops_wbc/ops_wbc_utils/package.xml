@@ -1,0 +1,18 @@
+<package>
+  <name>ops_wbc_utils</name>
+  <version>1.0.0</version>
+  <description>The ahl_utils package</description>
+  <maintainer email="robot@mail.com">robot</maintainer>
+  <license>BSD</license>
+  <!-- <url type="website">http://wiki.ros.org/ahl_utils</url> -->
+  <author email="daichi.yoshikawa@gmail.com">Daichi Yoshikawa</author>
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>cmake_modules</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>yaml-cpp</build_depend>
+
+  <run_depend>cmake_modules</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>yaml-cpp</run_depend>
+</package>

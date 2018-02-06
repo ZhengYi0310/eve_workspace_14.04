@@ -1,0 +1,28 @@
+<package>
+  <name>terse_roscpp</name>
+  <version>0.1.0</version>
+  <description>
+    This is a collection of useful tools when programming ROS code in c++ and
+    making your code less wordy.
+  </description>
+  <maintainer email="jbo@jhu.edu">Jonathan Bohren</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/terse_roscpp</url>
+  <!-- <url type="bugtracker"></url> -->
+
+  <author>Jonathan Bohren</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- Dependencies needed to compile this pacakge. -->
+  <build_depend>roscpp</build_depend>
+
+  <!-- Dependencies needed after this package is compiled. -->
+  <run_depend>roscpp</run_depend>
+
+  <export>
+    <cpp lflags="-L${prefix}/lib -Wl,-rpath,${prefix}/lib -lterse_roscpp" cflags="-I${prefix}/include"/>
+  </export>
+</package>

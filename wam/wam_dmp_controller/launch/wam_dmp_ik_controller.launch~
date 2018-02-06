@@ -1,0 +1,5 @@
+<launch>
+  <rosparam ns="barrett" file="$(find wam_dmp_controller)/config/wam_dmp_ik_controller.yaml" command="load"/>
+  <rosparam ns="barrett/wam_dmp_ik_controller" file="$(find wam_dmp_controller)/config/wam_joint_position_gains.yaml" command="load"/>
+  <rosparam ns="barrett/wam_dmp_ik_controller" file="$(find wam_dmp_controller)/config/wam_joint_space_variable_names.yaml" command="load"/>
+</launch>

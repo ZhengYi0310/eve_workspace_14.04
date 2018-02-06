@@ -1,0 +1,56 @@
+<package>
+  <name>wam_dmp_controller</name>
+  <version>1.0.0</version>
+  <description>dmp controller for barrett wam</description>
+  <maintainer email="robot@todo.com.com">robot</maintainer>
+
+  <license>GPL</license>
+
+  <url type="website">https://github.com/ZhengYi0310</url>
+
+  <author>Yi Zheng</author>
+  <author>Yi Zheng</author>
+
+  <!-- Dependencies which this package needs to build itself. -->
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- Dependencies needed to compile this package. -->
+  <build_depend>angles</build_depend>
+  <build_depend>controller_interface</build_depend>
+  <build_depend>hardware_interface</build_depend>
+  <build_depend>control_msgs</build_depend>
+  <build_depend>control_toolbox</build_depend>
+  <build_depend>realtime_tools</build_depend>
+  <build_depend>urdf</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>usc_utilities</build_depend>
+  <build_depend>dynamic_movement_primitive</build_depend>
+  <build_depend>rosrt</build_depend>
+  <build_depend>robot_info</build_depend>
+  <build_depend>pluginlib</build_depend>
+  <build_depend>effort_controllers</build_depend>
+  <build_depend>kdl_parser</build_depend>
+
+  <run_depend>angles</run_depend>
+  <run_depend>controller_interface</run_depend>
+  <run_depend>hardware_interface</run_depend>
+  <run_depend>control_msgs</run_depend>
+  <run_depend>control_toolbox</run_depend>
+  <run_depend>realtime_tools</run_depend>
+  <run_depend>urdf</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>usc_utilities</run_depend>
+  <run_depend>dynamic_movement_primitive</run_depend>
+  <run_depend>rosrt</run_depend>
+  <run_depend>robot_info</run_depend>
+  <run_depend>pluginlib</run_depend>
+  <run_depend>effort_controllers</run_depend>
+  <run_depend>kdl_parser</run_depend>
+
+  <export>
+	  <controller_interface plugin="${prefix}/controller_plugin.xml"/>
+  </export>
+
+</package>

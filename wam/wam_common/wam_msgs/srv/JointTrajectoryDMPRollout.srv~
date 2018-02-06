@@ -1,0 +1,4 @@
+trajectory_msgs/JointTrajectory jointTrajectory
+float64 sampling_frequency
+---
+int64 status

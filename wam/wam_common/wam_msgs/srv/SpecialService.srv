@@ -1,0 +1,9 @@
+string action
+int32 command
+float64 value1
+float64 value2
+---
+int32 success
+float64 response
+string status
+int32[] bt

@@ -1,0 +1,70 @@
+abs_dmp_bagfile_location: /home/robot/yzheng_ws/src/dmp/dmp_behaviors/demonstrations/joint_space_dmp.bag
+
+trajectory:
+
+  variable_names: [left_wam/base_yaw_joint, left_wam/shoulder_pitch_joint, left_wam/shoulder_yaw_joint, left_wam/elbow_pitch_joint, left_wam/wrist_yaw_joint, left_wam/wrist_pitch_joint, left_wam/palm_yaw_joint]
+
+  wam_joint_names: [left_wam/base_yaw_joint, left_wam/base_yaw_joint_d, left_wam/base_yaw_joint_dd, left_wam/shoulder_pitch_joint, left_wam/shoulder_pitch_joint_d, left_wam/shoulder_pitch_joint_dd, left_wam/shoulder_yaw_joint, left_wam/shoulder_yaw_joint_d, left_wam/shoulder_yaw_joint_dd, left_wam/elbow_pitch_joint, left_wam/elbow_pitch_joint_d, left_wam/elbow_pitch_joint_dd, left_wam/wrist_yaw_joint, left_wam/wrist_yaw_joint_d, left_wam/wrist_yaw_joint_dd, left_wam/wrist_pitch_joint, left_wam/wrist_pitch_joint_d, left_wam/wrist_pitch_joint_dd, left_wam/palm_yaw_joint, left_wam/palm_yaw_joint_d, left_wam/palm_yaw_joint_dd]
+  left_wam/base_yaw_joint:
+    name: left_wam/base_yaw_joint
+    unit: rad
+  left_wam/base_yaw_joint_d:
+    name: left_wam/base_yaw_joint_d
+    unit: rad/s
+  left_wam/base_yaw_joint_dd:
+    name: left_wam/base_yaw_joint_dd
+    unit: rad/s^2
+  left_wam/shoulder_pitch_joint:
+    name: left_wam/shoulder_pitch_joint
+    unit: rad
+  left_wam/shoulder_pitch_joint_d:
+    name: left_wam/shoulder_pitch_joint_d
+    unit: rad/s
+  left_wam/shoulder_pitch_joint_dd:
+    name: left_wam/shoulder_pitch_joint_dd
+    unit: rad/s^2
+  left_wam/shoulder_yaw_joint:
+    name: left_wam/shoulder_yaw_joint
+    unit: rad
+  left_wam/shoulder_yaw_joint_d:
+    name: left_wam/shoulder_yaw_joint_d
+    unit: rad/s
+  left_wam/shoulder_yaw_joint_dd:
+    name: left_wam/shoulder_yaw_joint_dd
+    unit: rad/s^2
+  left_wam/elbow_pitch_joint:
+    name: r_elbow_flex
+    unit: rad
+  left_wam/elbow_pitch_joint_d:
+    name: left_wam/elbow_pitch_joint_d
+    unit: rad/s
+  left_wam/elbow_pitch_joint_dd:
+    name: left_wam/elbow_pitch_jointx_dd
+    unit: rad/s^2
+  left_wam/wrist_yaw_joint:
+    name: left_wam/wrist_yaw_joint
+    unit: rad
+  left_wam/wrist_yaw_joint_d:
+    name: left_wam/wrist_yaw_joint_d
+    unit: rad/s
+  left_wam/wrist_yaw_joint_dd:
+    name: left_wam/wrist_yaw_joint_dd
+    unit: rad/s^2
+  left_wam/wrist_pitch_joint:
+    name: left_wam/wrist_pitch_joint
+    unit: rad
+  left_wam/wrist_pitch_joint_d:
+    name: left_wam/wrist_pitch_joint_d
+    unit: rad/s
+  left_wam/wrist_pitch_joint_dd:
+    name: left_wam/wrist_pitch_joint_dd
+    unit: rad/s^2
+  left_wam/palm_yaw_joint:
+    name: left_wam/palm_yaw_joint
+    unit: rad
+  left_wam/palm_yaw_joint_d:
+    name: left_wam/palm_yaw_joint_d
+    unit: rad/s
+  left_wam/palm_yaw_joint_dd:
+    name: left_wam/palm_yaw_joint_dd
+    unit: rad/s^2
