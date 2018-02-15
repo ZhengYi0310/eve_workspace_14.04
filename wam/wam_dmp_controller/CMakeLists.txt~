@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   urdf
   std_msgs
   geometry_msgs
+  sensor_msgs
   usc_utilities
   dynamic_movement_primitive
   rosrt
@@ -19,6 +20,11 @@ find_package(catkin REQUIRED COMPONENTS
   pluginlib
   effort_controllers
   message_generation
+  kdl_parser
+  forward_command_controller
+  dynamic_reconfigure
+  tf_conversions
+  
 )
 
 find_package(Boost REQUIRED COMPONENTS thread signals system filesystem)
@@ -30,6 +36,9 @@ add_message_files(DIRECTORY msg FILES
   NullspaceTermStamped.msg
   PoseTwistStamped.msg
   Waypoint.msg
+  JointControllerState.msg
+  RPY.msg
+  PoseRPY.msg
 )
 generate_messages(DEPENDENCIES
   geometry_msgs
@@ -47,6 +56,7 @@ catkin_package(
     urdf
     std_msgs
     geometry_msgs
+    sensor_msgs
 	usc_utilities
 	dynamic_movement_primitive
 	rosrt
@@ -54,6 +64,11 @@ catkin_package(
     pluginlib
     effort_controllers
     message_runtime
+    kdl_parser
+    forward_command_controller
+    dynamic_reconfigure
+    tf_conversions
+    barrett_hw
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
   )
@@ -64,7 +79,9 @@ add_library(${PROJECT_NAME}
   src/variable_name_map.cpp
   src/cartesian_twist_controller_ik_with_nullspace_optimization.cpp 
   src/dmp_ik_controller.cpp
+  src/KinematicChainControllerBase.cpp
 )
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBARIES})
 
 add_executable(test_wam_dmp_controller

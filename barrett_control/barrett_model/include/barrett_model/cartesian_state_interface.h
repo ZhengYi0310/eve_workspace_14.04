@@ -1,0 +1,63 @@
+#ifndef HARDWARE_INTERFACE_CARTESIAN_STATE_INTERFACE_H
+#define HARDWARE_INTERFACE_CARTESIAN_STATE_INTERFACE_H
+
+#include <hardware_interface/internal/hardware_resource_manager.h>
+#include <cassert>
+#include <string>
+
+namespace barrett_model
+{
+	/** A handle used to read the state of a single cartesian variable. */
+	class CartesianStateHandle 
+	{
+		public:
+			CartesianStateHandle() : name_(), pos_(0.0), vel_(0.0), eff_(0.0)
+			{}
+
+			/**
+   			 *\param name The name of the cartesian variable
+   			 * \param pos A pointer to the storage for this cartesian variable's position
+   			 * \param vel A pointer to the storage for this cartesian variable's velocity
+   			 * \param eff A pointer to the storage for this cartesian variable's effort (force or torque)
+   			 */
+			CartesianStateHandle(const std::string& name, const double* pos, const double* vel,
+								 const double* eff)
+								: name_(name), pos_(pos), vel_(vel), eff_(eff)
+
+			{
+				if (!pos)
+				{
+					throw hardware_interface::HardWareInterfaceException("Cannot create handle '" + name + "'. Position data pointer is null.");
+				}
+				if (!vel)
+    			{
+      				throw HardwareInterfaceException("Cannot create handle '" + name + "'. Velocity data pointer is null.");
+    			}
+    			if (!eff)
+    			{
+      				throw HardwareInterfaceException("Cannot create handle '" + name + "'. Effort data pointer is null.");
+    			}
+			}
+
+			std::string getName() const {return name_;}
+			double getPosition() const {assert(pos_); return *pos_;}
+			double getVelocity() const {assert(vel_); return *vel_;}
+			double getEffort()   const {assert(eff_); return *eff_;}
+
+		private:
+			std::string name_;
+			const double* pos_;
+			const double* vel_;
+			const double* eff_;
+ 	};
+ 	/** \brief Hardware interface to support reading the state of an array of cartesian variables
+ 	 *
+ 	 * This \ref HardwareInterface supports reading the state of an array of named
+ 	 * cartesian variables, each of which has some position, velocity, and effort (force or
+ 	 * torque).
+ 	 *
+ 	 */
+ 	class CartesianStateInterface : public HardwareResourceManager<CartesianStateHandle> {};
+ }
+
+ #endif

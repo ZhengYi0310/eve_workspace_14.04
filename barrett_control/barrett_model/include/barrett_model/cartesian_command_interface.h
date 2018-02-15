@@ -1,0 +1,122 @@
+#ifndef HARDWARE_INTERFACE_CARTESIAN_COMMAND_INTERFACE_H
+#define HARDWARE_INTERFACE_CARTESIAN_COMMAND_INTERFACE_H
+
+#include <cassert>
+#include <string>
+#include <hardware_interface/internal/hardware_resource_manager.h>
+#include <cartesian_hardware_interface/cartesian_state_interface.h>
+#include <hardware_interface/joint_command_interface.h>
+
+namespace barrett_model
+{
+	/** \brief A handle used to read and command a single cartesian variable. */
+	class CartesianHandle : public CartesianStateHandle
+	{
+		public:
+			CartesianHandle() : CartesianStateHandle(), cmd_(0) {}
+
+		 	/**
+   		  	 * \param js This cartesian variable's state handle
+   		  	 * \param cmd A pointer to the storage for this cartesian variable's output command
+   		  	 */
+  			CartesianVariableHandle(const CartesianStateHandle& js, double* cmd)
+    								: CartesianStateHandle(js), cmd_(cmd)
+  			{
+    			if (!cmd_)
+    			{
+      				throw hardware_interface::HardwareInterfaceException("Cannot create handle '" + js.getName() + "'. Command data pointer is null.");
+    			}
+  			}
+
+  			void setCommand(double command) {assert(cmd_); *cmd_ = command;}
+  			double getCommand() const {assert(cmd_); return *cmd_;}
+
+  		private:
+  			double* cmd_;
+	};
+
+	/** \brief Hardware interface to support commanding an array of cartesian variables.
+ 	 *
+ 	 * This \ref HardwareInterface supports commanding the output of an array of
+ 	 * named cartesian variables. Note that these commands can have any semantic meaning as long
+ 	 * as they each can be represented by a single double, they are not necessarily
+ 	 * effort commands. To specify a meaning to this command, see the derived
+ 	 * classes like \ref EffortJointInterface etc.
+ 	 * 
+ 	 * This class inherits from two different HW resource manager in order to be able to have
+ 	 * information also about joints, and not just about cartesian variables.
+ 	 * Moreover, even if this class controls cartesian variables, it has to clam also associated joints
+ 	 * as no other controller should be able to use them.
+ 	 *
+ 	 * \note Getting a cartesian variable handle through the getHandle() method \e will claim that resource.
+ 	 *
+ 	 */
+
+	class CartesianCommandInterface : public HardwareResourceManager<CartesianVariableHandle, ClaimResources>, 
+                                  	  public HardwareResourceManager<JointHandle, ClaimResources>
+ 	{
+ 		public:
+    	/// these "using" directives are needed to disambiguate
+    	using HardwareResourceManager<CartesianVariableHandle, ClaimResources>::ResourceManager<CartesianVariableHandle>::registerHandle;
+    	using HardwareResourceManager<JointHandle, ClaimResources>::ResourceManager<JointHandle>::registerHandle;
+    
+    	/// getHandle needs to be discriminated as there is no way of deducing which functions to call (only differ based on return type)
+    	/// unless using a Proxy class, and exploiting the cast operator
+    	class handleProxy
+    	{
+        	CartesianCommandInterface* myOwner;
+        	const std::string& myName;
+    		public:
+        		handleProxy( CartesianCommandInterface* owner, const std::string& name ) : myOwner(owner), myName(name) {}
+        		/// the commented implementation is more generic, and more error prone: could try to call also different cast,
+        		/// and may thus result in inconsistencies (as HardwareResourceManager<T,ClaimResources> only works for some T's
+        		// template<class T>
+        		// operator T() const
+        		// {
+        		//     return myOwner->HardwareResourceManager<T, ClaimResources>::getHandle(myName);
+        		// }
+        		operator CartesianVariableHandle() const
+        		{
+            		return myOwner->HardwareResourceManager<CartesianVariableHandle, ClaimResources>::getHandle(myName);
+        		}
+        		operator JointHandle() const
+        		{
+            		return myOwner->HardwareResourceManager<JointHandle, ClaimResources>::getHandle(myName);
+        		}
+    	};
+
+    	handleProxy getHandle(const std::string& name)
+    	{
+        	return handleProxy(this, name);
+    	}
+
+    	/// get names for all resources
+    	std::vector<std::string> getNames() const
+    	{
+        	std::vector<std::string> out1 = this->HardwareResourceManager<JointHandle, ClaimResources>::getNames();
+        	std::vector<std::string> out2 = this->HardwareResourceManager<CartesianVariableHandle, ClaimResources>::getNames();
+        	out1.insert(out1.end(), std::make_move_iterator(out2.begin()), std::make_move_iterator(out2.end()));
+        	return out1;
+    	}
+    
+    	/// Clear the resources this interface is claiming
+    	void clearClaims()
+    	{
+        	this->HardwareResourceManager<JointHandle, ClaimResources>::clearClaims();
+        	this->HardwareResourceManager<CartesianVariableHandle, ClaimResources>::clearClaims();
+        	return;
+    	}
+    
+    	/// Get the list of resources this interface is currently claiming
+    	std::set<std::string> getClaims() const
+    	{
+        	std::set<std::string> out1 = this->HardwareResourceManager<JointHandle, ClaimResources>::getClaims();
+        	std::set<std::string> out2 = this->HardwareResourceManager<CartesianVariableHandle, ClaimResources>::getClaims();
+        	out1.insert(out2.begin(), out2.end());
+        	return out1;
+    	}
+ 	};
+ 	/// \ref CartesianCommandInterface for commanding cartesian-based joints.
+	class PositionCartesianInterface : public CartesianCommandInterface {};
+}
+#endif
