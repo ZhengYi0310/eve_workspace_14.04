@@ -12,6 +12,19 @@ find_package(orocos_kdl REQUIRED)
 include_directories(
   ${orocos_kdl_INCLUDE_DIRS}
 )
+include(CheckCXXCompilerFlag)
+message(STATUS "Use compiler ${CMAKE_CXX_COMPILER}.")
+check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
+check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0x)
+if(COMPILER_SUPPORTS_CXX11)
+#  message(WARNING "Use compile flag -std=c++11")
+  set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+elseif(COMPILER_SUPPORTS_CXX0X)
+#  message(WARNING "Use compile flag -std=c++0x")
+  set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
+else()
+  message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
 
 if(Xenomai_FOUND)
   add_message_files(DIRECTORY msg FILES
@@ -56,6 +69,9 @@ if(Xenomai_FOUND)
 
   add_library(wam_server_lib src/wam_server_copy.cpp)
   target_link_libraries(wam_server_lib xenomai native rtdm ${BARRETT_LIBRARIES} ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
+  
+  add_library(base_robot_hw src/base_robot_hw.cpp)
+  target_link_libraries(base_robot_hw xenomai native rtdm ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
 
   #add_definitions(-D__XENO__)
   add_executable(wam_server src/wam_server_copy.cpp)
@@ -80,7 +96,7 @@ if(Xenomai_FOUND)
       DEPENDS hardware_interface controller_interface barrett barrett_model kdl_urdf_tools kdl_parser kdl_conversions terse_roscpp controller_manager control_toolbox rospy biotac_sensors realtime_tools pluginlib orocos_kdl visualization_msgs cmake_modules
       CATKIN_DEPENDS # TODO
       INCLUDE_DIRS include
-      LIBRARIES wam_server
+      LIBRARIES wam_server_lib
   )
 
   install(TARGETS wam_server

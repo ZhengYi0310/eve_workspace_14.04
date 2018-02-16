@@ -58,7 +58,7 @@ namespace barrett_model
  	 * torque).
  	 *
  	 */
- 	class CartesianStateInterface : public hardware_interface::HardwareResourceManager<CartesianStateHandle> {};
+ 	class CartesianStateInterface : public HardwareResourceManager<CartesianStateHandle> {};
  }
 
  #endif

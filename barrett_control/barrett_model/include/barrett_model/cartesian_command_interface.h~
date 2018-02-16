@@ -96,8 +96,7 @@ namespace barrett_model
     	{
         	std::vector<std::string> out1 = this->HardwareResourceManager<JointHandle, ClaimResources>::getNames();
         	std::vector<std::string> out2 = this->HardwareResourceManager<CartesianHandle, ClaimResources>::getNames();
-        	//out1.insert(out1.end(), std::make_move_iterator(out2.begin()), std::make_move_iterator(out2.end()));
-		out1.insert(out1.end(), out2.begin(), out2.end());
+        	out1.insert(out1.end(), std::make_move_iterator(out2.begin()), std::make_move_iterator(out2.end()));
         	return out1;
     	}
     

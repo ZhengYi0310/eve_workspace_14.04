@@ -13,6 +13,7 @@ include_directories(
   ${orocos_kdl_INCLUDE_DIRS}
 )
 
+
 if(Xenomai_FOUND)
   add_message_files(DIRECTORY msg FILES
   		arm_cartesian_state.msg
@@ -56,6 +57,9 @@ if(Xenomai_FOUND)
 
   add_library(wam_server_lib src/wam_server_copy.cpp)
   target_link_libraries(wam_server_lib xenomai native rtdm ${BARRETT_LIBRARIES} ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
+  
+  add_library(base_robot_hw src/base_robot_hw.cpp)
+  target_link_libraries(base_robot_hw xenomai native rtdm ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
 
   #add_definitions(-D__XENO__)
   add_executable(wam_server src/wam_server_copy.cpp)
