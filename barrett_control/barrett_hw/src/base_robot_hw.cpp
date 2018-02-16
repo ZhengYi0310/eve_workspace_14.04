@@ -20,6 +20,7 @@ namespace barrett_hw
         // ALLOCATE MEMORY
 
         // JOINT NAMES ARE TAKEN FROM URDF NAME CONVENTION
+        /*
         joint_names_.push_back( robot_namespace_ + std::string("_a1_joint") );
         joint_names_.push_back( robot_namespace_ + std::string("_a2_joint") );
         joint_names_.push_back( robot_namespace_ + std::string("_e1_joint") );
@@ -27,6 +28,8 @@ namespace barrett_hw
         joint_names_.push_back( robot_namespace_ + std::string("_a4_joint") );
         joint_names_.push_back( robot_namespace_ + std::string("_a5_joint") );
         joint_names_.push_back( robot_namespace_ + std::string("_a6_joint") );
+        */
+        joint_names_.resize(n_joints_);
         cart_12_names_.push_back( robot_namespace_ + std::string("_rot_xx") );
         cart_12_names_.push_back( robot_namespace_ + std::string("_rot_yx") );
         cart_12_names_.push_back( robot_namespace_ + std::string("_rot_zx") );
@@ -84,7 +87,7 @@ namespace barrett_hw
         // GET TRANSMISSIONS THAT BELONG TO THIS LWR 4+ ARM
         if (!parseTransmissionsFromURDF(urdf_string_))
         {
-            std::cout << "lwr_hw: " << "Error parsing URDF in lwr_hw.\n" << std::endl;
+            std::cout << "base_robot_hw: " << "Error parsing URDF in lwr_hw.\n" << std::endl;
             return;
         }
 
@@ -97,6 +100,30 @@ namespace barrett_hw
 
         // INIT KDL STUFF
         initKDLdescription(urdf_model_ptr);
+
+        // assign joint names based on the urdf file.
+        std::string tip_joint_name = robot_chain_.getSegment(robot_chain_.getNrOfJoints()).getJoint().getName(); 
+        boost::shared_ptr<const urdf::Joint> joint = urdf_model_.getJoint(tip_joint_name);
+        for (uint32_t i = n_joints_ - 1; i >= 0; i--)
+        {
+            while (std::find(joint_names_.begin(), joint_names_.end(), joint->name) != joint_names_.end() || joint->type != urdf::Joint::REVOLUTE)
+            {
+                // Get the next joint 
+                joint = urdf_model_.getLink(joint->parent_link_name)->parent_joint;
+                // Make sure we didn't run out of links 
+                if (!joint.get())
+                {
+                    ROS_ERROR_STREAM("Run out of joints while parsing URDF starting at joint: " << tip_joint_name);
+                    throw std::runtime_error("Run out of joints.");
+                }
+            }
+
+            ROS_INFO("parsing joint %i with name >>%s<<!", int(i) + 1, (joint->name).c_str());
+
+            // Store the joint name 
+            joint_names_[i] = joint->name;
+        }
+
 
         std::cout << "Succesfully created an abstract ARM with interfaces to ROS control" << std::endl;
     }
