@@ -4,9 +4,8 @@
 	
     <!-- Launchfile Arguments (optional)-->
     <arg name="robot_name" default="wam"/>
-    <param name="root_link" value="$(arg robot_name)/base_link"/>
-    <param name="tip_link" value="$(arg robot_name)/wrist_palm_link"/>
-    <param name="tip_joint" value="$(arg robot_name)/palm_yaw_joint"/>
+    <param name="root_link" value="$(arg robot_name)/FixedLink"/>
+    <param name="tip_link" value="$(arg robot_name)/LowerWristYawLink"/>
 
   <!-- Component Configuration -->
     

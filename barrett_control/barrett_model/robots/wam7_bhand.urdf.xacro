@@ -5,6 +5,8 @@
 
   <!-- Includea all the WAM stuff -->
   <xacro:include filename="$(find barrett_model)/models/wam_top.urdf.xacro"/> 
+  <xacro:include filename="$(find barrett_model)/robots/wam7_bhand.transmission.xacro"/> 
+  <xacro:include filename="$(find barrett_model)/robots/wam7_bhand.gazebo.xacro"/> 
 
   <!-- Root link is in the world frame-->
   <xacro:property name="width" value="0.0889" />
@@ -15,6 +17,15 @@
         <box size="1.831975 ${width} ${height}"/>
       </geometry>
     </visual>
+
+    <inertial>
+        <origin xyz="0 0 0" />
+        <mass value="1" />
+        <inertia
+          ixx="0.1" ixy="0"   ixz="0"
+                  iyy="0.1"   iyz="0"
+                            izz="0.1" />
+    </inertial>
   </link>
 
   <link name="rack2">
@@ -24,6 +35,15 @@
       </geometry>
       <origin rpy="0 0 1.57075" xyz="0 0 0"/>
     </visual>
+
+    <inertial>
+        <origin xyz="0 0 0" />
+        <mass value="1" />
+        <inertia
+          ixx="0.1" ixy="0"   ixz="0"
+                  iyy="0.1"   iyz="0"
+                            izz="0.1" />
+    </inertial>
   </link>
 
   <link name="rack3">
@@ -33,6 +53,15 @@
       </geometry>
       <origin rpy="0 0 1.57075" xyz="0 0 0"/>
     </visual>
+
+    <inertial>
+        <origin xyz="0 0 0" />
+        <mass value="1" />
+        <inertia
+          ixx="0.1" ixy="0"   ixz="0"
+                  iyy="0.1"   iyz="0"
+                            izz="0.1" />
+    </inertial>
   </link>
 
   <link name="rack4">
@@ -42,6 +71,15 @@
       </geometry>
       <origin rpy="0 0 1.57075" xyz="0 0 0"/>
     </visual>
+
+    <inertial>
+        <origin xyz="0 0 0" />
+        <mass value="1" />
+        <inertia
+          ixx="0.1" ixy="0"   ixz="0"
+                  iyy="0.1"   iyz="0"
+                            izz="0.1" />
+    </inertial>
   </link>
 
   <link name="rack5">
@@ -51,6 +89,15 @@
       </geometry>
       <origin rpy="0 1.57075 0" xyz="0 0 0.9525"/>
     </visual>
+
+    <inertial>
+        <origin xyz="0 0 0" />
+        <mass value="1" />
+        <inertia
+          ixx="0.1" ixy="0"   ixz="0"
+                  iyy="0.1"   iyz="0"
+                            izz="0.1" />
+      </inertial>
   </link>
 
   <link name="rack6">
@@ -60,10 +107,38 @@
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0"/>
     </visual>
+
+    <inertial>
+        <origin xyz="0 0 0" />
+        <mass value="1" />
+        <inertia
+          ixx="0.1" ixy="0"   ixz="0"
+                  iyy="0.1"   iyz="0"
+                            izz="0.1" />
+    </inertial>
   </link>
 
-  <link name ="left_wam_rack" />
-  <link name ="right_wam_rack" />
+  <link name ="left_wam_rack">
+    <inertial>
+        <origin xyz="0 0 0" />
+        <mass value="1" />
+        <inertia
+          ixx="0.1" ixy="0"   ixz="0"
+                  iyy="0.1"   iyz="0"
+                            izz="0.1" />
+    </inertial>
+  </link> 
+  <link name ="right_wam_rack">
+    <inertial>
+        <origin xyz="0 0 0" />
+        <mass value="1" />
+        <inertia
+          ixx="0.1" ixy="0"   ixz="0"
+                  iyy="0.1"   iyz="0"
+                            izz="0.1" />
+     </inertial>
+  </link>
+
 
   <joint name="rack1_to_rack2" type="fixed">
     <parent link="rack1"/>
@@ -117,5 +192,11 @@
   <!-- left wam -->
   <xacro:wam_left prefix="left_wam" parent_link="left_wam_rack" xyz="0.0 0.0 0" rpy="-1.57075 ${-PI} 0" />
   <xacro:wam_wrist_left prefix="left_wam"/>
+
+  <!-- gazebo stuff -->
+  <xacro:wam7_bhand_gazebo prefix="left_wam" name="barrett_hw"/>
+  <xacro:wam7_bhand_transmission prefix="left_wam" name="barrett_hw"/>
   <!-- <xacro:bhand prefix="left_wam/bhand" parent_link="left_wam/wrist_palm_link" xyz="0 0 0.06" rpy="0 0 0"/> -->
+
+  
 </robot>

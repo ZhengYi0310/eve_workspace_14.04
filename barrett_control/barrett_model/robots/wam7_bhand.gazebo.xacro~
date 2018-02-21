@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:macro name="wam7_bhand_gazebo" params="prefix name">
+
+		<gazebo>
+			<!-- <plugin name="${prefix}_wam7_bhand_hw_sim" filename="libbase_robot_hw_gazebo_plugin.so"> -->
+                        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+				<robotNamespace>${name}</robotNamespace>
+			</plugin>
+		</gazebo>
+
+		<gazebo reference="${prefix}/base_link">
+			<gravity>true</gravity>
+			<material>Gazebo/Orange</material>
+		</gazebo>
+
+		<gazebo reference="${prefix}/shoulder_yaw_link">
+			<gravity>true</gravity>
+			<material>Gazebo/Orange</material>
+		</gazebo>
+
+		<gazebo reference="${prefix}/shoulder_pitch_link">
+			<gravity>true</gravity>
+			<material>Gazebo/Orange</material>
+		</gazebo>
+
+		<gazebo reference="${prefix}/upper_arm_link">
+			<gravity>true</gravity>
+			<material>Gazebo/Orange</material>
+		</gazebo>
+
+		<gazebo reference="${prefix}/forearm_link">
+			<gravity>true</gravity>
+			<material>Gazebo/Orange</material>
+		</gazebo>
+
+		<gazebo reference="${prefix}/wrist_yaw_link">
+			<gravity>true</gravity>
+			<material>Gazebo/Orange</material>
+		</gazebo>
+
+		<gazebo reference="${prefix}/wrist_pitch_link">
+			<gravity>true</gravity>
+			<material>Gazebo/Orange</material>
+		</gazebo>
+
+		<gazebo reference="${prefix}/wrist_palm_link">
+			<gravity>true</gravity>
+			<material>Gazebo/Grey</material>
+		</gazebo>
+
+	</xacro:macro>
+
+</robot>
+

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(barrett_hw)
 # Load catkin and all dependencies required for this package
 # TODO: remove all from COMPONENTS that are not catkin packages.
-find_package(catkin COMPONENTS hardware_interface controller_interface 
+find_package(catkin COMPONENTS hardware_interface controller_interface transmission_interface
   barrett_model kdl_urdf_tools kdl_parser kdl_conversions terse_roscpp controller_manager biotac_sensors
   control_toolbox rospy xenomai_ros realtime_tools pluginlib visualization_msgs cmake_modules urdf roscpp)
 
@@ -101,7 +101,7 @@ target_link_libraries(base_robot_hw_gazebo_plugin
   ## INCLUDE_DIRS: 
   ## LIBRARIES: libraries you create in this project that dependent projects also need
   catkin_package(
-      DEPENDS hardware_interface controller_interface barrett barrett_model kdl_urdf_tools kdl_parser kdl_conversions terse_roscpp controller_manager control_toolbox rospy biotac_sensors realtime_tools pluginlib orocos_kdl visualization_msgs cmake_modules urdf
+      DEPENDS hardware_interface controller_interface transmission_interface barrett barrett_model kdl_urdf_tools kdl_parser kdl_conversions terse_roscpp controller_manager control_toolbox rospy biotac_sensors realtime_tools pluginlib orocos_kdl visualization_msgs cmake_modules urdf
       CATKIN_DEPENDS # TODO
       INCLUDE_DIRS include
       LIBRARIES wam_server_lib

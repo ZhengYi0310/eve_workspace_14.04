@@ -1,0 +1,58 @@
+<robot name="wam"
+  xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:property name="PI" value="3.1415926535897931" />
+
+  <!-- Includea all the WAM stuff -->
+  <xacro:include filename="$(find barrett_model)/models/arm.urdf.xacro"/> 
+  <!-- <xacro:include filename="$(find barrett_model)/robots/wam7_bhand.transmission.xacro"/> -->
+  <!-- <xacro:include filename="$(find barrett_model)/robots/wam7_bhand.gazebo.xacro"/> -->
+
+  <!-- Root link is in the world frame-->
+  <xacro:property name="width" value="0.0889" />
+  <xacro:property name="height" value="0.0492125" />
+  
+  <!-- and assemble your robot -->
+  <link name="box">
+	<inertial>
+		<mass value="5.0"/>
+		<origin rpy="0 0 0" xyz="0 0 0"/>
+		<inertia ixx="0.01"
+             		 iyy="0.01"
+             		 izz="0.01"
+             		 ixy="0" iyz="0" ixz="0"/>
+	</inertial>
+	<visual>
+		<origin xyz="0 0 0.50" rpy="0 0 0"/>
+		<geometry>
+		  <box size="1.0 1.0 1.0"/>
+		</geometry>
+	</visual>
+	<collision>
+		<origin xyz="0 0 0.50" rpy="0 0 0"/>
+		 <geometry>
+		  <box size="1.0 1.0 1.0"/>
+		 </geometry>
+	</collision>
+  </link>
+
+  <gazebo reference="box">
+	<static>true</static>>
+  </gazebo>
+  <!-- 7-DOF Wam -->
+
+  <!-- right wam -->
+  <!-- <xacro:wam_right prefix="right_wam" parent_link="right_wam_rack" xyz="0.0 0.0 0" rpy="-1.57075 0 0" /> -->
+  <!-- <xacro:wam_wrist_right prefix="right_wam"/> -->
+  <!-- <xacro:bhand prefix="right_wam/bhand" parent_link="right_wam/wrist_palm_link" xyz="0 0 0.06" rpy="0 0 0"/> -->
+
+  <!-- left wam -->
+  <!-- <xacro:wam_left prefix="left_wam" parent_link="box" xyz="0.0 0.0 0" rpy="-1.57075 ${-PI} 0" /> -->
+  <xacro:wam_left prefix="left_wam" parent_link="box" xyz="0.0 0.0 1" rpy="0 0 0" /> 
+  <xacro:wam_wrist_left prefix="left_wam"/> 
+  <!-- <xacro:bhand prefix="left_wam/bhand" parent_link="left_wam/wrist_palm_link" xyz="0 0 0.06" rpy="0 0 0"/> -->
+
+   <!-- gazebo stuff -->
+  <xacro:wam7_bhand_gazebo prefix="left_wam" name="barrett_hw"/> 
+  <xacro:wam7_bhand_transmission prefix="left_wam" name="barrett_hw"/> 
+</robot>

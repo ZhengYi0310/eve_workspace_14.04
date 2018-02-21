@@ -4,14 +4,13 @@
 	
     <!-- Launchfile Arguments (optional)-->
     <arg name="robot_name" default="wam"/>
-    <param name="root_link" value="$(arg robot_name)/base_link"/>
-    <param name="tip_link" value="$(arg robot_name)/wrist_palm_link"/>
-    <param name="tip_joint" value="$(arg robot_name)/palm_yaw_joint"/>
+    <param name="root_link" value="$(arg robot_name)/FixedLink"/>
+    <param name="tip_link" value="$(arg robot_name)/LowerWristYawLink"/>
 
   <!-- Component Configuration -->
     
 	<param name="robot_description_yi" command="$(find xacro)/xacro.py --inorder '$(find
-barrett_model)/robots/wam7_bhand_test.urdf.xacro'" />
+barrett_model)/robots/wam7.urdf.xacro'" />
 	<param name="use_gui" value="$(arg gui)"/>
 	
 </launch>

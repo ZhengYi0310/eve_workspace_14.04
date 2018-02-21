@@ -1,0 +1,17 @@
+<launch>
+	<arg name="model" />
+	<arg name="gui" default="True" />
+	
+    <!-- Launchfile Arguments (optional)-->
+    <arg name="robot_name" default="lwr"/>
+    <param name="root_link" value="$(arg robot_name)_base_link"/>
+    <param name="tip_link" value="$(arg robot_name)_7_link"/>
+    <param name="tip_joint" value="$(arg robot_name)_a1_joint"/>
+
+  <!-- Component Configuration -->
+    
+	<param name="robot_description_yi" command="$(find xacro)/xacro.py --inorder '$(find
+lwr_description)/model/single_lwr_robot.urdf.xacro'" />
+	<param name="use_gui" value="$(arg gui)"/>
+	
+</launch>

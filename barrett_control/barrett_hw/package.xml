@@ -16,6 +16,7 @@
   <build_depend>barrett</build_depend> 
   <build_depend>hardware_interface</build_depend>
   <build_depend>controller_interface</build_depend>
+  <build_depend>transmission_interface</build_depend>
   <build_depend>barrett_model</build_depend> 
   <build_depend>kdl_urdf_tools</build_depend>
   <build_depend>kdl_parser</build_depend>
@@ -37,6 +38,7 @@
   <run_depend>barrett</run_depend> 
   <run_depend>hardware_interface</run_depend>
   <run_depend>controller_interface</run_depend>
+  <run_depend>transmission_interface</run_depend>
   <run_depend>barrett_model</run_depend> 
   <run_depend>kdl_urdf_tools</run_depend> 
   <run_depend>kdl_parser</run_depend> 

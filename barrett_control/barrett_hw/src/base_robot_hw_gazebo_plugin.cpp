@@ -73,7 +73,7 @@ namespace barrett_hw
                 }
                 else
                 {
-                    robot_description_ = "robot_description"; // default
+                    robot_description_ = "barrett_hw/robot_description_yi"; // default
                 }
 
                 // Get the Gazebo simulation period
@@ -89,7 +89,7 @@ namespace barrett_hw
                 robot_hw_sim_->setParentModel(parent_model_);
                 if(!robot_hw_sim_->init())
                 {
-                    ROS_FATAL_NAMED("lwr_hw","Could not initialize robot simulation interface");
+                    ROS_FATAL_NAMED("barrett_hw","Could not initialize robot simulation interface");
                     return;
                 }
 
@@ -159,7 +159,7 @@ namespace barrett_hw
                     }
                     else
                     {
-                        ROS_INFO_ONCE_NAMED("LWRHWsim", "LWRHWsim plugin is waiting for model" 
+                        ROS_INFO_ONCE_NAMED("BaseRobotHWsimPlugin", "BaseRobotHWsimPlugin plugin is waiting for model" 
                                             "URDF in parameter [%s] on the ROS param server.", robot_description_.c_str());
 
                         model_nh_.getParam(param_name, urdf_string);

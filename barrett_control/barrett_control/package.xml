@@ -14,6 +14,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <run_depend>barrett_model</run_depend>
+  <run_depend>lwr_description</run_depend>
   <run_depend>barrett_control_msgs</run_depend>
   <run_depend>terse_roscpp</run_depend>
   <run_depend>kdl_urdf_tools</run_depend>

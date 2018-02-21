@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:property name="Interface10" value="PositionJointInterface"/>
+	<xacro:property name="Interface30" value="EffortJointInterface"/>
+
+	<xacro:macro name="wam7_bhand_transmission" params="prefix">
+
+		<transmission name="${prefix}/base_yaw_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="${prefix}/base_yaw_joint">
+				<hardwareInterface>${Interface10}</hardwareInterface>
+				<hardwareInterface>${Interface30}</hardwareInterface>
+			</joint>
+			<actuator name="${prefix}/base_yaw_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+
+		<transmission name="${prefix}/shoulder_pitch_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="${prefix}/shoulder_pitch_joint">
+				<hardwareInterface>${Interface10}</hardwareInterface>
+				<hardwareInterface>${Interface30}</hardwareInterface>
+			</joint>
+			<actuator name="${prefix}/shoulder_pitch_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+
+		<transmission name="${prefix}/shoulder_yaw_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="${prefix}/shoulder_yaw_joint">
+				<hardwareInterface>${Interface10}</hardwareInterface>
+				<hardwareInterface>${Interface30}</hardwareInterface>
+			</joint>
+			<actuator name="${prefix}/shoulder_yaw_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+
+		<transmission name="${prefix}/elbow_pitch_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="${prefix}/elbow_pitch_joint">
+				<hardwareInterface>${Interface10}</hardwareInterface>
+				<hardwareInterface>${Interface30}</hardwareInterface>
+			</joint>
+			<actuator name="${prefix}/elbow_pitch_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+
+		<transmission name="${prefix}/wrist_yaw_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="${prefix}/wrist_yaw_joint">
+				<hardwareInterface>${Interface10}</hardwareInterface>
+				<hardwareInterface>${Interface30}</hardwareInterface>
+			</joint>
+			<actuator name="${prefix}/wrist_yaw_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+
+		<transmission name="${prefix}/wrist_pitch_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="${prefix}/wrist_pitch_joint">
+				<hardwareInterface>${Interface10}</hardwareInterface>
+				<hardwareInterface>${Interface30}</hardwareInterface>
+			</joint>
+			<actuator name="${prefix}/wrist_pitch_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+
+		<transmission name="${prefix}/palm_yaw_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="${prefix}/palm_yaw_joint">
+				<hardwareInterface>${Interface10}</hardwareInterface>
+				<hardwareInterface>${Interface30}</hardwareInterface>
+			</joint>
+			<actuator name="${prefix}/palm_yaw_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+
+	</xacro:macro>
+
+</robot>
+

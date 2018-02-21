@@ -1,0 +1,158 @@
+digraph G {
+node [shape=box];
+"rack1" [label="rack1"];
+"rack2" [label="rack2"];
+"rack3" [label="rack3"];
+"rack4" [label="rack4"];
+"rack5" [label="rack5"];
+"rack6" [label="rack6"];
+"left_wam_rack" [label="left_wam_rack"];
+"left_wam/base_link" [label="left_wam/base_link"];
+"left_wam/shoulder_yaw_link" [label="left_wam/shoulder_yaw_link"];
+"left_wam/shoulder_pitch_link" [label="left_wam/shoulder_pitch_link"];
+"left_wam/upper_arm_link" [label="left_wam/upper_arm_link"];
+"left_wam/forearm_link" [label="left_wam/forearm_link"];
+"left_wam/wrist_yaw_link" [label="left_wam/wrist_yaw_link"];
+"left_wam/wrist_pitch_link" [label="left_wam/wrist_pitch_link"];
+"left_wam/wrist_palm_link" [label="left_wam/wrist_palm_link"];
+"left_wam/bhand/bhand_palm_link" [label="left_wam/bhand/bhand_palm_link"];
+"left_wam/bhand/bhand_grasp_link" [label="left_wam/bhand/bhand_grasp_link"];
+"left_wam/bhand/bhand_palm_surface_link" [label="left_wam/bhand/bhand_palm_surface_link"];
+"left_wam/bhand/finger_1/prox_link" [label="left_wam/bhand/finger_1/prox_link"];
+"left_wam/bhand/finger_1/med_link" [label="left_wam/bhand/finger_1/med_link"];
+"left_wam/bhand/finger_1/dist_link" [label="left_wam/bhand/finger_1/dist_link"];
+"left_wam/bhand/finger_1/tip_link" [label="left_wam/bhand/finger_1/tip_link"];
+"left_wam/bhand/finger_2/prox_link" [label="left_wam/bhand/finger_2/prox_link"];
+"left_wam/bhand/finger_2/med_link" [label="left_wam/bhand/finger_2/med_link"];
+"left_wam/bhand/finger_2/dist_link" [label="left_wam/bhand/finger_2/dist_link"];
+"left_wam/bhand/finger_2/tip_link" [label="left_wam/bhand/finger_2/tip_link"];
+"left_wam/bhand/finger_3/med_link" [label="left_wam/bhand/finger_3/med_link"];
+"left_wam/bhand/finger_3/dist_link" [label="left_wam/bhand/finger_3/dist_link"];
+"left_wam/bhand/finger_3/tip_link" [label="left_wam/bhand/finger_3/tip_link"];
+"right_wam_rack" [label="right_wam_rack"];
+"right_wam/base_link" [label="right_wam/base_link"];
+"right_wam/shoulder_yaw_link" [label="right_wam/shoulder_yaw_link"];
+"right_wam/shoulder_pitch_link" [label="right_wam/shoulder_pitch_link"];
+"right_wam/upper_arm_link" [label="right_wam/upper_arm_link"];
+"right_wam/forearm_link" [label="right_wam/forearm_link"];
+"right_wam/wrist_yaw_link" [label="right_wam/wrist_yaw_link"];
+"right_wam/wrist_pitch_link" [label="right_wam/wrist_pitch_link"];
+"right_wam/wrist_palm_link" [label="right_wam/wrist_palm_link"];
+"right_wam/bhand/bhand_palm_link" [label="right_wam/bhand/bhand_palm_link"];
+"right_wam/bhand/bhand_grasp_link" [label="right_wam/bhand/bhand_grasp_link"];
+"right_wam/bhand/bhand_palm_surface_link" [label="right_wam/bhand/bhand_palm_surface_link"];
+"right_wam/bhand/finger_1/prox_link" [label="right_wam/bhand/finger_1/prox_link"];
+"right_wam/bhand/finger_1/med_link" [label="right_wam/bhand/finger_1/med_link"];
+"right_wam/bhand/finger_1/dist_link" [label="right_wam/bhand/finger_1/dist_link"];
+"right_wam/bhand/finger_1/tip_link" [label="right_wam/bhand/finger_1/tip_link"];
+"right_wam/bhand/finger_2/prox_link" [label="right_wam/bhand/finger_2/prox_link"];
+"right_wam/bhand/finger_2/med_link" [label="right_wam/bhand/finger_2/med_link"];
+"right_wam/bhand/finger_2/dist_link" [label="right_wam/bhand/finger_2/dist_link"];
+"right_wam/bhand/finger_2/tip_link" [label="right_wam/bhand/finger_2/tip_link"];
+"right_wam/bhand/finger_3/med_link" [label="right_wam/bhand/finger_3/med_link"];
+"right_wam/bhand/finger_3/dist_link" [label="right_wam/bhand/finger_3/dist_link"];
+"right_wam/bhand/finger_3/tip_link" [label="right_wam/bhand/finger_3/tip_link"];
+node [shape=ellipse, color=blue, fontcolor=blue];
+"rack1" -> "rack1_to_rack2" [label="xyz: 0.877888 0 -0.0492125 \nrpy: 0 -0 0"]
+"rack1_to_rack2" -> "rack2"
+"rack1" -> "rack1_to_rack3" [label="xyz: -0.877888 0 -0.0492125 \nrpy: 0 -0 0"]
+"rack1_to_rack3" -> "rack3"
+"rack1" -> "rack1_to_rack4" [label="xyz: 0 0.2794 -0.0492125 \nrpy: 0 -0 0"]
+"rack1_to_rack4" -> "rack4"
+"rack1" -> "rack1_to_rack5" [label="xyz: 0 0 0.0492125 \nrpy: 0 -0 0"]
+"rack1_to_rack5" -> "rack5"
+"rack5" -> "rack5_to_rack6" [label="xyz: 0 0 1.22396 \nrpy: 0 -0 0"]
+"rack5_to_rack6" -> "rack6"
+"rack6" -> "rack6_to_leftwam" [label="xyz: 0.293687 0.15875 0 \nrpy: 0 -0 0"]
+"rack6_to_leftwam" -> "left_wam_rack"
+"left_wam_rack" -> "left_wam/wam_fixed_joint" [label="xyz: 0 0 0 \nrpy: 1.57084 9.26536e-05 -3.14159"]
+"left_wam/wam_fixed_joint" -> "left_wam/base_link"
+"left_wam/base_link" -> "left_wam/base_yaw_joint" [label="xyz: 0 0 0.346 \nrpy: 0 -0 0"]
+"left_wam/base_yaw_joint" -> "left_wam/shoulder_yaw_link"
+"left_wam/shoulder_yaw_link" -> "left_wam/shoulder_pitch_joint" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"left_wam/shoulder_pitch_joint" -> "left_wam/shoulder_pitch_link"
+"left_wam/shoulder_pitch_link" -> "left_wam/shoulder_yaw_joint" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"left_wam/shoulder_yaw_joint" -> "left_wam/upper_arm_link"
+"left_wam/upper_arm_link" -> "left_wam/elbow_pitch_joint" [label="xyz: 0.045 0 0.55 \nrpy: -1.5708 0 0"]
+"left_wam/elbow_pitch_joint" -> "left_wam/forearm_link"
+"left_wam/forearm_link" -> "left_wam/wrist_yaw_joint" [label="xyz: -0.045 -0.3 0 \nrpy: 1.5708 -0 0"]
+"left_wam/wrist_yaw_joint" -> "left_wam/wrist_yaw_link"
+"left_wam/wrist_yaw_link" -> "left_wam/wrist_pitch_joint" [label="xyz: 0 0 0 \nrpy: -1.5708 0 0"]
+"left_wam/wrist_pitch_joint" -> "left_wam/wrist_pitch_link"
+"left_wam/wrist_pitch_link" -> "left_wam/palm_yaw_joint" [label="xyz: 0 0 0 \nrpy: 1.57081 1.5708 1.13367e-05"]
+"left_wam/palm_yaw_joint" -> "left_wam/wrist_palm_link"
+"left_wam/wrist_palm_link" -> "left_wam/bhand/bhand_base_joint" [label="xyz: 0 0 0.06 \nrpy: 0 -0 0"]
+"left_wam/bhand/bhand_base_joint" -> "left_wam/bhand/bhand_palm_link"
+"left_wam/bhand/bhand_palm_link" -> "left_wam/bhand/bhand_grasp_joint" [label="xyz: 0 0 0.12 \nrpy: 0 -0 0"]
+"left_wam/bhand/bhand_grasp_joint" -> "left_wam/bhand/bhand_grasp_link"
+"left_wam/bhand/bhand_palm_link" -> "left_wam/bhand/bhand_palm_surface_joint" [label="xyz: 0 0 0.08 \nrpy: 0 -0 0"]
+"left_wam/bhand/bhand_palm_surface_joint" -> "left_wam/bhand/bhand_palm_surface_link"
+"left_wam/bhand/bhand_palm_link" -> "left_wam/bhand/finger_1/prox_joint" [label="xyz: -0.025 0 0.0415 \nrpy: 0 0 -1.5708"]
+"left_wam/bhand/finger_1/prox_joint" -> "left_wam/bhand/finger_1/prox_link"
+"left_wam/bhand/finger_1/prox_link" -> "left_wam/bhand/finger_1/med_joint" [label="xyz: 0.05 0 0.0339 \nrpy: 1.5708 -0 0"]
+"left_wam/bhand/finger_1/med_joint" -> "left_wam/bhand/finger_1/med_link"
+"left_wam/bhand/finger_1/med_link" -> "left_wam/bhand/finger_1/dist_joint" [label="xyz: 0.06994 0.003 0 \nrpy: 0 -0 0.785398"]
+"left_wam/bhand/finger_1/dist_joint" -> "left_wam/bhand/finger_1/dist_link"
+"left_wam/bhand/finger_1/dist_link" -> "left_wam/bhand/finger_1/tip_joint" [label="xyz: 0.05 0 0 \nrpy: 0 -0 0"]
+"left_wam/bhand/finger_1/tip_joint" -> "left_wam/bhand/finger_1/tip_link"
+"left_wam/bhand/bhand_palm_link" -> "left_wam/bhand/finger_2/prox_joint" [label="xyz: 0.025 0 0.0415 \nrpy: 0 0 -1.5708"]
+"left_wam/bhand/finger_2/prox_joint" -> "left_wam/bhand/finger_2/prox_link"
+"left_wam/bhand/finger_2/prox_link" -> "left_wam/bhand/finger_2/med_joint" [label="xyz: 0.05 0 0.0339 \nrpy: 1.5708 -0 0"]
+"left_wam/bhand/finger_2/med_joint" -> "left_wam/bhand/finger_2/med_link"
+"left_wam/bhand/finger_2/med_link" -> "left_wam/bhand/finger_2/dist_joint" [label="xyz: 0.06994 0.003 0 \nrpy: 0 -0 0.785398"]
+"left_wam/bhand/finger_2/dist_joint" -> "left_wam/bhand/finger_2/dist_link"
+"left_wam/bhand/finger_2/dist_link" -> "left_wam/bhand/finger_2/tip_joint" [label="xyz: 0.05 0 0 \nrpy: 0 -0 0"]
+"left_wam/bhand/finger_2/tip_joint" -> "left_wam/bhand/finger_2/tip_link"
+"left_wam/bhand/bhand_palm_link" -> "left_wam/bhand/finger_3/med_joint" [label="xyz: 0 0.05 0.0754 \nrpy: 1.5708 -5.55112e-17 1.5708"]
+"left_wam/bhand/finger_3/med_joint" -> "left_wam/bhand/finger_3/med_link"
+"left_wam/bhand/finger_3/med_link" -> "left_wam/bhand/finger_3/dist_joint" [label="xyz: 0.06994 0.003 0 \nrpy: 0 -0 0.785398"]
+"left_wam/bhand/finger_3/dist_joint" -> "left_wam/bhand/finger_3/dist_link"
+"left_wam/bhand/finger_3/dist_link" -> "left_wam/bhand/finger_3/tip_joint" [label="xyz: 0.05 0 0 \nrpy: 0 -0 0"]
+"left_wam/bhand/finger_3/tip_joint" -> "left_wam/bhand/finger_3/tip_link"
+"rack6" -> "rack6_to_righttwam" [label="xyz: -0.293687 0.15875 0 \nrpy: 0 -0 0"]
+"rack6_to_righttwam" -> "right_wam_rack"
+"right_wam_rack" -> "right_wam/wam_fixed_joint" [label="xyz: 0 0 0 \nrpy: -1.57075 0 0"]
+"right_wam/wam_fixed_joint" -> "right_wam/base_link"
+"right_wam/base_link" -> "right_wam/base_yaw_joint" [label="xyz: 0 0 0.346 \nrpy: 0 -0 0"]
+"right_wam/base_yaw_joint" -> "right_wam/shoulder_yaw_link"
+"right_wam/shoulder_yaw_link" -> "right_wam/shoulder_pitch_joint" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"right_wam/shoulder_pitch_joint" -> "right_wam/shoulder_pitch_link"
+"right_wam/shoulder_pitch_link" -> "right_wam/shoulder_yaw_joint" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"right_wam/shoulder_yaw_joint" -> "right_wam/upper_arm_link"
+"right_wam/upper_arm_link" -> "right_wam/elbow_pitch_joint" [label="xyz: 0.045 0 0.55 \nrpy: -1.5708 0 0"]
+"right_wam/elbow_pitch_joint" -> "right_wam/forearm_link"
+"right_wam/forearm_link" -> "right_wam/wrist_yaw_joint" [label="xyz: -0.045 -0.3 0 \nrpy: 1.5708 -0 0"]
+"right_wam/wrist_yaw_joint" -> "right_wam/wrist_yaw_link"
+"right_wam/wrist_yaw_link" -> "right_wam/wrist_pitch_joint" [label="xyz: 0 0 0 \nrpy: -1.5708 0 0"]
+"right_wam/wrist_pitch_joint" -> "right_wam/wrist_pitch_link"
+"right_wam/wrist_pitch_link" -> "right_wam/palm_yaw_joint" [label="xyz: 0 0 0 \nrpy: 1.57081 -1.5708 -1.13367e-05"]
+"right_wam/palm_yaw_joint" -> "right_wam/wrist_palm_link"
+"right_wam/wrist_palm_link" -> "right_wam/bhand/bhand_base_joint" [label="xyz: 0 0 0.06 \nrpy: 0 -0 0"]
+"right_wam/bhand/bhand_base_joint" -> "right_wam/bhand/bhand_palm_link"
+"right_wam/bhand/bhand_palm_link" -> "right_wam/bhand/bhand_grasp_joint" [label="xyz: 0 0 0.12 \nrpy: 0 -0 0"]
+"right_wam/bhand/bhand_grasp_joint" -> "right_wam/bhand/bhand_grasp_link"
+"right_wam/bhand/bhand_palm_link" -> "right_wam/bhand/bhand_palm_surface_joint" [label="xyz: 0 0 0.08 \nrpy: 0 -0 0"]
+"right_wam/bhand/bhand_palm_surface_joint" -> "right_wam/bhand/bhand_palm_surface_link"
+"right_wam/bhand/bhand_palm_link" -> "right_wam/bhand/finger_1/prox_joint" [label="xyz: -0.025 0 0.0415 \nrpy: 0 0 -1.5708"]
+"right_wam/bhand/finger_1/prox_joint" -> "right_wam/bhand/finger_1/prox_link"
+"right_wam/bhand/finger_1/prox_link" -> "right_wam/bhand/finger_1/med_joint" [label="xyz: 0.05 0 0.0339 \nrpy: 1.5708 -0 0"]
+"right_wam/bhand/finger_1/med_joint" -> "right_wam/bhand/finger_1/med_link"
+"right_wam/bhand/finger_1/med_link" -> "right_wam/bhand/finger_1/dist_joint" [label="xyz: 0.06994 0.003 0 \nrpy: 0 -0 0.785398"]
+"right_wam/bhand/finger_1/dist_joint" -> "right_wam/bhand/finger_1/dist_link"
+"right_wam/bhand/finger_1/dist_link" -> "right_wam/bhand/finger_1/tip_joint" [label="xyz: 0.05 0 0 \nrpy: 0 -0 0"]
+"right_wam/bhand/finger_1/tip_joint" -> "right_wam/bhand/finger_1/tip_link"
+"right_wam/bhand/bhand_palm_link" -> "right_wam/bhand/finger_2/prox_joint" [label="xyz: 0.025 0 0.0415 \nrpy: 0 0 -1.5708"]
+"right_wam/bhand/finger_2/prox_joint" -> "right_wam/bhand/finger_2/prox_link"
+"right_wam/bhand/finger_2/prox_link" -> "right_wam/bhand/finger_2/med_joint" [label="xyz: 0.05 0 0.0339 \nrpy: 1.5708 -0 0"]
+"right_wam/bhand/finger_2/med_joint" -> "right_wam/bhand/finger_2/med_link"
+"right_wam/bhand/finger_2/med_link" -> "right_wam/bhand/finger_2/dist_joint" [label="xyz: 0.06994 0.003 0 \nrpy: 0 -0 0.785398"]
+"right_wam/bhand/finger_2/dist_joint" -> "right_wam/bhand/finger_2/dist_link"
+"right_wam/bhand/finger_2/dist_link" -> "right_wam/bhand/finger_2/tip_joint" [label="xyz: 0.05 0 0 \nrpy: 0 -0 0"]
+"right_wam/bhand/finger_2/tip_joint" -> "right_wam/bhand/finger_2/tip_link"
+"right_wam/bhand/bhand_palm_link" -> "right_wam/bhand/finger_3/med_joint" [label="xyz: 0 0.05 0.0754 \nrpy: 1.5708 -5.55112e-17 1.5708"]
+"right_wam/bhand/finger_3/med_joint" -> "right_wam/bhand/finger_3/med_link"
+"right_wam/bhand/finger_3/med_link" -> "right_wam/bhand/finger_3/dist_joint" [label="xyz: 0.06994 0.003 0 \nrpy: 0 -0 0.785398"]
+"right_wam/bhand/finger_3/dist_joint" -> "right_wam/bhand/finger_3/dist_link"
+"right_wam/bhand/finger_3/dist_link" -> "right_wam/bhand/finger_3/tip_joint" [label="xyz: 0.05 0 0 \nrpy: 0 -0 0"]
+"right_wam/bhand/finger_3/tip_joint" -> "right_wam/bhand/finger_3/tip_link"
+}

@@ -82,29 +82,21 @@ namespace barrett_hw
         // RESET VARIABLES
         reset();
 
-        std::cout << "Parsing transmissions from the URDF..." << std::endl;
-
-        // GET TRANSMISSIONS THAT BELONG TO THIS LWR 4+ ARM
-        if (!parseTransmissionsFromURDF(urdf_string_))
-        {
-            std::cout << "base_robot_hw: " << "Error parsing URDF in lwr_hw.\n" << std::endl;
-            return;
-        }
-
-        std::cout << "Registering interfaces..." << std::endl;
-
         const urdf::Model *const urdf_model_ptr = urdf_model_.initString(urdf_string_) ? &urdf_model_ : NULL;
-        registerInterfaces(urdf_model_ptr, transmissions_);
 
         std::cout << "Initializing KDL variables..." << std::endl;
 
         // INIT KDL STUFF
         initKDLdescription(urdf_model_ptr);
-
+        
+        std::cout << "Assign joint names..." << std::endl;
         // assign joint names based on the urdf file.
-        std::string tip_joint_name = robot_chain_.getSegment(robot_chain_.getNrOfJoints()).getJoint().getName(); 
-        boost::shared_ptr<const urdf::Joint> joint = urdf_model_.getJoint(tip_joint_name);
-        for (uint32_t i = n_joints_ - 1; i >= 0; i--)
+        const KDL::Segment& tip_seg = robot_chain_.getSegment(robot_chain_.getNrOfSegments() - 1);
+        const KDL::Joint& tip_joint = tip_seg.getJoint();
+        const std::string& tip_joint_name_const = tip_joint.getName();
+        std::cout << tip_joint_name_const;
+        boost::shared_ptr<const urdf::Joint> joint = urdf_model_.getJoint(tip_joint_name_const);
+        for (int i = n_joints_ - 1; i >= 0; i--)
         {
             while (std::find(joint_names_.begin(), joint_names_.end(), joint->name) != joint_names_.end() || joint->type != urdf::Joint::REVOLUTE)
             {
@@ -113,7 +105,7 @@ namespace barrett_hw
                 // Make sure we didn't run out of links 
                 if (!joint.get())
                 {
-                    ROS_ERROR_STREAM("Run out of joints while parsing URDF starting at joint: " << tip_joint_name);
+                    ROS_ERROR_STREAM("Run out of joints while parsing URDF starting at joint: " << tip_joint_name_const);
                     throw std::runtime_error("Run out of joints.");
                 }
             }
@@ -124,7 +116,17 @@ namespace barrett_hw
             joint_names_[i] = joint->name;
         }
 
-
+        std::cout << "Parsing transmissions from the URDF..." << std::endl;        
+        // GET TRANSMISSIONS THAT BELONG TO THIS LWR 4+ ARM
+        if (!parseTransmissionsFromURDF(urdf_string_))
+        {
+            std::cout << "base_robot_hw: " << "Error parsing URDF in barrett_hw.\n" << std::endl;
+            return;
+        }
+        std::cout << "Registering interfaces..." << std::endl;        
+        registerInterfaces(urdf_model_ptr, transmissions_);
+        
+        
         std::cout << "Succesfully created an abstract ARM with interfaces to ROS control" << std::endl;
     }
     
@@ -219,8 +221,11 @@ namespace barrett_hw
                 continue;
             }
 
-            const std::string& hardware_interface = joint_interfaces.front();
-
+            std::string hardware_interface = joint_interfaces[0];
+            for (uint32_t i = 1; i < joint_interfaces.size(); i++)
+            {
+                hardware_interface = hardware_interface + ", " + joint_interfaces[i];
+            }
             // Debug
             std::cout << "\x1B[37m" << "base_robot_hw: " << "Loading joint '" << joint_names_[j]
                       << "' of type '" << hardware_interface << "'" << "\x1B[0m" << std::endl;
@@ -448,15 +453,15 @@ namespace barrett_hw
         // Now iterate and save only transmission from this robot
         for (int j = 0; j < n_joints_; ++j)
         {
-            // std::cout << "Check joint " << joint_names_[j] << std::endl;
+            std::cout << "Check joint " << joint_names_[j] << std::endl;
             std::vector<transmission_interface::TransmissionInfo>::iterator it = transmissions.begin();
             for(; it != transmissions.end(); ++it)
             {
-                // std::cout << "With transmission " << it->name_ << std::endl;
+                std::cout << "With transmission " << it->name_ << std::endl;
                 if (joint_names_[j].compare(it->joints_[0].name_) == 0)
                 {
                     transmissions_.push_back( *it );
-                    // std::cout << "Found a match for transmission " << it->name_ << std::endl;
+                    std::cout << "Found a match for transmission " << it->name_ << std::endl;
                 }
             }
         }
@@ -487,12 +492,12 @@ namespace barrett_hw
 
         // Get the info from parameters
         std::string root_name;
-        ros::param::get(std::string("/") + robot_namespace_ + std::string("/root"), root_name);
+        ros::param::get(std::string("/") + robot_namespace_ + std::string("/root_link"), root_name);
         if(root_name.empty())
-            root_name = kdl_tree.getRootSegment()->first; // default
+        root_name = robot_namespace_ + std::string("_base_link"); // default
     
         std::string tip_name;
-            ros::param::get(std::string("/") + robot_namespace_ + std::string("/tip"), tip_name);
+            ros::param::get(std::string("/") + robot_namespace_ + std::string("/tip_link"), tip_name);
         if( tip_name.empty() )
             tip_name = robot_namespace_ + std::string("_7_link"); ; // default
 

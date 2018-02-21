@@ -25,9 +25,11 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
-  <xacro:include filename="$(find barrett_model)/models/hand.urdf.xacro"/>
+  <!-- <xacro:include filename="$(find barrett_model)/models/hand.urdf.xacro"/> -->
   <xacro:include filename="$(find barrett_model)/models/common.urdf.xacro"/>
   <xacro:property name="b" value="0.5"/>
+  <xacro:include filename="$(find barrett_model)/robots/wam7_bhand.transmission.xacro"/> 
+  <xacro:include filename="$(find barrett_model)/robots/wam7_bhand.gazebo.xacro"/> 
 
   <!-- Upper arm macros -->
   <xacro:macro name="wam_base" params="prefix parent_link xyz rpy">
@@ -68,7 +70,7 @@
       <child link="${prefix}/shoulder_yaw_link"/>
       <origin xyz="0 0 0.346" rpy="${rpy}"/>
       <axis xyz="0 0 1"/>
-      <limit effort="60" lower="-2.6" upper="2.6" velocity="2.0"/>
+      <limit effort="25" lower="-2.6" upper="2.6" velocity="2.0"/>
       <dynamics damping="${1.8*b}" friction="0"/>
     </joint>
     <gazebo reference="${prefix}/base_yaw_joint">
@@ -104,9 +106,9 @@
     <joint name="${prefix}/shoulder_pitch_joint" type="revolute">
       <parent link="${prefix}/shoulder_yaw_link"/>
       <child link="${prefix}/shoulder_pitch_link"/>
-      <origin xyz="0 0 0" rpy="${rpy}"/>
-      <axis xyz="0 1 0"/>
-      <limit effort="60" lower="-2.0" upper="2.0" velocity="2.0"/>
+      <origin xyz="0 0 0" rpy="${-PI/2} 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="20" lower="-2.0" upper="2.0" velocity="2.0"/>
       <dynamics damping="${0.5*b}" friction="0"/>
     </joint>
     <gazebo reference="${prefix}/shoulder_pitch_joint">
@@ -142,9 +144,9 @@
     <joint name="${prefix}/shoulder_yaw_joint" type="revolute">
       <parent link="${prefix}/shoulder_pitch_link"/>
       <child link="${prefix}/upper_arm_link"/>
-      <origin xyz="0 0 0" rpy="${rpy}"/>
+      <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
       <axis xyz="0 0 1"/>
-      <limit effort="45" lower="-2.8" upper="2.8" velocity="2.0"/>
+      <limit effort="15" lower="-2.8" upper="2.8" velocity="2.0"/>
       <dynamics damping="${1.5*b}" friction="0"/>
     </joint>
     <gazebo reference="${prefix}/shoulder_yaw_joint">
@@ -183,7 +185,7 @@
       <child link="${prefix}/forearm_link"/>
       <origin xyz="0.045 0 0.55" rpy="${-PI/2} 0 0"/>
       <axis xyz="0 0 1"/>
-      <limit effort="30" lower="-0.9" upper="${PI}" velocity="2.00"/>
+      <limit effort="15" lower="-0.9" upper="${PI}" velocity="2.00"/>
       <dynamics damping="${0.8*b}" friction="0"/>
     </joint>
     <gazebo reference="${prefix}/elbow_pitch_joint">
@@ -236,7 +238,7 @@
       <child link="${prefix}/wrist_yaw_link"/>
       <origin xyz="-0.045 -0.3 0" rpy="${rpy}"/>
       <axis xyz="0 0 1"/>
-      <limit effort="10" lower="-4.76" upper="1.24" velocity="2.0"/>
+      <limit effort="5" lower="-4.76" upper="1.24" velocity="2.0"/>
       <dynamics damping="${0.5*b}" friction="0"/>
     </joint>
     <gazebo reference="${prefix}/wrist_yaw_joint">
@@ -274,7 +276,7 @@
       <child link="${prefix}/wrist_pitch_link"/>
       <origin xyz="0 0 0" rpy="${-PI/2} 0 0"/>
       <axis xyz="0 0 1"/>
-      <limit effort="10" lower="-1.6" upper="1.6" velocity="2.00"/>
+      <limit effort="5" lower="-1.6" upper="1.6" velocity="2.00"/>
       <dynamics damping="${0.1*b}" friction="0"/>
     </joint>
     <gazebo reference="${prefix}/wrist_pitch_joint">
@@ -310,9 +312,9 @@
     <joint name="${prefix}/palm_yaw_joint" type="revolute">
       <parent link="${prefix}/wrist_pitch_link"/>
       <child link="${prefix}/wrist_palm_link"/>
-      <origin xyz="0 0 0" rpy="${rpy}"/>
+      <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
       <axis xyz="0 0 1"/>
-      <limit effort="10" lower="-3.0" upper="3.0" velocity="2.00"/><!-- 2.95 is a limit taken in from 3 due to saftey and differences between arms. -->
+      <limit effort="5" lower="-3.0" upper="3.0" velocity="2.00"/><!-- 2.95 is a limit taken in from 3 due to saftey and differences between arms. -->
       <dynamics damping="${0.1*b}" friction="0"/>
     </joint>
     <gazebo reference="${prefix}/palm_yaw_joint">
@@ -343,6 +345,9 @@
       </collision>
     </link>
   </xacro:macro>
+
+
+ 
 
   <xacro:macro name="wam_wrist_palm_stump" params="prefix">
     <joint name="${prefix}/wrist_palm_stump_joint" type="fixed">
