@@ -1,0 +1,9 @@
+Header header
+float64 translation_x_vel
+float64 translation_y_vel
+float64 translation_z_vel
+float64 rotation_x_vel
+float64 rotation_y_vel
+float64 rotation_z_vel
+
+

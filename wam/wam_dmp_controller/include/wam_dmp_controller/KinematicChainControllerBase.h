@@ -157,7 +157,7 @@ namespace wam_dmp_controller
     	for (int i = 0; i < kdl_chain_.getNrOfJoints() && link_; i++)
     	{
         	joint_ = urdf_model_.getJoint(link_->parent_joint->name);  
-        	ROS_INFO("Getting limits for joint: %s", joint_->name.c_str());
+        	ROS_DEBUG("Getting limits for joint: %s", joint_->name.c_str());
         	index = kdl_chain_.getNrOfJoints() - i - 1;
 
         	joint_limits_.min(index) = joint_->limits->lower;
@@ -174,10 +174,10 @@ namespace wam_dmp_controller
 	    ROS_INFO("Controller %s succssfully loaded", controller_type.c_str());
 
     	getHandles(hw);        
-    	ROS_INFO("Number of joints in handle = %lu", joint_handles_.size() );
+    	ROS_DEBUG("Number of joints in handle = %lu", joint_handles_.size() );
         for (uint32_t i = 0; i < joint_handles_.size(); i++)
         {
-            ROS_INFO("The name of for the handle %lu is: %s", i + 1, joint_handles_[i].getName().c_str());
+            ROS_DEBUG("The name of for the handle %lu is: %s", i + 1, joint_handles_[i].getName().c_str());
         }
 
         // Get joint handles for all of the joints in the chain

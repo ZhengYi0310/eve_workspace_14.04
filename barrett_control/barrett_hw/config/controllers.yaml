@@ -25,5 +25,16 @@ barrett_hw:
         left_wam/wrist_yaw_joint: 0.5
         left_wam/wrist_pitch_joint: 0.5
         left_wam/palm_yaw_joint: 1
+
+  gravity_compensation_controller:
+    type: wam_dmp_controller/GravityCompensation
+    root_link: left_wam/base_link
+    tip_link: left_wam/wrist_palm_link
+
+  arm_state_controller: 
+    type: wam_dmp_controller/ArmStateController
+    root_link: left_wam/base_link
+    tip_link: left_wam/wrist_palm_link
+    publish_rate: 100
     
      

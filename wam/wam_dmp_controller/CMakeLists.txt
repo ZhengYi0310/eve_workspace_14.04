@@ -39,6 +39,7 @@ add_message_files(DIRECTORY msg FILES
   JointControllerState.msg
   RPY.msg
   PoseRPY.msg
+  ArmState.msg
 )
 generate_messages(DEPENDENCIES
   geometry_msgs
@@ -82,6 +83,8 @@ add_library(${PROJECT_NAME}
   src/KinematicChainControllerBase.cpp
   src/joint_impedance_controller.cpp
   src/joint_space_controller.cpp
+  src/gravity_compensation.cpp
+  src/arm_state_controller.cpp
 )
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBARIES})

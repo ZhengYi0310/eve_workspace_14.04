@@ -4,4 +4,6 @@
   <class name="wam_dmp_controller/JointPositionController" type="wam_dmp_controller::JointPositionController" base_class_type="controller_interface::ControllerBase" />
   <class name="wam_dmp_controller/JointImpedanceController" type="wam_dmp_controller::JointImpedanceController" base_class_type="controller_interface::ControllerBase" />
   <class name="wam_dmp_controller/JointSpaceController" type="wam_dmp_controller::JointSpaceController" base_class_type="controller_interface::ControllerBase" />
+  <class name="wam_dmp_controller/GravityCompensation" type="wam_dmp_controller::GravityCompensation" base_class_type="controller_interface::ControllerBase" />
+  <class name="wam_dmp_controller/ArmStateController" type="wam_dmp_controller::ArmStateController" base_class_type="controller_interface::ControllerBase" />
 </library>
