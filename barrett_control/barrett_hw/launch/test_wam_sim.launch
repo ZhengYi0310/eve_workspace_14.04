@@ -24,7 +24,7 @@
 	<!-- the urdf/sdf parameter -->
 	<!-- WAM Parameters -->
   	<include ns="barrett_hw" file="$(find barrett_model)/launch/xacrodisplay.launch">
-        	<arg name="robot_name" value="left_wam" /> 
+        	<arg name="robot_name" value="left_wam" />  
         </include>
 	<param name="use_gui" value="$(arg gui)"/>
 	
@@ -45,7 +45,8 @@
 	<!-- robot simulation uses the full robot description -->
 	<group if="$(arg use_barrett_hw_sim)">
 		<!-- spawn the robot in gazebo -->
-		<node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param barrett_hw/robot_description_yi -urdf -model $(arg robot_name)"  respawn="false" output="screen" />
+		<node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param barrett_hw/robot_description_yi -urdf -model $(arg robot_name)"  respawn="false" output="screen" /> 
+                
 
 		<!-- enable/disable gui at will, the rviz listens to the simulation -->
 		<include file="$(find gazebo_ros)/launch/empty_world.launch">

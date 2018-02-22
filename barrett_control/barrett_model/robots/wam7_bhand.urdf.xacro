@@ -11,6 +11,14 @@
   <!-- Root link is in the world frame-->
   <xacro:property name="width" value="0.0889" />
   <xacro:property name="height" value="0.0492125" />
+
+  <link name="world"/>
+
+  <joint name="fixed" type="fixed">
+    <parent link="world"/>
+    <child link="rack1"/>
+  </joint>
+
   <link name="rack1">
     <visual>
       <geometry>
@@ -191,12 +199,13 @@
 
   <!-- left wam -->
   <xacro:wam_left prefix="left_wam" parent_link="left_wam_rack" xyz="0.0 0.0 0" rpy="-1.57075 ${-PI} 0" />
-  <xacro:wam_wrist_left prefix="left_wam"/>
+  <xacro:wam_wrist_left prefix="left_wam"/> 
+  <!-- <xacro:bhand prefix="left_wam/bhand" parent_link="left_wam/wrist_palm_link" xyz="0 0 0.06" rpy="0 0 0"/> -->
 
   <!-- gazebo stuff -->
-  <xacro:wam7_bhand_gazebo prefix="left_wam" name="barrett_hw"/>
-  <xacro:wam7_bhand_transmission prefix="left_wam" name="barrett_hw"/>
-  <!-- <xacro:bhand prefix="left_wam/bhand" parent_link="left_wam/wrist_palm_link" xyz="0 0 0.06" rpy="0 0 0"/> -->
+  <xacro:wam7_bhand_gazebo prefix="left_wam" name="barrett_hw"/> 
+  <xacro:wam7_bhand_transmission prefix="left_wam" name="barrett_hw"/> 
+  
 
   
 </robot>

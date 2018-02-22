@@ -65,24 +65,22 @@ namespace wam_dmp_controller
 
         // get URDF and name of root and tip from the parameter server
         std::string robot_description, root_seg_name, tip_seg_name;
-
-        std::string urdf_str;
-		ros::NodeHandle temp_nh("barrett"); //TODO be careful of the namespace here
-        if(!usc_utilities::read(temp_nh, "robot_description_yi", urdf_str));
+    
+		if (!nh_.getParam("robot_description_yi", robot_description))
         {
-            ROS_ERROR_STREAM("KinematicChainControllerBase: No robot description (URDF) found on parameter server ("<<temp_nh.getNamespace()<<"/robot_description_yi)");
+            ROS_ERROR_STREAM("KinematicChainControllerBase: No robot description (URDF) found on parameter server ("<<n.getNamespace()<<"/robot_description_yi)");
             return false;
         }
 
-        if (!nh_.getParam("root_seg_name", root_seg_name))
+        if (!nh_.getParam("root_link", root_seg_name))
         {
-            ROS_ERROR_STREAM("KinematicChainControllerBase: No root name found on parameter server ("<<n.getNamespace()<<"/root_name)");
+            ROS_ERROR_STREAM("KinematicChainControllerBase: No root name found on parameter server ("<<n.getNamespace()<<"/root_link)");
             return false;
         }
 
-        if (!nh_.getParam("tip_seg_name", tip_seg_name))
+        if (!nh_.getParam("tip_link", tip_seg_name))
         {
-            ROS_ERROR_STREAM("KinematicChainControllerBase: No tip name found on parameter server ("<<n.getNamespace()<<"/tip_name)");
+            ROS_ERROR_STREAM("KinematicChainControllerBase: No tip name found on parameter server ("<<n.getNamespace()<<"/tip_link)");
             return false;
         }
 
@@ -92,7 +90,7 @@ namespace wam_dmp_controller
 
         urdf::Model urdf_model_;
         //if (!urdf.initParamWithinNodeHandle("robot_description", n))
-        if (!urdf_model_.initString(urdf_str))
+        if (!urdf_model_.initString(robot_description))
         {
             ROS_ERROR("Failed to parse urdf file");
             n.shutdown();

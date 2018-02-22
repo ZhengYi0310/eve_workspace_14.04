@@ -494,12 +494,12 @@ namespace barrett_hw
         std::string root_name;
         ros::param::get(std::string("/") + robot_namespace_ + std::string("/root_link"), root_name);
         if(root_name.empty())
-        root_name = robot_namespace_ + std::string("_base_link"); // default
+        root_name = std::string("base_link"); // default
     
         std::string tip_name;
             ros::param::get(std::string("/") + robot_namespace_ + std::string("/tip_link"), tip_name);
         if( tip_name.empty() )
-            tip_name = robot_namespace_ + std::string("_7_link"); ; // default
+            tip_name = std::string("j7"); ; // default
 
         std::cout << "Using root: " << root_name << " and tip: " << tip_name << std::endl;
 

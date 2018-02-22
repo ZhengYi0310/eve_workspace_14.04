@@ -37,14 +37,16 @@
 
 
   <!-- forearm with actuation "wrist" -->
-  <!--
+  
   <xacro:macro name="wam_wrist_right" params="prefix">
-    <xacro:wam_forearm prefix="${prefix}"/>
+    <!-- <xacro:wam_forearm prefix="${prefix}"/> -->
+    <!--
     <xacro:wam_wrist_yaw prefix="${prefix}" rpy="${PI/2} 0 0"/>
     <xacro:wam_wrist_pitch prefix="${prefix}"/>
     <xacro:wam_palm prefix="${prefix}" rpy="${PI/2} -${PI/2} 0"/>
+    -->
   </xacro:macro>
-  -->
+  
   
   <xacro:macro name="wam_wrist_left" params="prefix">
     <xacro:wam_forearm prefix="${prefix}"/>
@@ -52,6 +54,6 @@
     <xacro:wam_wrist_pitch prefix="${prefix}"/>
     <xacro:wam_palm prefix="${prefix}" rpy="${PI/2} ${PI/2} 0"/>
   </xacro:macro>
-  
+ 
 
 </robot>

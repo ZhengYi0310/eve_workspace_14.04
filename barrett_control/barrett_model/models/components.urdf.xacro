@@ -54,11 +54,13 @@
         </material>
         <geometry>
           <mesh filename="${models_path}/sw_meshes/base_link_convex.dae"/>
+          <!-- <mesh filename="package://barrett_model/meshes/wambase.stl" /> -->
         </geometry>
       </visual>
       <collision>
         <geometry>
-          <mesh filename="${models_path}/sw_meshes/base_link_convex.dae"/>
+          <mesh filename="${models_path}/sw_meshes/base_link_convex.dae"/> 
+          <!-- <mesh filename="package://barrett_model/meshes/wambase.stl" /> -->
         </geometry>
       </collision>
     </link>
@@ -91,12 +93,14 @@
           <color rgba="0.7 0.7 0.7 1.0"/>
         </material>
         <geometry>
-          <mesh filename="${models_path}/sw_meshes/shoulder_link_convex_decomposition.dae"/>
+          <mesh filename="${models_path}/sw_meshes/shoulder_link_convex_decomposition.dae"/> 
+          <!-- <mesh filename="package://barrett_model/meshes/wam1.stl" /> -->
         </geometry>
       </visual>
       <collision>
         <geometry>
-          <mesh filename="${models_path}/sw_meshes/shoulder_link_convex_decomposition.dae"/>
+          <mesh filename="${models_path}/sw_meshes/shoulder_link_convex_decomposition.dae"/> 
+          <!-- <mesh filename="package://barrett_model/meshes/wam1.stl" /> -->
         </geometry>
       </collision>
     </link>
@@ -122,6 +126,7 @@
         </material>
         <geometry>
           <mesh filename="${models_path}/sw_meshes/shoulder_pitch_link_convex.dae"/>
+          <!-- <mesh filename="package://barrett_model/meshes/wam2.stl" /> -->
         </geometry>
       </visual>
       <inertial>
@@ -134,7 +139,8 @@
       </inertial>
       <collision>
         <geometry>
-          <mesh filename="${models_path}/sw_meshes/shoulder_pitch_link_convex.dae"/>
+          <mesh filename="${models_path}/sw_meshes/shoulder_pitch_link_convex.dae"/> 
+          <!-- <mesh filename="package://barrett_model/meshes/wam2.stl" /> -->
         </geometry>
       </collision>
     </link>
@@ -167,12 +173,14 @@
           <color rgba="0.7 0.7 0.7 1.0"/>
         </material>
         <geometry>
-          <mesh filename="${models_path}/sw_meshes/upper_arm_link_convex_decomposition.dae"/>
+          <mesh filename="${models_path}/sw_meshes/upper_arm_link_convex_decomposition.dae"/> 
+          <!-- <mesh filename="package://barrett_model/meshes/wam3.stl" /> -->
         </geometry>
       </visual>
       <collision>
         <geometry>
-          <mesh filename="${models_path}/sw_meshes/upper_arm_link_convex_decomposition.dae"/>
+          <mesh filename="${models_path}/sw_meshes/upper_arm_link_convex_decomposition.dae"/> 
+          <!-- <mesh filename="package://barrett_model/meshes/wam3.stl" /> -->
         </geometry>
       </collision>
     </link>
@@ -205,15 +213,17 @@
           <color rgba="0.7 0.7 0.7 1.0"/>
         </material>
         <geometry>
-          <mesh filename="${models_path}/sw_meshes/elbow_link_convex.dae"/>
+          <mesh filename="${models_path}/sw_meshes/elbow_link_convex.dae"/> 
+          <!-- <mesh filename="package://barrett_model/meshes/wam4.stl" /> -->
         </geometry>
       </visual>
       <collision>
         <geometry>
-          <mesh filename="${models_path}/sw_meshes/elbow_link_convex.dae"/>
+          <mesh filename="${models_path}/sw_meshes/elbow_link_convex.dae"/> 
+          <!-- <mesh filename="package://barrett_model/meshes/wam4.stl" /> -->
         </geometry>
       </collision>
-
+      <!--
       <visual>
         <material name="WAMGrey">
           <color rgba="0.7 0.7 0.7 1.0"/>
@@ -223,6 +233,7 @@
           <mesh filename="${models_path}/sw_meshes/forearm_link_convex_decomposition.dae"/>
         </geometry>
       </visual>
+      -->
       <collision>
         <origin xyz="-0.045 -0.0730 0" rpy="${PI/2} 0 0" />
         <geometry>
@@ -258,13 +269,15 @@
         </material>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="${models_path}/sw_meshes/wrist_yaw_link_convex_decomposition.dae"/>
+          <mesh filename="${models_path}/sw_meshes/wrist_yaw_link_convex_decomposition.dae"/> 
+          <!-- <mesh filename="package://barrett_model/meshes/wam5.stl" /> -->
         </geometry>
       </visual>
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="${models_path}/sw_meshes/wrist_yaw_link_convex_decomposition.dae"/>
+          <mesh filename="${models_path}/sw_meshes/wrist_yaw_link_convex_decomposition.dae"/> 
+          <!-- <mesh filename="package://barrett_model/meshes/wam5.stl" /> -->
         </geometry>
       </collision>
     </link>
@@ -296,12 +309,14 @@
           <color rgba="0.7 0.7 0.7 1.0"/>
         </material>
         <geometry>
-          <mesh filename="${models_path}/sw_meshes/wrist_pitch_link_convex_decomposition.dae"/>
+          <mesh filename="${models_path}/sw_meshes/wrist_pitch_link_convex_decomposition.dae"/> 
+          <!-- <mesh filename="package://barrett_model/meshes/wam6.stl" /> -->
         </geometry>
       </visual>
       <collision>
         <geometry>
-          <mesh filename="${models_path}/sw_meshes/wrist_pitch_link_convex_decomposition.dae"/>
+          <mesh filename="${models_path}/sw_meshes/wrist_pitch_link_convex_decomposition.dae"/> 
+          <!-- <mesh filename="package://barrett_model/meshes/wam6.stl" /> -->
         </geometry>
       </collision>
     </link>
@@ -334,13 +349,15 @@
         </material>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="${models_path}/sw_meshes/wrist_palm_link_convex.dae"/>
+          <mesh filename="${models_path}/sw_meshes/wrist_palm_link_convex.dae"/> 
+          <!--<mesh filename="package://barrett_model/meshes/wam7.stl" /> -->
         </geometry>
       </visual>
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="${models_path}/sw_meshes/wrist_palm_link_convex.dae"/>
+          <mesh filename="${models_path}/sw_meshes/wrist_palm_link_convex.dae"/> 
+          <!-- <mesh filename="package://barrett_model/meshes/wam7.stl" /> -->
         </geometry>
       </collision>
     </link>
@@ -392,13 +409,13 @@
         <!--</material>-->
         <!--<origin xyz="0 0 0" rpy="-${PI} 0 0" />-->
         <!--<geometry>-->
-          <!--<mesh filename="${models_path}/meshes/wamForeArmLink4.DAE"/>-->
+          <!--<mesh filename="${models_path}/meshes/wamForeArmLink4.dae"/>-->
         <!--</geometry>-->
       <!--</visual>-->
       <!--<collision>-->
         <!--<origin xyz="0 0 0" rpy="-${PI} 0 0" />-->
         <!--<geometry>-->
-          <!--<mesh filename="${models_path}/meshes/wamForeArmLink4.stl"/>-->
+          <!--<mesh filename="${models_path}/meshes/wamForeArmLink4.dae"/>-->
         <!--</geometry>-->
       <!--</collision>-->
     <!--</link>-->
@@ -428,13 +445,13 @@
         <!--</material>-->
         <!--<origin xyz="0 0.02711 0" rpy="${PI} 0 0" />-->
         <!--<geometry>-->
-          <!--<mesh filename="${models_path}/meshes/wamUpperWristYawLink.DAE"/>-->
+          <!--<mesh filename="${models_path}/meshes/wamUpperWristYawLink.dae"/>-->
         <!--</geometry>-->
       <!--</visual>-->
       <!--<collision>-->
         <!--<origin xyz="0 0.02711 0" rpy="${PI} 0 0" />-->
         <!--<geometry>-->
-          <!--<mesh filename="${models_path}/meshes/wamUpperWristYawLink5.stl"/>-->
+          <!--<mesh filename="${models_path}/meshes/wamUpperWristYawLink5.dae"/>-->
         <!--</geometry>-->
       <!--</collision>-->
     <!--</link>-->
@@ -465,13 +482,13 @@
         <!--</material>-->
         <!--<origin xyz="0 0 0" rpy="0 0 0" />-->
         <!--<geometry>-->
-          <!--<mesh filename="${models_path}/meshes/forceTorqueSensor.DAE"/>-->
+          <!--<mesh filename="${models_path}/meshes/forceTorqueSensor.dae"/>-->
         <!--</geometry>-->
       <!--</visual>-->
       <!--<collision>-->
         <!--<origin xyz="0 0 0" rpy="0 0 0" />-->
         <!--<geometry>-->
-          <!--<mesh filename="${models_path}/meshes/forceTorqueSensor.stl"/>-->
+          <!--<mesh filename="${models_path}/meshes/forceTorqueSensor.dae"/>-->
         <!--</geometry>-->
       <!--</collision>-->
     <!--</link>-->

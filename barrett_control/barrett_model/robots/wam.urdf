@@ -1,0 +1,1067 @@
+<?xml version="1.0"?>
+<robot name="wam"
+
+       xmlns:xi="http://www.w3.org/2001/XInclude"
+       xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz"
+       xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model"
+       xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body"
+       xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom"
+       xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+       xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering"
+       xmlns:renderable="http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics">
+  <link name="world"/>
+
+  <joint name="fixed" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+  </joint>
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="0.5 0.25 0.0"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </visual>
+    <inertial>
+      <mass value="9.97059584"/>
+      <origin xyz="-0.02017671 -0.26604706 -0.14071720" />
+      <inertia ixx="1.01232865" ixy="0.05992441" ixz="0.05388736" iyy="0.38443311" iyz="0.37488748" izz="0.82739198"/>
+    </inertial>
+  </link>
+
+  <link name="base_link_tilt">
+    <visual>
+      <geometry>
+        <box size="0.5 0.25 0.0"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </visual>
+    <inertial>
+      <mass value="9.97059584"/>
+      <origin xyz="-0.02017671 -0.26604706 -0.14071720" />
+      <inertia ixx="1.01232865" ixy="0.05992441" ixz="0.05388736" iyy="0.38443311" iyz="0.37488748" izz="0.82739198"/>
+    </inertial>
+  </link>
+
+  #WAM BASE
+  <link name="wam_base"> 
+    <inertial>
+      <mass value="9.97059584"/>
+      <origin xyz="-0.02017671 -0.26604706 -0.14071720" />
+      <inertia ixx="1.01232865" ixy="0.05992441" ixz="0.05388736" iyy="0.38443311" iyz="0.37488748" izz="0.82739198"/>
+    </inertial>
+    <visual> 
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="wam_base_visual">
+        <mesh filename="package://barrett_model/meshes/wambase.stl" />
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.9 0.9 0.9 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0.22 0.14 0.33"/>
+      <geometry name="wam_base_collision">
+        <mesh filename="package://barrett_model/meshes/wambase.stl" scale="1.0 1.0 0.95"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  #LINK J1  
+  <link name="j1">
+    <inertial>
+      <mass value="10.76768767"/>
+      <origin xyz="-0.00443422 0.12189039 -0.00066489" />  
+      <inertia ixx="0.29486350" ixy="-0.00795023" ixz="-0.00009311" iyy="0.11350017" iyz="0.00018711" izz="0.25065343"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_j1_visual">
+        <mesh filename="package://barrett_model/meshes/wam1.stl" />
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.9 0.9 0.9 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="1.57079633 0 0" xyz="0 0 0"/><!--3.14159265-->
+      <geometry name="link_j1_collision">
+        <mesh filename="package://barrett_model/meshes/wam1.stl" />
+      </geometry>
+    </collision>
+  </link>
+  
+  #LINK J2  
+  <link name="j2">
+    <inertial>
+      <mass value="3.87493756"/>
+      <origin xyz="-0.00236983 0.03105614 0.01542114" />  
+      <inertia ixx="0.02606840" ixy="-0.00001346" ixz="-0.00011701" iyy="0.01472202" iyz="0.00003659" izz="0.01934814"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_j2_visual">
+        <mesh filename="package://barrett_model/meshes/wam2.stl" />
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.9 0.9 0.9 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_j2_collision">
+        <mesh filename="package://barrett_model/meshes/wam2.stl" />
+      </geometry>
+    </collision>
+  </link>
+  
+  #LINK J3  
+  <link name="j3">
+    <inertial>
+      <mass value="1.80228141"/>
+      <origin xyz="-0.03825858 0.20750770 0.00003309" />  
+      <inertia ixx="0.13671601" ixy="-0.01680434" ixz="0.00000510" iyy="0.00588354" iyz="-0.00000530" izz="0.13951371"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_j3_visual">
+        <mesh filename="package://barrett_model/meshes/wam3.stl" />
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.9 0.9 0.9 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="1.57079633 0 0" xyz="0 0 0"/>
+      <geometry name="link_j3_collision">
+        <mesh filename="package://barrett_model/meshes/wam3.stl" />
+      </geometry>
+    </collision>
+  </link>
+  <!--
+  #LINK J4  
+  <link name="j4">
+    <inertial>
+      <mass value="1.06513649"/>
+      <origin xyz="0.01095471 -0.00002567 0.14053900" />  
+      <inertia ixx="0.03952350" ixy="0.00000189" ixz="0.00003117" iyy="0.04008214" iyz="0.00000131" izz="0.00210299"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_j4_visual">
+        <mesh filename="package://barrett_model/meshes/wam4.stl" />
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.9 0.9 0.9 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="-1.57079633 0 0" xyz="0 0 0"/>
+      <geometry name="link_j4_collision">
+        <mesh filename="package://barrett_model/meshes/wam4.stl" />
+      </geometry>
+      <contact_coefficients kd="1.0" kp="1000.0" mu="0"/>
+    </collision>
+  </link>
+  -->  
+  <!--
+  #LINK J5  
+  <link name="j5">
+    <inertial>
+      <mass value="0.12376019"/>
+      <origin xyz="0.00008921 0.00511217 0.00435824" />  
+      <inertia ixx="0.00005587" ixy="0.00000026" ixz="0.00000000" iyy="0.00007817" iyz="-0.00000083" izz="0.00006594"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 3.141592650" xyz="0 0 0"/>
+      <geometry name="link_j5_visual">
+        <mesh filename="package://barrett_model/meshes/wam5.stl" />
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.9 0.9 0.9 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="-1.57079633 0 0" xyz="0 0 0"/>
+      <geometry name="link_j5_collision">
+        <mesh filename="package://barrett_model/meshes/wam5.stl"/>
+      </geometry>
+      <contact_coefficients kd="1.0" kp="1000.0" mu="0"/>
+    </collision>
+  </link> 
+  --> 
+  <!--
+  #LINK J6  
+  <link name="j6">
+    <inertial>
+      <mass value="0.41797364"/>
+      <origin xyz="-0.00012262 -0.01703194 0.02468336" />  
+      <inertia ixx="0.00093106" ixy="0.00000148" ixz="-0.00000201" iyy="0.00049833" iyz="-0.00022162" izz="0.00057483"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_j6_visual">
+        <mesh filename="package://barrett_model/meshes/wam6.stl" />
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.9 0.9 0.9 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="-1.57079633 0 0" xyz="0 0 0"/>
+      <geometry name="link_j6_collision">
+        <mesh filename="package://barrett_model/meshes/wam6.stl"/>
+      </geometry>
+      <contact_coefficients kd="1.0" kp="1000.0" mu="0"/>
+    </collision>
+  </link>  
+  
+  #LINK J7  
+  <link name="j7">
+    <inertial>
+      <mass value="0.06864753"/>
+      <origin xyz="-0.00007974 0.00016313 -0.00323552" />  
+      <inertia ixx="0.00003845" ixy="-0.00000019" ixz="0.00000002" iyy="0.00003878" iyz="-0.00000004" izz="0.00007408"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_j6_visual">
+        <mesh filename="package://barrett_model/meshes/wam7.stl" />
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.9 0.9 0.9 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 -0.06"/>
+      <geometry name="link_j7_collision">
+        <mesh filename="package://barrett_model/meshes/wam7.stl"/>
+      </geometry>
+      <contact_coefficients kd="1.0" kp="1000.0" mu="0"/>
+    </collision>
+  </link> 
+  --> 
+  
+  #LINK FT SENSOR
+  <!--
+  <link name="bhand_ftsensor">
+    <inertial>
+      <mass value="0.06864753"/>
+      <origin xyz="0 0 0" />  
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_bhand_ftsensor_visual">
+        <mesh filename="package://barrett_model/meshes/bhand_ftsensor.stl" />
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.9 0.9 0.9 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="1.57079633 0 0" xyz="0 0.008 0"/>
+      <geometry name="link_bhand_ftsensor_collision">
+        <mesh filename="package://barrett_model/meshes/bhand_ftsensor.stl"/>
+        <cylinder length="0.015" radius="0.04"/>
+      </geometry>
+      <contact_coefficients kd="1.0" kp="1000.0" mu="0"/>
+    </collision>
+  </link>  
+  -->
+  <!--
+  #LINK BHAND BASE
+  <link name="bhand_base">
+    <inertial>
+      <mass value="0.8"/>
+      <origin xyz="0 0 0" />  
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_bhand_base_visual">
+        <mesh filename="package://barrett_model/meshes/bh_base.stl" />
+      </geometry>
+      <material name="Blue">
+        <color rgba="0.2 0.2 0.9 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 -1.57079633" xyz="0 0 -0.058"/>stl
+      <geometry name="link_bhand_base_collision">
+        <mesh filename="package://barrett_model/meshes/bh_base.stl" />
+      </geometry>
+      <contact_coefficients kd="1.0" kp="1000.0" mu="0"/>
+    </collision>
+  </link>  
+  -->
+  
+  #FINGERS
+  <!--
+  #LINK BHAND LINK F11
+  <link name="bhand_link11">
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0" />  
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_bhand_f11_visual">
+        <mesh filename="package://barrett_model/meshes/bhand_link1.stl" />
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.9 0.9 0.9 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.032"/>
+      <geometry name="link_bhand_f11_collision">
+        <mesh filename="package://barrett_model/meshes/bh_link1.stl"/>
+      </geometry>
+      <contact_coefficients kd="1.0" kp="1000.0" mu="0"/>
+    </collision>
+  </link>  
+  
+  #LINK BHAND LINK F21
+  <link name="bhand_link21">
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0" />  
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_bhand_f21_visual">
+        <mesh filename="package://barrett_model/meshes/bhand_link1.stl" />
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.9 0.9 0.9 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.032"/>
+      <geometry name="link_bhand_f21_collision">
+        <mesh filename="package://barrett_model/meshes/bh_link1.stl"/>
+      </geometry>
+      <contact_coefficients kd="1.0" kp="1000.0" mu="0"/>
+    </collision>
+  </link>  
+  
+  #LINK BHAND LINK F12
+  <link name="bhand_link12">
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0" />  
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_bhand_f12_visual">
+        <mesh filename="package://barrett_model/meshes/bhand_link2.stl" />
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.9 0.9 0.9 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_bhand_f12_collision">
+        <mesh filename="package://barrett_model/meshes/bh_link2.stl"/>
+      </geometry>
+      <contact_coefficients kd="1.0" kp="1000.0" mu="0"/>
+    </collision>
+  </link>  
+  
+  #LINK BHAND LINK F22
+  <link name="bhand_link22">
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0" />  
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_bhand_f22_visual">
+        <mesh filename="package://barrett_model/meshes/bhand_link2.stl" />
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.9 0.9 0.9 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_bhand_f22_collision">
+        <mesh filename="package://barrett_model/meshes/bstlh_link2.stl"/>
+      </geometry>
+      <contact_coefficients kd="1.0" kp="1000.0" mu="0"/>
+    </collision>
+  </link>  
+  
+  #LINK BHAND LINK F32
+  <link name="bhand_link32">
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0" />  
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_bhand_f32_visual">
+        <mesh filename="package://barrett_model/meshes/bhand_link2.stl" />
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.9 0.9 0.9 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_bhand_f32_collision">
+        <mesh filename="package://barrett_model/meshes/bh_link2.stl"/>
+      </geometry>
+      <contact_coefficients kd="1.0" kp="1000.0" mu="0"/>
+    </collision>
+  </link>  
+  
+  #LINK BHAND LINK F13
+  <link name="bhand_link13">
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0" />  
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_bhand_f13_visual">
+        <mesh filename="package://barrett_model/meshes/bhand_link3.stl" />
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.9 0.9 0.9 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_bhand_f13_collision">
+        <mesh filename="package://barrett_model/meshes/bh_link3.stl"/>
+      </geometry>
+      <contact_coefficients kd="1.0" kp="1000.0" mu="0"/>
+    </collision>
+  </link>  
+  
+  #LINK BHAND LINK F23
+  <link name="bhand_link23">
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0" />  
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_bhand_f23_visual">
+        <mesh filename="package://barrett_model/meshes/bhand_link3.stl" />
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.9 0.9 0.9 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_bhand_f23_collision">
+        <mesh filename="package://barrett_model/meshes/bh_link3.stl"/>
+      </geometry>
+      <contact_coefficients kd="1.0" kp="1000.0" mu="0"/>
+    </collision>
+  </link>  
+  
+  #LINK BHAND LINK F33
+  <link name="bhand_link33">
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0" />  
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_bhand_f33_visual">
+        <mesh filename="package://barrett_model/meshes/bhand_link3.stl" />
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.9 0.9 0.9 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="link_bhand_f33_collision">
+        <mesh filename="package://barrett_model/meshes/bh_link3.stl"/>
+      </geometry>
+      <contact_coefficients kd="1.0" kp="1000.0" mu="0"/>
+    </collision>
+  </link>  
+  -->
+  ## Joint Descriptions 
+  <joint name="wam_basejoint_tilt" type="revolute">
+    <origin xyz="0.0 0.0 0.2794" rpy="3.1415927 0 0" />
+    <parent link="base_link"/>
+    <child link="base_link_tilt" />
+    <axis xyz="0 1 0"/>
+    <limit effort="100000" velocity="1.5" lower="1.5708" upper="1.5708"/>
+    <joint_properties damping="100.0" friction="1000.0" />
+    <dynamics damping="1000"/>
+  </joint>
+
+  <joint name="wam_basejoint" type="revolute">
+    <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+    <parent link="base_link_tilt"/>
+    <child link="wam_base" />
+    <axis xyz="0 0 1"/>
+    <limit effort="100000" velocity="1.5" lower="1.5708" upper="1.5708"/>
+    <joint_properties damping="100.0" friction="1000.0" />
+    <dynamics damping="1000"/>
+  </joint>
+  
+  <!--
+  <joint name="wam_basejoint" type="fixed">stl
+    <parent link="base_link"/>
+    <child link="wam_base" />
+    <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+  </joint>
+  -->
+  # joint limits have 0.01 tolerance
+  # velocity halved
+  <joint name="wam_j1_joint" type="revolute">
+     <origin xyz="0.22 0.14 0.346" rpy="-1.57079633 0 0" /> 
+     <parent link="wam_base"/>
+     <child link="j1" />
+     <axis xyz="0 -1 0"/>
+     <limit effort="30" velocity="1.5" lower="-2.61" upper="2.61"/>
+     <joint_properties damping="100.0" friction="1000.0" />
+     <dynamics damping="1000"/>
+  </joint >
+   
+  <joint name="wam_j2_joint" type="revolute">
+     <origin xyz="0.0 0.0 0.0" rpy="0 0 0" /> 
+     <parent link="j1"/>
+     <child link="j2" />
+     <axis xyz="0 0 1"/>
+     <limit effort="30" velocity="1.5" lower="-2.01" upper="2.01"/>
+     <joint_properties damping="100.0" friction="1000.0" />
+     <dynamics damping="1000"/>
+  </joint >
+  
+  <joint name="wam_j3_joint" type="revolute">
+     <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/> 
+     <parent link="j2"/>
+     <child link="j3" />
+     <axis xyz="0 -1 0"/>
+     <limit effort="30" velocity="1.5" lower="-2.81" upper="2.81"/>
+     <joint_properties damping="100.0" friction="1000.0" />
+     <dynamics damping="1000"/>
+  </joint >
+  <!--
+  <joint name="wam_j4_joint" type="revolute">
+     <origin xyz="0.045 -0.55 0.0" rpy="1.57079633 0 0"/> 
+     <parent link="j3"/>
+     <child link="j4"/>
+     <axis xyz="0 1 0"/>
+     <limit effort="30" velocity="1.5" lower="-0.91" upper="3.11"/>
+     <joint_properties damping="100.0" friction="1000.0" />
+     <dynamics damping="1000"/>
+  </joint >
+  -->
+  <!--
+  <joint name="wam_j5_joint" type="revolute">
+     <origin xyz="-0.045 0.0 0.3" rpy="1.57079633 0 0" /> 
+     <parent link="j4"/>
+     <child link="j5" />
+     <axis xyz="0 1 0"/>
+     <limit effort="30" velocity="1.5" lower="-4.77" upper="1.25"/>
+     <joint_properties damping="100.0" friction="1000.0" />
+     <dynamics damping="1000"/>
+  </joint >
+  -->
+  <!--
+  <joint name="wam_j6_joint" type="revolute">
+     <origin xyz="0.0 0.0 0.0" rpy="-1.57079633 0 0" /> 
+     <parent link="j5"/>
+     <child link="j6" />
+     <axis xyz="0 1 0"/>
+     <limit effort="30" velocity="1.5" lower="-1.61" upper="1.61"/>
+     <joint_properties damping="100.0" friction="1000.0" />
+     <dynamics damping="1000"/>
+  </joint >
+  
+  <joint name="wam_j7_joint" type="revolute">
+     <origin xyz="0.0 0.0 0.06" rpy="0 0 0" /> 
+     <parent link="j6"/>
+     <child link="j7" />
+     <axis xyz="0 0 1"/>
+     <limit effort="30" velocity="1.5" lower="-3.01" upper="3.01" />
+     <joint_properties damping="100.0" friction="1000.0" />
+     <dynamics damping="1000"/>
+  </joint >
+  -->
+  <!--
+  <joint name="bhand_ftsensor_joint" type="fixed">
+    <parent link="j7"/>
+    <child link="bhand_ftsensor" />stl
+    <origin xyz="0.0 0.0 0.0" rpy="1.57079633 0 1.57079633" />
+  </joint>
+  -->
+  <!--
+  <joint name="bhand_base_joint" type="fixed">
+    <parent link="j7"/>
+    <child link="bhand_base" />
+    <origin xyz="0.0 0.013 0.0" rpy="-1.57079633 0.0 0.0" />
+  </joint>
+  -->
+  <!--
+  <joint name="bhand_j11_joint" type="revolute">
+     <origin xyz="-0.02475 0.0 0.0395" rpy="0.0 0 1.57079633" /> 
+     <parent link="bhand_base"/>
+     <child link="bhand_link11" />
+     <axis xyz="0 0 1"/>
+     <limit effort="30" velocity="1.5" lower="0.0" upper="3.14159265" />
+     <joint_properties damping="100.0" friction="1000.0" />
+     <dynamics damping="1000"/>
+  </joint >
+  
+  <joint name="bhand_j21_joint" type="revolute">
+     <origin xyz="0.02475 0.0 0.0395" rpy="0.0 0.0 1.57079633" /> 
+     <parent link="bhand_base"/>
+     <child link="bhand_link21" />
+     <axis xyz="0 0 1"/>
+     <limit effort="30" velocity="1.5" lower="-3.14159265" upper="0.0" />
+     <joint_properties damping="100.0" friction="1000.0" />
+     <dynamics damping="1000"/>
+  </joint >
+  
+  <joint name="bhand_j12_joint" type="revolute">
+     <origin xyz="0.050 0.0 0.038" rpy="1.57079633 0 0.0" /> 
+     <parent link="bhand_link11"/>
+     <child link="bhand_link12" />
+     <axis xyz="0 0 1"/>
+     <limit effort="30" velocity="1.5" lower="0.0" upper="2.44346095" />
+     <joint_properties damping="100.0" friction="1000.0" />
+     <dynamics damping="1000"/>
+  </joint >
+  
+  <joint name="bhand_j22_joint" type="revolute">
+     <origin xyz="0.050 0.0 0.038" rpy="1.57079633 0 0.0" /> 
+     <parent link="bhand_link21"/>
+     <child link="bhand_link22" />
+     <axis xyz="0 0 1"/>
+     <limit effort="30" velocity="1.5" lower="0.0" upper="2.44346095" />
+     <joint_properties damping="100.0" friction="1000.0" />
+     <dynamics damping="1000"/>
+  </joint >
+  
+  <joint name="bhand_j32_joint" type="revolute">
+     <origin xyz="0.0 0.050 0.0775" rpy="1.57079633 0 1.57079633" /> 
+     <parent link="bhand_base"/>
+     <child link="bhand_link32" />
+     <axis xyz="0 0 1"/>
+     <limit effort="30" velocity="1.5" lower="0.0" upper="2.44346095" />
+     <joint_properties damping="100.0" friction="1000.0" />
+     <dynamics damping="1000"/>
+  </joint >
+  
+  <joint name="bhand_j13_joint" type="revolute">
+     <origin xyz="0.070 0.0 0.0" rpy="0.0 0 0.0" /> 
+     <parent link="bhand_link12"/>
+     <child link="bhand_link13" />
+     <axis xyz="0 0 1"/>
+     <limit effort="30" velocity="1.5" lower="0.698131701" upper="2.44346095" />
+     <joint_properties damping="100.0" friction="1000.0" />
+     <dynamics damping="1000"/>
+  </joint >
+  
+  <joint name="bhand_j23_joint" type="revolute">
+     <origin xyz="0.070 0.0 0.0" rpy="0.0 0 0.0" /> 
+     <parent link="bhand_link22"/>
+     <child link="bhand_link23" />
+     <axis xyz="0 0 1"/>
+     <limit effort="30" velocity="1.5" lower="0.698131701" upper="2.44346095" />
+     <joint_properties damping="100.0" friction="1000.0" />
+     <dynamics damping="1000"/>
+  </joint >
+  
+  <joint name="bhand_j33_joint" type="revolute">
+     <origin xyz="0.070 0.0 0.0" rpy="0.0 0 0.0" /> stl
+     <parent link="bhand_link32"/>
+     <child link="bhand_link33" />
+     <axis xyz="0 0 1"/>
+     <limit effort="30" velocity="1.5" lower="0.698131701" upper="2.44346095" />
+     <joint_properties damping="100.0" friction="1000.0" />
+     <dynamics damping="1000"/>
+  </joint >
+  -->
+  <!--
+  #Adding Gazebo Requirements
+  <gazebo reference="wam_world">
+     <material>Gazebo/White</material>
+     <selfCollide>true</selfCollide>
+  </gazebo>
+  
+  <gazebo reference="wam_base">
+     <material>Gazebo/White</material>
+     <selfCollide>true</selfCollide>
+     <turnGravityOff>true</turnGravityOff>
+  </gazebo>
+  
+  <gazebo reference="j1">
+     <material>Gazebo/White</material>
+     <selfCollide>true</selfCollide>
+     <turnGravityOff>true</turnGravityOff>
+  </gazebo>
+  
+  <gazebo reference="j2">
+     <material>Gazebo/Grey</material>
+     <selfCollide>true</selfCollide>
+     <turnGravityOff>true</turnGravityOff>
+  </gazebo>
+  
+  <gazebo reference="j3">
+     <material>Gazebo/Grey</material>
+     <selfCollide>true</selfCollide>
+     <turnGravityOff>true</turnGravityOff>
+  </gazebo>
+  
+  <gazebo reference="j4">
+     <material>Gazebo/Grey</material>
+     <selfCollide>true</selfCollide>
+     <turnGravityOff>true</turnGravityOff>
+  </gazebo>  
+  
+  <gazebo reference="j5">
+     <material>Gazebo/Grey</material>
+     <selfCollide>true</selfCollide>
+     <turnGravityOff>true</turnGravityOff>
+  </gazebo>  
+  
+  <gazebo reference="j6">
+     <material>Gazebo/Grey</material>
+     <selfCollide>true</selfCollide>
+     <turnGravityOff>true</turnGravityOff>
+  </gazebo>      
+  
+  <gazebo reference="j7">
+     <material>Gazebo/Grey</material>
+     <selfCollide>true</selfCollide>
+     <turnGravityOff>true</turnGravityOff>
+  </gazebo>  
+  
+  <gazebo reference="bhand_ftsensor">
+     <material>Gazebo/Grey</material>
+     <selfCollide>true</selfCollide>
+     <turnGravityOff>true</turnGravityOff>
+  </gazebo> 
+  
+  <gazebo reference="bhand_base">
+     <material>Gazebo/Grey</material>
+     <selfCollide>true</selfCollide>
+     <turnGravityOff>true</turnGravityOff>
+  </gazebo> 
+  
+  <gazebo reference="bhand_link11">
+     <material>Gazebo/Grey</material>
+     <selfCollide>true</selfCollide>
+     <turnGravityOff>true</turnGravityOff>
+  </gazebo> 
+  
+  <gazebo reference="bhand_link21">
+     <material>Gazebo/Grey</material>
+     <selfCollide>true</selfCollide>
+     <turnGravityOff>true</turnGravityOff>
+  </gazebo> 
+  
+  <gazebo reference="bhand_link12">
+     <material>Gazebo/Grey</material>
+     <selfCollide>true</selfCollide>
+     <turnGravityOff>true</turnGravityOff>
+  </gazebo> 
+  
+  <gazebo reference="bhand_link22">
+     <material>Gazebo/Grey</material>
+     <selfCollide>true</selfCollide>
+     <turnGravityOff>true</turnGravityOff>
+  </gazebo> 
+  
+  <gazebo reference="bhand_link32">
+     <material>Gazebo/Grey</material>
+     <selfCollide>true</selfCollide>
+     <turnGravityOff>true</turnGravityOff>
+  </gazebo> 
+  
+  <gazebo reference="bhand_link13">
+     <material>Gazebo/Grey</material>
+     <selfCollide>true</selfCollide>
+     <turnGravityOff>true</turnGravityOff>
+  </gazebo> 
+    
+  <gazebo reference="bhand_link23">
+     <material>Gazebo/Grey</material>
+     <selfCollide>true</selfCollide>
+     <turnGravityOff>true</turnGravityOff>
+  </gazebo> 
+  
+  <gazebo reference="bhand_link33">
+     <material>Gazebo/Grey</material>
+     <selfCollide>true</selfCollide>
+     <turnGravityOff>true</turnGravityOff>
+  </gazebo> 
+  
+  #Adding Transmissions
+  <transmission type="transmission_interface/SimpleTransmission" name="j1_transmission">
+     <type>transmission_interface/SimpleTransmission</type>
+			<joint name="wam_j1_joint">
+				<hardwareInterface>PositionJointInterface</hardwareInterface>
+				<hardwareInterface>EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="wam_j1_joint_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+   </transmission>
+  
+  <transmission type="transmission_interface/SimpleTransmission" name="j2_transmission">
+     <type>transmission_interface/SimpleTransmission</type>
+			<joint name="wam_j2_joint">
+				<hardwareInterface>PositionJointInterface</hardwareInterface>
+				<hardwareInterface>EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="wam_j2_joint_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+  </transmission>
+  
+  <transmission type="transmission_interface/SimpleTransmission" name="j3_transmission">
+    <type>transmission_interface/SimpleTransmission</type>
+			<joint name="wam_j3_joint">
+				<hardwareInterface>PositionJointInterface</hardwareInterface>
+				<hardwareInterface>EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="wam_j3_joint_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+  </transmission>
+  
+  <transmission type="transmission_interface/SimpleTransmission" name="j4_transmission">
+     <type>transmission_interface/SimpleTransmission</type>
+			<joint name="wam_j4_joint">
+				<hardwareInterface>PositionJointInterface</hardwareInterface>
+				<hardwareInterface>EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="wam_j4_joint_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+  </transmission>
+  
+  <transmission type="transmission_interface/SimpleTransmission" name="j5_transmission">
+    <type>transmission_interface/SimpleTransmission</type>
+			<joint name="wam_j5_joint">
+				<hardwareInterface>PositionJointInterface</hardwareInterface>
+				<hardwareInterface>EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="wam_j5_joint_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+  </transmission>
+  
+  <transmission type="transmission_interface/SimpleTransmission" name="j6_transmission">
+     <type>transmission_interface/SimpleTransmission</type>
+			<joint name="wam_j6_joint">
+				<hardwareInterface>PositionJointInterface</hardwareInterface>
+				<hardwareInterface>EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="wam_j6_joint_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+  </transmission>
+  
+  <transmission type="transmission_interface/SimpleTransmission" name="j7_transmission">
+     <type>transmission_interface/SimpleTransmission</type>
+			<joint name="wam_j7_joint">
+				<hardwareInterface>PositionJointInterface</hardwareInterface>
+				<hardwareInterface>EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="wam_j7_joint_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+  </transmission>
+  
+  #FINGER TRANSMISSIONS
+  
+  <transmission type="transmission_interface/SimpleTransmission" name="f11_transmission">
+      <type>transmission_interface/SimpleTransmission</type>
+			<joint name="bhand_f11_joint">
+				<hardwareInterface>PositionJointInterface</hardwareInterface>
+				<hardwareInterface>EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="bhand_f11_joint_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+  </transmission>
+  
+  <transmission type="transmission_interface/SimpleTransmission" name="f21_transmission">
+     <type>transmission_interface/SimpleTransmission</type>
+			<joint name="bhand_f21_joint">
+				<hardwareInterface>PositionJointInterface</hardwareInterface>
+				<hardwareInterface>EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="bhand_f21_joint_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+  </transmission>
+  
+  <transmission type="transmission_interface/SimpleTransmission" name="f12_transmission">
+     <type>transmission_interface/SimpleTransmission</type>
+			<joint name="bhand_f31_joint">
+				<hardwareInterface>PositionJointInterface</hardwareInterface>
+				<hardwareInterface>EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="bhand_f31_joint_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+  </transmission>
+  
+  <transmission type="transmission_interface/SimpleTransmission" name="f22_transmission">
+     <type>transmission_interface/SimpleTransmission</type>
+			<joint name="bhand_f22_joint">
+				<hardwareInterface>PositionJointInterface</hardwareInterface>
+				<hardwareInterface>EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="bhand_f22_joint_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+  </transmission>
+  
+  <transmission type="transmission_interface/SimpleTransmission" name="f32_transmission">
+     <type>transmission_interface/SimpleTransmission</type>
+			<joint name="bhand_f32_joint">
+				<hardwareInterface>PositionJointInterface</hardwareInterface>
+				<hardwareInterface>EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="bhand_f32_joint_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+  </transmission>
+
+  <transmission type="transmission_interface/SimpleTransmission" name="f13_transmission">
+    <type>transmission_interface/SimpleTransmission</type>
+			<joint name="bhand_f13_joint">
+				<hardwareInterface>PositionJointInterface</hardwareInterface>
+				<hardwareInterface>EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="bhand_f13_joint_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+  </transmission>
+  
+  <transmission type="transmission_interface/SimpleTransmission" name="f23_transmission">
+    <type>transmission_interface/SimpleTransmission</type>
+			<joint name="bhand_f23_joint">
+				<hardwareInterface>PositionJointInterface</hardwareInterface>
+				<hardwareInterface>EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="bhand_f123_joint_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+  </transmission>
+  
+  <transmission type="transmission_interface/SimpleTransmission" name="f33_transmission">
+     <type>transmission_interface/SimpleTransmission</type>
+			<joint name="bhand_f33_joint">
+				<hardwareInterface>PositionJointInterface</hardwareInterface>
+				<hardwareInterface>EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="bhand_f33_joint_motor">
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+  </transmission>
+  
+  <gazebo>
+     <plugin name="${prefix}_wam7_bhand_hw_sim" filename="libbase_robot_hw_gazebo_plugin.so">
+        <robotNamespace>left_wam</robotNamespace>
+     </plugin>
+  </gazebo>
+  -->
+  # Asus Xtion (Kinect) camera
+  # Generated using the ROS stack "hector_models"
+  # Available from https://github.com/tu-darmstadt-ros-pkg/hector_models.git  
+  <!--
+  <joint name="wam_base_kinect_joint" type="fixed">
+    <origin rpy="3.14159265 0.35 0.0" xyz="0.34 0.14 -0.03"/>
+    <parent link="base_link"/>
+    <child link="wam_base_kinect_link"/>
+  </joint>
+  <link name="wam_base_kinect_link">
+    <inertial>
+      <mass value="0.200"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="5.8083e-4" ixy="0" ixz="0" iyy="3.0833e-5" iyz="0" izz="5.9083e-4"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://barrett_model/meshes/asus_camera_simple.dae" scale="0.5 0.7 0.7"/>
+      </geometry>
+    </visual>
+    -->
+    <!--
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.035 0.185 0.025"/>
+      </geometry>
+    </collision>
+    
+  </link>
+  <joint name="wam_base_kinect_depth_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0.0 0.049 0.0"/>
+    <parent link="wam_base_kinect_link"/>
+    <child link="wam_base_kinect_depth_frame"/>
+  </joint>
+  <link name="wam_base_kinect_depth_frame"/>
+  <joint name="wam_base_kinect_depth_optical_joint" type="fixed">
+    <origin rpy="-1.57079632679 0.0 -1.57079632679" xyz="0 0 0"/>
+    <parent link="wam_base_kinect_depth_frame"/>
+    <child link="wam_base_kinect_depth_optical_frame"/>
+  </joint>
+  <link name="wam_base_kinect_depth_optical_frame">
+    <visual>
+      <geometry>
+        <sphere radius="0.0005"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="wam_base_kinect_rgb_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0.0 0.022 0.0"/>
+    <parent link="wam_base_kinect_link"/>
+    <child link="wam_base_kinect_rgb_frame"/>
+  </joint>
+  <link name="wam_base_kinect_rgb_frame">
+    <visual>
+      <geometry>
+        <sphere radius="0.0005"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="wam_base_kinect_rgb_optical_joint" type="fixed">
+    <origin rpy="-1.57079632679 0.0 -1.57079632679" xyz="0 0 0"/>
+    <parent link="wam_base_kinect_rgb_frame"/>
+    <child link="wam_base_kinect_rgb_optical_frame"/>
+  </joint>
+  <link name="wam_base_kinect_rgb_optical_frame">
+    <visual>
+      <geometry>
+        <sphere radius="0.0005"/>
+      </geometry>
+    </visual>
+  </link>
+-->
+</robot>
+

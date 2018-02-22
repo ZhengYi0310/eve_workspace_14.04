@@ -11,42 +11,42 @@
 
 		<gazebo reference="${prefix}/base_link">
 			<gravity>true</gravity>
-			<material>Gazebo/Orange</material>
+			<material>Gazebo/Grey</material>
 		</gazebo>
 
 		<gazebo reference="${prefix}/shoulder_yaw_link">
 			<gravity>true</gravity>
-			<material>Gazebo/Orange</material>
+			<material>Gazebo/Grey</material>
 		</gazebo>
 
 		<gazebo reference="${prefix}/shoulder_pitch_link">
 			<gravity>true</gravity>
-			<material>Gazebo/Orange</material>
+			<material>Gazebo/Grey</material>
 		</gazebo>
 
 		<gazebo reference="${prefix}/upper_arm_link">
 			<gravity>true</gravity>
-			<material>Gazebo/Orange</material>
+			<material>Gazebo/Grey</material>
 		</gazebo>
 
 		<gazebo reference="${prefix}/forearm_link">
 			<gravity>true</gravity>
-			<material>Gazebo/Orange</material>
+			<material>Gazebo/Grey</material>
 		</gazebo>
 
 		<gazebo reference="${prefix}/wrist_yaw_link">
 			<gravity>true</gravity>
-			<material>Gazebo/Orange</material>
+			<material>Gazebo/Grey</material>
 		</gazebo>
 
 		<gazebo reference="${prefix}/wrist_pitch_link">
 			<gravity>true</gravity>
-			<material>Gazebo/Orange</material>
+			<material>Gazebo/Grey</material>
 		</gazebo>
 
 		<gazebo reference="${prefix}/wrist_palm_link">
 			<gravity>true</gravity>
-			<material>Gazebo/Grey</material>
+			<material>Gazebo/Red</material>
 		</gazebo>
 
 	</xacro:macro>
