@@ -7,6 +7,7 @@
 // ROS headers
 #include <std_msgs/Duration.h>
 #include <urdf/model.h>
+#include <ros/console.h>
 
 // ROS controls
 #include <hardware_interface/robot_hw.h>

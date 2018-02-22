@@ -380,9 +380,15 @@ namespace barrett_hw
         {
             *lower_limit = limits.min_position;
             *upper_limit = limits.max_position;
+            std::cout << "For joint: " << joint_name << ", the min_position is: " << limits.min_position << ", the max_position is: " << limits.max_position << "." << std::endl;
+            
         }
         if (limits.has_effort_limits)
+        {
             *effort_limit = limits.max_effort;
+            std::cout << "For joint: " << joint_name << ", the max_effort is: " << limits.max_effort << "." << std::endl;
+        }
+                
 
         if (has_soft_limits)
         {

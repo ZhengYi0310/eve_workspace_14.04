@@ -149,15 +149,13 @@ namespace wam_dmp_controller
         	link_ = urdf_model_.getLink(link_->getParent()->name);
     	}
 
-    	
+    	// Get joint handles for all of the joints in the chain
+    	getHandles(hw);
 
 	std::string controller_type;
  	nh_.getParam("type", controller_type);
 	ROS_INFO("Controller %s succssfully loaded", controller_type.c_str());
     	ROS_INFO("Number of joints in handle = %lu", joint_handles_.size() );
-
-        // Get joint handles for all of the joints in the chain
-    	getHandles(hw);
         
     	joint_msr_states_.resize(kdl_chain_.getNrOfJoints());
     	joint_des_states_.resize(kdl_chain_.getNrOfJoints());

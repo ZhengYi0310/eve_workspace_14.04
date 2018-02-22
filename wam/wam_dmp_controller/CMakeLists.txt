@@ -81,6 +81,7 @@ add_library(${PROJECT_NAME}
   src/dmp_ik_controller.cpp
   src/KinematicChainControllerBase.cpp
   src/joint_impedance_controller.cpp
+  src/joint_space_controller.cpp
 )
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBARIES})

@@ -2,4 +2,5 @@
   <class name="wam_dmp_controller/DMPJointPositionController" type="wam_dmp_controller::DMPJointPositionController" base_class_type="controller_interface::ControllerBase" />
   <class name="wam_dmp_controller/DMPIKController" type="wam_dmp_controller::DMPIKController" base_class_type="controller_interface::ControllerBase" />
   <class name="wam_dmp_controller/JointPositionController" type="wam_dmp_controller::JointPositionController" base_class_type="controller_interface::ControllerBase" />
+  <class name="wam_dmp_controller/JointImpedanceController" type="wam_dmp_controller::JointImpedanceController" base_class_type="controller_interface::ControllerBase" />
 </library>

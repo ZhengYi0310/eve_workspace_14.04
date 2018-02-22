@@ -167,6 +167,7 @@ namespace barrett_hw
             void registerJointLimits(const std::string& joint_name, const hardware_interface::JointHandle& joint_handle_effort, const hardware_interface::JointHandle& joint_handle_position, const hardware_interface::JointHandle& joint_handle_velocity, const hardware_interface::JointHandle& joint_handle_stiffness, const hardware_interface::JointHandle& joint_handle_damping, const urdf::Model*const urdf_model, double*const effort_limit, double*const lower_limit, double*const upper_limit, double*const lower_limit_stiffness, double*const upper_limit_stiffness, double*const lower_limit_damping, double*const upper_limit_damping);
             
     }; // class 
+    
 }
 
 #endif
