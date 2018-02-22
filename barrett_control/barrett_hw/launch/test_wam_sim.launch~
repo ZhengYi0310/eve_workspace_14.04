@@ -68,6 +68,6 @@
 
 	<!-- real robot and controllers -->
 	
-        <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"  args="--stopped joint_space_controller --shutdown-timeout 2" />
+        <node name="controller_stopper" pkg="controller_manager" type="spawner" respawn="false" output="screen"  args="--stopped barrett_hw/joint_space_controller --shutdown-timeout 2" />
 	
 </launch>

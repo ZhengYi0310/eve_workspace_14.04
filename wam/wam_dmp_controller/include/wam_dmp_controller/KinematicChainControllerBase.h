@@ -66,8 +66,9 @@ namespace wam_dmp_controller
 
         // get URDF and name of root and tip from the parameter server
         std::string robot_description, root_seg_name, tip_seg_name;
+        std::string urdf_string;
     
-		if (!nh_.getParam("robot_description_yi", robot_description))
+        if (!ros::param::search(nh_.getNamespace(), "robot_description_yi", robot_description))
         {
             ROS_ERROR_STREAM("KinematicChainControllerBase: No robot description (URDF) found on parameter server ("<<n.getNamespace()<<"/robot_description_yi)");
             return false;
@@ -88,10 +89,27 @@ namespace wam_dmp_controller
         // Get the gravity vector (direction and magnitude)
         gravity_ = KDL::Vector::Zero();
         gravity_(2) = -9.81;
+        
+        if (nh_.hasParam(robot_description))
+        {
+            nh_.getParam(robot_description.c_str(), urdf_string);
+        }
+        else
+        {
+            ROS_ERROR("Parameter %s not set, shutting down node...", robot_description.c_str());
+            n.shutdown();
+            return false;
+        }
 
+        if (urdf_string.size() == 0)
+        {
+            ROS_ERROR("Unable to load robot model from parameter %s",robot_description.c_str());
+            n.shutdown();
+            return false;
+        }
         urdf::Model urdf_model_;
         //if (!urdf.initParamWithinNodeHandle("robot_description", n))
-        if (!urdf_model_.initString(robot_description))
+        if (!urdf_model_.initString(urdf_string))
         {
             ROS_ERROR("Failed to parse urdf file");
             n.shutdown();
@@ -151,13 +169,18 @@ namespace wam_dmp_controller
 
     	
 
-	std::string controller_type;
- 	nh_.getParam("type", controller_type);
-	ROS_INFO("Controller %s succssfully loaded", controller_type.c_str());
+	    std::string controller_type;
+ 	    nh_.getParam("type", controller_type);
+	    ROS_INFO("Controller %s succssfully loaded", controller_type.c_str());
+
+    	getHandles(hw);        
     	ROS_INFO("Number of joints in handle = %lu", joint_handles_.size() );
+        for (uint32_t i = 0; i < joint_handles_.size(); i++)
+        {
+            ROS_INFO("The name of for the handle %lu is: %s", i + 1, joint_handles_[i].getName().c_str());
+        }
 
         // Get joint handles for all of the joints in the chain
-    	getHandles(hw);
         
     	joint_msr_states_.resize(kdl_chain_.getNrOfJoints());
     	joint_des_states_.resize(kdl_chain_.getNrOfJoints());

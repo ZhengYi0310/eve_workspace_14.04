@@ -50,12 +50,12 @@ namespace wam_dmp_controller
 
             if ( !Kv_handle.getParam(joint_handles_[i].getName().c_str(), Kv_(i) ) ) 
             {
-                ROS_WARN("Kp gain not set for %s in yaml file, Using 0.7.", joint_handles_[i].getName().c_str());
+                ROS_WARN("Kv gain not set for %s in yaml file, Using 0.7.", joint_handles_[i].getName().c_str());
                 Kv_(i) = 0.7;
             }
             else 
             {
-                 ROS_WARN("Kp gain set for %s in yaml file, Using %f", joint_handles_[i].getName().c_str(), Kv_(i)); 
+                 ROS_WARN("Kv gain set for %s in yaml file, Using %f", joint_handles_[i].getName().c_str(), Kv_(i)); 
             }            
         }
 		sub_posture_ = nh_.subscribe("command", 1, &JointSpaceController::command, this);

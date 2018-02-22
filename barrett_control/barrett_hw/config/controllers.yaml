@@ -7,6 +7,8 @@ barrett_hw:
 
   joint_space_controller:
     type: wam_dmp_controller/JointSpaceController
+    root_link: left_wam/base_link
+    tip_link: left_wam/wrist_palm_link
     Kp_Gains:
         left_wam/base_yaw_joint: 900
         left_wam/shoulder_pitch_joint: 2500
