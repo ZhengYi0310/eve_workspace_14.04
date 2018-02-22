@@ -13,9 +13,6 @@
 #include <std_msgs/Float64MultiArray.h>
 
 #include <boost/scoped_ptr.hpp>
-/*
-	tau_cmd_ = M(q_msr_)[Kp_*(q_des_ - q_msr_) + Kv_*(dotq_des - dotq_msr_)] + C(q_msr_, dotq_msr_)q_msr_ + G(q_msr_)
-*/
 
 namespace wam_dmp_controller
 {
