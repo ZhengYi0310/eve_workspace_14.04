@@ -43,7 +43,7 @@ namespace wam_dmp_controller
             if ( !Kp_handle.getParam(joint_handles_[i].getName(), Kp_(i) ) ) 
             {
                 ROS_WARN("Kp gain not set for %s in yaml file, Using 300.", joint_handles_[i].getName().c_str());
-                Kp_(i) = 300;
+                Kp_.coeffRef(i, i) = 300;
             }
             else 
             {
@@ -53,7 +53,7 @@ namespace wam_dmp_controller
             if ( !Kv_handle.getParam(joint_handles_[i].getName().c_str(), Kv_(i) ) ) 
             {
                 ROS_WARN("Kv gain not set for %s in yaml file, Using 0.7.", joint_handles_[i].getName().c_str());
-                Kv_(i) = 0.7;
+                Kv_.coeffRef(i, i) = 0.7;
             }
             else 
             {
@@ -63,12 +63,15 @@ namespace wam_dmp_controller
             if ( !Ki_handle.getParam(joint_handles_[i].getName().c_str(), Ki_(i) ) ) 
             {
                 ROS_WARN("Ki gain not set for %s in yaml file, Using 0.5.", joint_handles_[i].getName().c_str());
-                Kv_(i) = 0.5;
+                Kv_.coeffRef(i, i) = 0.5;
             }
             else 
             {
                  ROS_WARN("Ki gain set for %s in yaml file, Using %f", joint_handles_[i].getName().c_str(), Kv_(i)); 
-            }            
+            }  
+
+            // scale Kp_ gains for later 
+            Kp_.coeffRef(i, i) /= Kv_.coeffRef(i, i);
             
         }
 
@@ -102,6 +105,11 @@ namespace wam_dmp_controller
         trans_xyzdot_des_ws_ = Eigen::Vector3d::Zero();
         rot_xyz_des_ws_ = Eigen::Vector3d::Zero();
         rot_xyzdot_des_ws_ = Eigen::Vector3d::Zero();
+        ws_x_ = Eigen::VectorXd(6);
+        ws_xdot_ = Eigen::VectorXd(6);
+        tau_ = Eigen::VectorXd(7);
+        F_unit_ = Eigen::VectorXd(6);
+        J_dyn_inv = Eigen::MatrixXd::Zero(6, 6);
 
     	// instantiate analytical to geometric transformation matrices
     	ws_E_ = Eigen::MatrixXd::Zero(6,6);
@@ -251,12 +259,10 @@ namespace wam_dmp_controller
     	Eigen::MatrixXd ws_JA_ee;
     	ws_JA_ee = ws_E_ * ws_J_ee.data;
     	/////////////////////////////////////////////////////
-        //TODO edit the dimension here !!
-    	for (uint32_t i = 0; i < 3; i++)
-    	{
-    		trans_xyz_ws_[i] = p_ws_ee_[i];
-    	}
-    	trans_xyzdot_ws_ = ws_JA_ee * joint_msr_states_.qdot.data;
+        trans_xyz_ws_ << p_ws_ee_.x(), p_ws_ee_.y(), p_ws_ee_.z();
+        rot_xyz_ws_ << gamma, beta, alpha;
+    	trans_xyzdot_ws_ = (ws_JA_ee * joint_msr_states_.qdot.data).block(0, 0, 3, 1);
+        rot_xyzdot_ws_ = (ws_JA_ee * joint_msr_states_.qdot.data).block(3, 0, 3, 1); 
     	//////////////////////////////////////////////////////
 
     	 //////////////////////////////////////////////////////////////////////////////////
@@ -354,13 +360,47 @@ namespace wam_dmp_controller
 
     	if (null_control_)
     	{
-    		// evaluate the null space projection
-    		Eigen::MatrixXd ns_projection = Eigen::Matrix<double, 7, 7>::Identity() - ws_JA_ee.transpose() * J_dyn_inv;
-    		/* TODO add the secondary nullspace controller here */
-    	}
+    		// evaluate the null space prmZ
 
-        // TODO THE ORIENTATION AND POSITION ARE TREATED DIFFERENTLY ? THE ORIENTATION CAN'T BE SUBTRACTED NAIVELY
-        //	tau_ += command_filter_ * (Kp_ * (xyz_ws_des_ - xyz_ws_) + Kv_ * (xyz_des_ws_ - xyz_xdot_des_ws_))
+            // TODO THE ORIENTATION AND POSITION ARE TREATED DIFFERENTLY ? THE ORIENTATION CAN'T BE SUBTRACTED NAIVELY
+            // Do velocity clipping one the translation velocity
+        }
+        trans_xyz_error_ = Kp_.block(0, 0, 3, 3) * (trans_xyz_des_ws_ - trans_xyz_ws_);
+        if(trans_xyz_error_.norm() > trans_vmax_)
+        {
+            trans_xyz_error_ = trans_vmax_ / trans_xyz_error_.norm() * trans_xyz_error_;
+        }
+
+        tau_trans_ = Kv_.block(0, 0, 3, 3) * (trans_xyzdot_ws_ - trans_xyz_error_);
+        
+        Z_ = Eigen::AngleAxisd(rot_xyz_ws_[2], Eigen::Vector3d::UnitZ());
+        Y_ = Eigen::AngleAxisd(rot_xyz_ws_[1], Eigen::Vector3d::UnitY());
+        X_ = Eigen::AngleAxisd(rot_xyz_ws_[0], Eigen::Vector3d::UnitX());
+        Z_des_ = Eigen::AngleAxisd(rot_xyz_des_ws_[2], Eigen::Vector3d::UnitZ());
+        Y_des_ = Eigen::AngleAxisd(rot_xyz_des_ws_[1], Eigen::Vector3d::UnitY());
+        X_des_ = Eigen::AngleAxisd(rot_xyz_des_ws_[0], Eigen::Vector3d::UnitX());
+        
+
+        rot_xyz_ws_qua_ = Z_ * Y_ * X_;
+        rot_xyz_des_ws_qua_ = Z_des_ * Y_des_ * X_des_;
+        rot_xyz_error_qua_ = rot_xyz_ws_qua_.matrix() * rot_xyz_des_ws_qua_.matrix().inverse();
+
+        double norm = sqrt(rot_xyz_error_qua_.x() * rot_xyz_error_qua_.x() + rot_xyz_error_qua_.y() * rot_xyz_error_qua_.y() + rot_xyz_error_qua_.z() * rot_xyz_error_qua_.z());
+        double c = 0.0;
+        if(norm != 0.0)
+        {
+            c = 2.0 * acos(rot_xyz_error_qua_.w()) / norm;
+
+            if(c > rot_vmax_)
+                c = rot_vmax_;
+            else if(c < -rot_vmax_)
+                c = -rot_vmax_;
+        }
+        rot_xyz_error_ << rot_xyz_error_qua_.x() * c, rot_xyz_error_qua_.y() * c, rot_xyz_error_qua_.z() * c;
+        tau_rot_ = Kv_.block(3, 3, 3, 3) * (rot_xyzdot_ws_ + Kp_.block(3, 3, 3, 3) * rot_xyz_error_);
+        F_unit_.block(0, 0, 3, 1) = tau_trans_;
+        F_unit_.block(3, 0, 3, 1) = tau_rot_;
+        tau_ += command_filter_ * F_unit_;
 
     	// set joint efforts
     	for(int i=0; i<kdl_chain_.getNrOfJoints(); i++)
@@ -372,7 +412,6 @@ namespace wam_dmp_controller
 			joint_damping_handles_[i].setCommand(0);
 			joint_set_point_handles_[i].setCommand(joint_msr_states_.q(i));
       	}
-
   	}
   	// Start command subscriber 
     void OperationalSpaceController::setCommandCB(const wam_dmp_controller::PoseRPYConstPtr& msg)

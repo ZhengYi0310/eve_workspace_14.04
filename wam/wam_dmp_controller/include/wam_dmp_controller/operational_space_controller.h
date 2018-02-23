@@ -82,9 +82,11 @@ namespace wam_dmp_controller
   			Eigen::Vector3d trans_xyz_ws_, trans_xyzdot_ws_;
             Eigen::Vector3d rot_xyz_ws_, rot_xyzdot_ws_;
             Eigen::Vector3d trans_xyz_des_ws_, trans_xyzdot_des_ws_;
-            Eigen::Vector3d rot_xyz_des_ws_, rot_xyzdot_des_ws_;
-            Eigen::Vector3d trans_vmax_;
-            Eigen::Vector3d rot_vmax_;
+            Eigen::Vector3d rot_xyz_des_ws_, rot_xyzdot_des_ws_, trans_xyz_error_, rot_xyz_error_;
+            Eigen::Matrix3d rot_xyz_ws_mat_, rot_xyz_des_ws_mat_;
+            Eigen::Quaternion<double> rot_xyz_error_qua_, rot_xyz_ws_qua_, rot_xyz_des_ws_qua_;
+            Eigen::AngleAxisd Z_, Y_, X_, Z_des_, Y_des_, X_des_;
+            double rot_vmax_, trans_vmax_;
 
   			KDL::Vector p_wrist_ee_;
     		KDL::Vector p_base_ws_;
@@ -109,11 +111,13 @@ namespace wam_dmp_controller
             Eigen::Matrix<double, 6 ,6> null_Kv_;
             Eigen::Matrix<double, 6, 6> lamb_;
             Eigen::MatrixXd J_dyn_inv;
+            Eigen::Vector3d tau_trans_;
+            Eigen::Vector3d tau_rot_;
             bool null_control_;
     		//double gamma_im_link5_initial_;
 
     		// commandss
-    		Eigen::VectorXd tau_;
+    		Eigen::VectorXd tau_, F_unit_;
     		Eigen::MatrixXd command_filter_;
             realtime_tools::RealtimeBuffer<Commands> command_buffer_;
             Commands command_struct_; // pre-allocated member that is re-used to set the realtime buffer
