@@ -24,12 +24,25 @@ find_package(catkin REQUIRED COMPONENTS
   forward_command_controller
   dynamic_reconfigure
   tf_conversions
+  kdljacdot
+  roscpp
+  kdl_conversions
+  eigen_conversions
   
 )
 
 find_package(Boost REQUIRED COMPONENTS thread signals system filesystem)
 add_definitions(${Boost_DEFINITIONS})
-include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
+find_package(Eigen3)
+if(NOT EIGEN3_FOUND)
+  find_package(Eigen REQUIRED)
+  set(EIGEN3_INCLUDE_DIRS ${EIGEN_INCLUDE_DIRS})
+  set(EIGEN3_LIBRARIES ${EIGEN_LIBRARIES})
+else()
+  set(EIGEN3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
+endif()
+
+include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS})
 
 add_message_files(DIRECTORY msg FILES
   JointPositionVelocityStamped.msg
@@ -69,6 +82,10 @@ catkin_package(
     forward_command_controller
     dynamic_reconfigure
     tf_conversions
+    kdljacdot
+    roscpp
+    kdl_conversions
+    eigen_conversions
     
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
@@ -85,14 +102,15 @@ add_library(${PROJECT_NAME}
   src/joint_space_controller.cpp
   src/gravity_compensation.cpp
   src/arm_state_controller.cpp
+  src/operational_space_controller.cpp
 )
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBARIES})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBARIES} ${EIGEN3_LIBRARIES})
 
 add_executable(test_wam_dmp_controller
   test/test_dmp_controller.cpp
 )
-target_link_libraries(test_wam_dmp_controller ${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBARIES})
+target_link_libraries(test_wam_dmp_controller ${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBARIES} ${EIGEN3_LIBRARIES})
 add_dependencies(test_wam_dmp_controller ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS} wam_dmp_controller_gencpp)
 
 # Install

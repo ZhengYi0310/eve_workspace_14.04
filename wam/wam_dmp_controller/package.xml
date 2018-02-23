@@ -36,6 +36,10 @@
   <build_depend>forward_command_controller</build_depend>
   <build_depend>dynamic_reconfigure</build_depend>
   <build_depend>tf_conversions</build_depend>
+   <build_depend>kdljacdot</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>kdl_conversions</build_depend>
+  <build_depend>eigen_conversions</build_depend>
   
   <run_depend>angles</run_depend>
   <run_depend>controller_interface</run_depend>
@@ -58,6 +62,10 @@
   <run_depend>forward_command_controller</run_depend>
   <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>tf_conversions</run_depend>
+  <run_depend>kdljacdot</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>kdl_conversions</run_depend>
+  <run_depend>eigen_conversions</run_depend>
  
   <export>
 	  <controller_interface plugin="${prefix}/controller_plugin.xml"/>

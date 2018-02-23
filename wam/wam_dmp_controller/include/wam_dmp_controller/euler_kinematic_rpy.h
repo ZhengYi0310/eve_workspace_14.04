@@ -12,25 +12,29 @@
 #define EULER_KIN_RPY_H
 
 #include <math.h>
-#include <Eigen/LU>
+#include <Eigen/Core>
 using namespace Eigen;
 namespace wam_dmp_controller
 {
   inline void eul_kin_RPY(const double pitch, const double yaw, Eigen::Matrix3d &E)
   {	
-    T << 0, -sin(yaw), cos(pitch) * cos(yaw),
+    /*
+    E << 0, -sin(yaw), cos(pitch) * cos(yaw),
          0, cos(yaw),  cos(pitch) * sin(yaw),
          1, 0,         -sin(pitch);
+    */
   }
 
   inline void eul_kin_RPY_dot(const double pitch, const double yaw,
 			    const double pitch_dot, const double yaw_dot,
 			    Eigen::Matrix3d &E_dot)
   {	
-    T_dot <<
+    /*
+    E_dot <<
 	0, -cos(yaw) * yaw_dot, -cos(yaw) * sin(pitch) * pitch_dot - cos(pitch) * sin(yaw) * yaw_dot,
 	0, -sin(yaw) * yaw_dot, -sin(pitch) * sin(yaw) * pitch_dot + cos(pitch) * cos(yaw) * yaw_dot,
 	0, 0, -cos(pitch) * pitch_dot;
+   */
   }
 }
 

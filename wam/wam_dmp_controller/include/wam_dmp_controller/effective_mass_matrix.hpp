@@ -8,7 +8,7 @@
 
 namespace wam_dmp_controller
 {
-  inline void compute(const Eigen::MatrixXd& lambda_inv, Eigen::MatrixXd& lambda, double thresh = 0.001, bool damped=true)
+  inline void ComputeMassMatrix(const Eigen::MatrixXd& lambda_inv, Eigen::MatrixXd& lambda, double thresh = 0.001, bool damped=true)
   {
     double lambda_ = damped ? 0.2:0.0;
     Eigen::JacobiSVD<Eigen::Matrix3d> svd(lambda_inv, Eigen::ComputeFullU | Eigen::ComputeFullV);
