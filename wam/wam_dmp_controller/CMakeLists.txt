@@ -103,6 +103,7 @@ add_library(${PROJECT_NAME}
   src/gravity_compensation.cpp
   src/arm_state_controller.cpp
   src/operational_space_controller.cpp
+  src/kalman_filter.cpp
 )
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBARIES} ${EIGEN3_LIBRARIES})

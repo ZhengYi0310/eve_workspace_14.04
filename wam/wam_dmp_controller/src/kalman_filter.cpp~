@@ -9,7 +9,7 @@
 #include "kalman_filter/kalman_filter.hpp"
 #include "kalman_filter/exception.hpp"
 
-using namespace wam_dmp_controller;
+using namespace ops_wbc_kalman_filter;
 using namespace std;
 
 void KalmanFilter::setRandomVariables(const NormalDistributionPtr& state,

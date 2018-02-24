@@ -4,7 +4,7 @@
 #include <memory>
 #include <Eigen/Dense>
 
-#include "wam_dmp_controller/normal_distribution.hpp"
+#include "kalman_filter/normal_distribution.hpp"
 
 namespace ops_wbc_kalman_filter
 {

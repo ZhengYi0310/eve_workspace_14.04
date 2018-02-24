@@ -5,6 +5,7 @@
 #include <Eigen/Core>
 #include <Eigen/LU>
 #include <Eigen/SVD>
+#include <stdint.h>
 
 namespace wam_dmp_controller
 {
@@ -16,7 +17,7 @@ namespace wam_dmp_controller
     Eigen::JacobiSVD<Eigen::MatrixXd>::SingularValuesType sing_vals_ = svd.singularValues();
     Eigen::MatrixXd S = lambda_inv;
     S.setZero();
-    for(uint32_t i = 0; i < sing_vals_.size(); ++i)
+    for(int i = 0; i < sing_vals_.size(); ++i)
     {
       if(sing_vals_(i) < thresh)
       {

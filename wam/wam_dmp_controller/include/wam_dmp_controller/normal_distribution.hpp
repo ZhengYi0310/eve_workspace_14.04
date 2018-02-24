@@ -4,7 +4,7 @@
 #include <memory>
 #include <Eigen/Dense>
 
-namespace ops_wbc_kalman_filter
+namespace wam_dmp_controller
 {
     class NormalDistribution
     {
