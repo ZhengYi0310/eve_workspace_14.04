@@ -2,6 +2,8 @@
 #define __WAM_DMP_CONTROLLER_OPERATIONAL_SPACE_CONTROLLER_H
 
 #include "wam_dmp_controller/KinematicChainControllerBase.h"
+#include <geometry_msgs/Vector3.h>
+#include <wam_dmp_controller/RPY.h>
 
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/condition.hpp>
@@ -31,9 +33,9 @@ namespace wam_dmp_controller
 
   			//void get_gains_inertia(double& kp_z, double& kp_gamma, double& kd_pos, double& kd_att);
     		//void set_gains_inertia(double kp_z, double kp_gamma, double kd_pos, double kd_att);
-    		//void set_p_wrist_ee(double x, double y, double z);
-    		//void set_p_base_ws(double x, double y, double z);
-    		//void set_ws_base_angles(double alpha, double beta, double gamma);
+    		void set_p_wrist_ee(double x, double y, double z);
+    		void set_p_base_ws(double x, double y, double z);
+    		void set_ws_base_angles(double alpha, double beta, double gamma);
             //void setCommand(geometry_msgs::Vector3 xyz);
             //void setCommand(geometry_msgs::Vector3 xyz, wam_dmp_controller::RPY rpy);
             //void setCommand(geometry_msgs::Vector3 xyz, wam_dmp_controller::RPY dxyz);
@@ -111,14 +113,14 @@ namespace wam_dmp_controller
             Eigen::Matrix<double, 6 ,6> null_Kv_;
             Eigen::Matrix<double, 6, 6> lamb_;
             Eigen::MatrixXd J_dyn_inv;
-            Eigen::Vector3d tau_trans_;
-            Eigen::Vector3d tau_rot_;
-            bool null_control_;
+            Eigen::Vector3d tau_trans_, tau_rot_, tau_null_;
+    		Eigen::VectorXd tau_, F_unit_;
+    		Eigen::MatrixXd command_filter_;
+            Eigen::VectorXd q_rest_;
+            //bool null_control_;
     		//double gamma_im_link5_initial_;
 
     		// commandss
-    		Eigen::VectorXd tau_, F_unit_;
-    		Eigen::MatrixXd command_filter_;
             realtime_tools::RealtimeBuffer<Commands> command_buffer_;
             Commands command_struct_; // pre-allocated member that is re-used to set the realtime buffer
 
@@ -127,6 +129,7 @@ namespace wam_dmp_controller
     		bool use_simulation_;
 
             ros::Subscriber sub_command_;
+            void setCommand(geometry_msgs::Vector3 position, wam_dmp_controller::RPY orientation);
             void setCommandCB(const wam_dmp_controller::PoseRPYConstPtr& msg);
   	};
 } 

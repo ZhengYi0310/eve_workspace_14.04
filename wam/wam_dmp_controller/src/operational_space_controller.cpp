@@ -36,6 +36,8 @@ namespace wam_dmp_controller
         ros::NodeHandle Kp_handle(n, "Kp_Gains");
         ros::NodeHandle Kv_handle(n, "Kv_Gains");
         ros::NodeHandle Ki_handle(n, "Ki_Gains");
+        ros::NodeHandle null_Kp_handle(n, "null_Kp_gains");
+        ros::NodeHandle null_Kv_handle(n, "null_Kv_gains");
         
         for (size_t i = 0; i < joint_handles_.size(); i++)
         {
@@ -58,7 +60,10 @@ namespace wam_dmp_controller
             else 
             {
                  ROS_WARN("Kv gain set for %s in yaml file, Using %f", joint_handles_[i].getName().c_str(), Kv_(i)); 
-            }      
+            }     
+            // scale Kp_ gains for later 
+            Kp_.coeffRef(i, i) /= Kv_.coeffRef(i, i);
+            
 
             if ( !Ki_handle.getParam(joint_handles_[i].getName().c_str(), Ki_(i) ) ) 
             {
@@ -68,10 +73,30 @@ namespace wam_dmp_controller
             else 
             {
                  ROS_WARN("Ki gain set for %s in yaml file, Using %f", joint_handles_[i].getName().c_str(), Kv_(i)); 
-            }  
+            } 
 
-            // scale Kp_ gains for later 
-            Kp_.coeffRef(i, i) /= Kv_.coeffRef(i, i);
+            if ( !null_Kp_handle.getParam(joint_handles_[i].getName().c_str(), null_Kp_(i) ) ) 
+            {
+                ROS_WARN("null_Kp gain not set for %s in yaml file, Using 0.0.", joint_handles_[i].getName().c_str());
+                null_Kp_.coeffRef(i, i) = 0.0;
+            }
+            else 
+            {
+                 ROS_WARN("null_Kp gain set for %s in yaml file, Using %f", joint_handles_[i].getName().c_str(), null_Kp_(i)); 
+            } 
+
+            if ( !null_Kv_handle.getParam(joint_handles_[i].getName().c_str(), null_Kv_(i) ) ) 
+            {
+                ROS_WARN("null_Kv gain not set for %s in yaml file, Using 0.0.", joint_handles_[i].getName().c_str());
+                null_Kv_.coeffRef(i, i) = 0.0;
+            }
+            else 
+            {
+                 ROS_WARN("null_Kv gain set for %s in yaml file, Using %f", joint_handles_[i].getName().c_str(), null_Kv_(i)); 
+            } 
+
+            //TODO also need to load the rest joint postures from the parameter server.....
+            
             
         }
 
@@ -107,7 +132,9 @@ namespace wam_dmp_controller
         rot_xyzdot_des_ws_ = Eigen::Vector3d::Zero();
         ws_x_ = Eigen::VectorXd(6);
         ws_xdot_ = Eigen::VectorXd(6);
-        tau_ = Eigen::VectorXd(7);
+        tau_ = Eigen::VectorXd(kdl_chain_.getNrOfJoints());
+        q_rest_ = Eigen::VectorXd(kdl_chain_.getNrOfJoints());
+        command_filter_ = Eigen::MatrixXd::Zero(kdl_chain_.getNrOfJoints(), 6);
         F_unit_ = Eigen::VectorXd(6);
         J_dyn_inv = Eigen::MatrixXd::Zero(6, 6);
 
@@ -119,8 +146,6 @@ namespace wam_dmp_controller
     	null_Kp_ = Eigen::MatrixXd::Zero(6, 6);
     	null_Kv_ = Eigen::MatrixXd::Zero(6, 6);
     	lamb_ = Eigen::MatrixXd::Zero(6, 6);
-    	null_control_ = false;
-              
       	// Start command subscriber 
         sub_command_ = n.subscribe("Cartesian_space_command", 10, &OperationalSpaceController::setCommandCB, this);
 
@@ -284,7 +309,10 @@ namespace wam_dmp_controller
 
     	ComputeMassMatrix(Lambda_inv, Lambda);
 
-    	//
+        // Always consider null-space control, otherwise might cause unstable behavior for redundant Manipulator 
+        // in joint space 
+        J_dyn_inv = M.data.inverse() * ws_JA_ee.transpose() * Lambda;
+
     	//////////////////////////////////////////////////////////////////////////////////
 
     	//////////////////////////////////////////////////////////////////////////////////
@@ -334,11 +362,11 @@ namespace wam_dmp_controller
     	//
     	//////////////////////////////////////////////////////////////////////////////////
     	//
+      	command_filter_ = ws_JA_ee.transpose() * Lambda;        
     	if(use_simulation_)
-      		tau_ = C.data * joint_msr_states_.qdot.data - ws_JA_ee.transpose() * Lambda * ws_JA_ee_dot * joint_msr_states_.qdot.data;
+      		tau_ = C.data * joint_msr_states_.qdot.data + G.data - command_filter_ * ws_JA_ee_dot * joint_msr_states_.qdot.data;
     	else
-      		tau_ = C.data * joint_msr_states_.qdot.data - ws_JA_ee.transpose() * Lambda * ws_JA_ee_dot * joint_msr_states_.qdot.data;
-      	command_filter_ = ws_JA_ee.transpose() * Lambda;
+      		tau_ = C.data * joint_msr_states_.qdot.data + G.data - command_filter_ * ws_JA_ee_dot * joint_msr_states_.qdot.data;
     	//////////////////////////////////////////////////////////////////////////////////
     	//
     	// 
@@ -347,24 +375,6 @@ namespace wam_dmp_controller
     	// for details on the definition of a dynamically consistent generalized inverse)
     	//
     	//////////////////////////////////////////////////////////////////////////////////
-    	//  
-
-    	// evaluate the generalized inver of the jacobian matrix
-    	//Eigen::MatrixXd J_dyn_inv;
-    	if (use_simulation_)
-    		J_dyn_inv = M.data.inverse() * ws_JA_ee.transpose() * Lambda;
-    	else
-    		J_dyn_inv = M.data.inverse() * ws_JA_ee.transpose() * Lambda;
-
-    	
-
-    	if (null_control_)
-    	{
-    		// evaluate the null space prmZ
-
-            // TODO THE ORIENTATION AND POSITION ARE TREATED DIFFERENTLY ? THE ORIENTATION CAN'T BE SUBTRACTED NAIVELY
-            // Do velocity clipping one the translation velocity
-        }
         trans_xyz_error_ = Kp_.block(0, 0, 3, 3) * (trans_xyz_des_ws_ - trans_xyz_ws_);
         if(trans_xyz_error_.norm() > trans_vmax_)
         {
@@ -402,6 +412,9 @@ namespace wam_dmp_controller
         F_unit_.block(3, 0, 3, 1) = tau_rot_;
         tau_ += command_filter_ * F_unit_;
 
+        // Consider the nullspace controller here 
+        tau_null_ = M.data * (null_Kp_ * (q_rest_ - joint_msr_states_.q.data) - null_Kv_ * joint_msr_states_.qdot.data);
+        tau_ += tau_null_;
     	// set joint efforts
     	for(int i=0; i<kdl_chain_.getNrOfJoints(); i++)
       	{
@@ -413,20 +426,40 @@ namespace wam_dmp_controller
 			joint_set_point_handles_[i].setCommand(joint_msr_states_.q(i));
       	}
   	}
-  	// Start command subscriber 
-    void OperationalSpaceController::setCommandCB(const wam_dmp_controller::PoseRPYConstPtr& msg)
+
+    void OperationalSpaceController::setCommand(geometry_msgs::Vector3 position, wam_dmp_controller::RPY orientation)
     {
-        command_struct_.trans_xyz_command_[0] = (msg->position).x;
-        command_struct_.trans_xyz_command_[1] = (msg->position).y;
-        command_struct_.trans_xyz_command_[2] = (msg->position).z;
-        command_struct_.rot_xyz_command_[0] = (msg->orientation).roll;
-        command_struct_.rot_xyz_command_[1] = (msg->orientation).yaw;
-        command_struct_.rot_xyz_command_[2] = (msg->orientation).pitch;
+        command_struct_.trans_xyz_command_[0] = position.x;
+        command_struct_.trans_xyz_command_[1] = position.y;
+        command_struct_.trans_xyz_command_[2] = position.z;
+        command_struct_.rot_xyz_command_[0] = orientation.roll;
+        command_struct_.rot_xyz_command_[1] = orientation.pitch;
+        command_struct_.rot_xyz_command_[2] = orientation.yaw;
 
         command_struct_.trans_xyzdot_command_ = Eigen::Vector3d::Zero();
         command_struct_.rot_xyzdot_command_ = Eigen::Vector3d::Zero();
 
-        command_buffer_.writeFromNonRT(command_struct_);
+        command_buffer_.writeFromNonRT(command_struct_);        
+    }
+  	// Start command subscriber 
+    void OperationalSpaceController::setCommandCB(const wam_dmp_controller::PoseRPYConstPtr& msg)
+    {
+        setCommand(msg->position, msg->orientation);
+    }
+
+    void OperationalSpaceController::set_p_wrist_ee(double x, double y, double z)
+    {
+        p_wrist_ee_ = KDL::Vector(x, y, z);
+    }
+  
+    void OperationalSpaceController::set_p_base_ws(double x, double y, double z)
+    {
+        p_base_ws_ = KDL::Vector(x, y, z);
+    }
+
+    void OperationalSpaceController::set_ws_base_angles(double alpha, double beta, double gamma)
+    {
+        R_ws_base_ = KDL::Rotation::EulerZYX(alpha, beta, gamma);
     }
 }
 PLUGINLIB_EXPORT_CLASS(wam_dmp_controller::OperationalSpaceController, controller_interface::ControllerBase)
