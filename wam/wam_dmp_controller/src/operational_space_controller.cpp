@@ -391,10 +391,17 @@ namespace wam_dmp_controller
         X_des_ = Eigen::AngleAxisd(rot_xyz_des_ws_[0], Eigen::Vector3d::UnitX());
         
 
-        rot_xyz_ws_qua_ = Z_ * Y_ * X_;
-        rot_xyz_des_ws_qua_ = Z_des_ * Y_des_ * X_des_;
-        rot_xyz_error_qua_ = rot_xyz_ws_qua_.matrix() * rot_xyz_des_ws_qua_.matrix().inverse();
-
+        rot_xyz_ws_qua_ = rot_xyz_ws_mat_ = Z_ * Y_ * X_;
+        rot_xyz_des_ws_qua_ = rot_xyz_des_ws_mat_ = Z_des_ * Y_des_ * X_des_;
+        rot_xyz_error_qua_ = rot_xyz_ws_mat_ * rot_xyz_des_ws_mat_.inverse();
+        
+        /* 
+        // Opeational Space Control: A Theoretic and Empirical Comparison 
+        KDL::Vector temp = KDL::Vector(rot_xyz_des_ws_qua_.x(), rot_xyz_des_ws_qua_.y(), rot_xyz_des_ws_qua_.z());
+        skew_symmetric(temp, rot_xyz_des_ws_skew_);
+        rot_xyz_error_ = rot_xyz_des_ws_qua_.w() * rot_xyz_ws_qua_.vec() - rot_xyz_ws_qua_.w() * rot_xyz_des_ws_qua_.vec() + rot_xyz_des_ws_skew_ *  rot_xyz_ws_qua_.vec();
+        tau_rot_ =  Kv_.block(3, 3, 3, 3) * (rot_xyzdot_ws_ - Kp_.block(3, 3, 3, 3) * rot_xyz_error_); 
+        */
         double norm = sqrt(rot_xyz_error_qua_.x() * rot_xyz_error_qua_.x() + rot_xyz_error_qua_.y() * rot_xyz_error_qua_.y() + rot_xyz_error_qua_.z() * rot_xyz_error_qua_.z());
         double c = 0.0;
         if(norm != 0.0)

@@ -4,6 +4,7 @@
 #include "wam_dmp_controller/KinematicChainControllerBase.h"
 #include <geometry_msgs/Vector3.h>
 #include <wam_dmp_controller/RPY.h>
+#include <wam_dmp_controller/skew_symmetric.h>
 
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/condition.hpp>
@@ -85,6 +86,7 @@ namespace wam_dmp_controller
             Eigen::Vector3d rot_xyz_ws_, rot_xyzdot_ws_;
             Eigen::Vector3d trans_xyz_des_ws_, trans_xyzdot_des_ws_;
             Eigen::Vector3d rot_xyz_des_ws_, rot_xyzdot_des_ws_, trans_xyz_error_, rot_xyz_error_;
+            Eigen::Matrix3d rot_xyz_des_ws_skew_;
             Eigen::Matrix3d rot_xyz_ws_mat_, rot_xyz_des_ws_mat_;
             Eigen::Quaternion<double> rot_xyz_error_qua_, rot_xyz_ws_qua_, rot_xyz_des_ws_qua_;
             Eigen::AngleAxisd Z_, Y_, X_, Z_des_, Y_des_, X_des_;
