@@ -2,6 +2,7 @@
 #define __OPS_WBC_KALMAN_FILTER_NORMAL_DISTRIBUTION_HPP
 
 #include <memory>
+#include <boost/shared_ptr.hpp>
 #include <Eigen/Dense>
 
 namespace wam_dmp_controller
@@ -31,7 +32,7 @@ namespace wam_dmp_controller
             Eigen::MatrixXd mean_;
             Eigen::MatrixXd variance_;
     };
-    using NormalDistributionPtr = std::shared_ptr<NormalDistribution>;
+    typedef boost::shared_ptr<NormalDistribution> NormalDistributionPtr;
 }
 
 #endif // __OPS_WBC_KALMAN_FILTER_NORMAL_DISTRIBUTION_HPP

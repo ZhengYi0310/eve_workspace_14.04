@@ -2,8 +2,8 @@
 #define __OPS_WBC_KALMAN_FILTER_NORMAL_DISTRIBUTION_HPP
 
 #include <memory>
+#include <boost/shared_ptr>
 #include <Eigen/Dense>
-#include <boost/shared_ptr.hpp>
 
 namespace wam_dmp_controller
 {

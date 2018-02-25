@@ -18,6 +18,7 @@ namespace wam_dmp_controller
             void InitializeLinearModel(const Eigen::MatrixXd& coeff_of_mean,
                                 const Eigen::MatrixXd& coeff_of_ctrl_data,
                                 const Eigen::MatrixXd& coeff_of_msr_data);
+            void InitializeEstimator(Eigen::MatrixXd x_mean_0, Eigen::MatrixXd P_xx_0);
             void updateCtrlMatrix(const Eigen::MatrixXd& coeff_of_ctrl_data);
             void estimate(const Eigen::MatrixXd& ctrl_data, const Eigen::MatrixXd& msr_data_curr, const Eigen::MatrixXd& msr_data_last, NormalDistributionPtr& state);
 
@@ -59,7 +60,6 @@ namespace wam_dmp_controller
             Eigen::MatrixXd Q_;
             Eigen::MatrixXd Q_inverse_;
             Eigen::MatrixXd H_;
-            Eigen::MatrixXd O_;
             Eigen::MatrixXd S_;
             Eigen::MatrixXd T_;
             Eigen::MatrixXd U_;
