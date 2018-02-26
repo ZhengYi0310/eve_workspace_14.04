@@ -1,0 +1,14 @@
+# controller gains (position)
+float64[] Kp_gains
+float64[] Kd_gains
+# nullspace motion gains 
+float64[] null_Kp_gains
+float64[] null_Kv_gains
+---
+# controller gains (position)
+float64[] Kp_gains
+float64[] Kd_gains
+# nullspace motion gains 
+float64[] null_Kp_gains
+float64[] null_Kv_gains
+bool accepted

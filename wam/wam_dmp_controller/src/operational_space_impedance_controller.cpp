@@ -105,8 +105,13 @@ namespace wam_dmp_controller
         // Serivces 
         // advertise HybridImpedanceCommand service
         //set_cmd_traj_pos_service_ = n.advertiseService("set_traj_pos_cmd", &OperationalSpaceImpedanceController::set_cmd_traj_spline_srv, this); 
-        //get_cmd_traj_pos_service_ = n.advertiseService("get_traj_pos_cmd", &OperationalSpaceImpedanceController::get_cmd_traj_spline_srv, this);  
+        //get_cmd_traj_pos_service_ = n.advertiseService("get_traj_pos_cmd", &OperationalSpaceImpedanceController::get_cmd_traj_spline_srv, this); 
       	// Start command subscriber 
+        //
+        set_cmd_gains_service_ = n.advertiseService("set_impedance_gains", 
+                                                    &OperationalSpaceImpedanceController::set_cmd_gains, this);
+        get_cmd_gains_service_ = n.advertiseService("get_impedance_gains", 
+                                                    &OperationalSpaceImpedanceController::get_cmd_gains, this);
         sub_command_ = n.subscribe("Cartesian_space_command", 10, &OperationalSpaceImpedanceController::set_cmd_traj_callback, this);
         pub_ext_force_est_.reset(new realtime_tools::RealtimePublisher<geometry_msgs::WrenchStamped>(n, "ext_force_est", 100));
         pub_cart_des_.reset(new realtime_tools::RealtimePublisher<wam_dmp_controller::PoseRPY>(n, "des_cart_pos", 100));
@@ -503,197 +508,114 @@ namespace wam_dmp_controller
         pub_cart_err_->unlockAndPublish();
         //pub_ext_force_est_->unlockAndPublish;
     }
-
-    /*
-
-    void OperationalSpaceImpedanceController::set_default_traj()
-    {
-        p2p_traj_mutex_.lock();
-        
-        // get current robot joints configuration q
-        KDL::JntArray q;
-        q.resize(kdl_chain_.getNrOfJoints());
-        for(size_t i=0; i<kdl_chain_.getNrOfJoints(); i++)
-            q(i) = joint_handles_[i].getPosition();
-    
-        // forward kinematics
-        KDL::Frame ee_fk_frame;
-        ee_fk_solver_->JntToCart(q, ee_fk_frame);
-    
-        // evaluate current cartesian configuration
-        KDL::Rotation R_ws_ee;
-        KDL::Vector p_ws_ee;
-        double alpha, beta, gamma;
-        R_ws_ee = R_ws_base_ * ee_fk_frame.M;
-        R_ws_ee.GetEulerZYX(alpha, beta, gamma);
-        p_ws_ee = R_ws_base_ * (ee_fk_frame.p - p_base_ws_);
-
-        // set trans and rot tajectory constants
-        for(int i=0; i<6; i++)
-        {
-	        p2p_traj_const_(1, i) = 0;
-	        p2p_traj_const_(2, i) = 0;
-	        p2p_traj_const_(3, i) = 0;
-        }
-
-        for(int i=0; i<3; i++)
-            p2p_traj_const_(0, i) = p_ws_ee.data[i];
-        p2p_traj_const_(0, 3) = gamma;
-        p2p_traj_const_(0, 4) = beta;
-        p2p_traj_const_(0, 5) = alpha;
-        prev_trans_setpoint_ << p_ws_ee.x(), p_ws_ee.y(), p_ws_ee.z();
-        prev_rot_setpoint_ << gamma, beta, alpha;
-
-        // reset the time
-        time_ = p2p_traj_duration_;
-        run_spline_ = false;
-
-        p2p_traj_mutex_.unlock();
-
-    }
-    */
     
     void OperationalSpaceImpedanceController::get_parameters(ros::NodeHandle &n)
     {
+        std::vector<std::string> name;
+        name.push_back("trans_x");
+        name.push_back("trans_y");
+        name.push_back("trans_z");
+        name.push_back("rot_x");
+        name.push_back("rot_y");
+        name.push_back("rot_z");
         ros::NodeHandle Kp_handle(n, "Kp_Gains");
         ros::NodeHandle Kv_handle(n, "Kv_Gains");
         ros::NodeHandle Ki_handle(n, "Ki_Gains");
         ros::NodeHandle null_Kp_handle(n, "null_Kp_gains");
         ros::NodeHandle null_Kv_handle(n, "null_Kv_gains");
-        
-        for (size_t i = 0; i < joint_handles_.size(); i++)
+        ros::NodeHandle rest_postures_handle(n, "rest_posture");
+         
+        for (size_t i = 0; i < 6; i++)
         {
-            std::cout << joint_handles_[i].getName();
-            if ( !Kp_handle.getParam(joint_handles_[i].getName(), Kp_(i) ) ) 
+            if ( !Kp_handle.getParam(name[i].c_str(), Kp_.coeffRef(i, i))) 
             {
-                ROS_WARN("Kp gain not set for %s in yaml file, Using 300.", joint_handles_[i].getName().c_str());
+                ROS_WARN("Kp gain not set for %s in yaml file, Using 300.", name[i].c_str());
                 Kp_.coeffRef(i, i) = 300;
             }
             else 
             {
-                ROS_WARN("Kp gain set for %s in yaml file, Using %f", joint_handles_[i].getName().c_str(), Kp_(i)); 
+                ROS_WARN("Kp gain set for %s in yaml file, Using %f", name[i].c_str(), Kp_.coeff(i, i)); 
             }
-
-            if ( !Kv_handle.getParam(joint_handles_[i].getName().c_str(), Kv_(i) ) ) 
-            {
-                ROS_WARN("Kv gain not set for %s in yaml file, Using 0.7.", joint_handles_[i].getName().c_str());
-                Kv_.coeffRef(i, i) = 0.7;
-            }
-            else 
-            {
-                 ROS_WARN("Kv gain set for %s in yaml file, Using %f", joint_handles_[i].getName().c_str(), Kv_(i)); 
-            }     
-            // scale Kp_ gains for later 
-            Kp_.coeffRef(i, i) /= Kv_.coeffRef(i, i);
             
-
-            if ( !Ki_handle.getParam(joint_handles_[i].getName().c_str(), Ki_(i) ) ) 
+            if ( !Kv_handle.getParam(name[i].c_str(), Kv_.coeffRef(i, i))) 
             {
-                ROS_WARN("Ki gain not set for %s in yaml file, Using 0.5.", joint_handles_[i].getName().c_str());
-                Kv_.coeffRef(i, i) = 0.5;
+                ROS_WARN("Kv gain not set for %s in yaml file, Using 300.", name[i].c_str());
+                Kv_.coeffRef(i, i) = 300;
             }
             else 
             {
-                 ROS_WARN("Ki gain set for %s in yaml file, Using %f", joint_handles_[i].getName().c_str(), Kv_(i)); 
-            } 
+                ROS_WARN("Kv gain set for %s in yaml file, Using %f", name[i].c_str(), Kv_.coeff(i, i)); 
+            }
 
-            if ( !null_Kp_handle.getParam(joint_handles_[i].getName().c_str(), null_Kp_(i) ) ) 
+            if ( !Ki_handle.getParam(name[i].c_str(), Ki_.coeffRef(i, i))) 
             {
-                ROS_WARN("null_Kp gain not set for %s in yaml file, Using 0.0.", joint_handles_[i].getName().c_str());
-                null_Kp_.coeffRef(i, i) = 0.0;
+                ROS_WARN("Ki gain not set for %s in yaml file, Using 1.", name[i].c_str());
+                Ki_.coeffRef(i, i) = 1;
             }
             else 
             {
-                 ROS_WARN("null_Kp gain set for %s in yaml file, Using %f", joint_handles_[i].getName().c_str(), null_Kp_(i)); 
-            } 
+                ROS_WARN("Ki gain set for %s in yaml file, Using %f", name[i].c_str(), Ki_.coeff(i, i)); 
+            }
 
-            if ( !null_Kv_handle.getParam(joint_handles_[i].getName().c_str(), null_Kv_(i) ) ) 
+            if ( !null_Kp_handle.getParam(name[i].c_str(), null_Kp_.coeffRef(i, i))) 
             {
-                ROS_WARN("null_Kv gain not set for %s in yaml file, Using 0.0.", joint_handles_[i].getName().c_str());
-                null_Kv_.coeffRef(i, i) = 0.0;
+                ROS_WARN("null_Kp gain not set for %s in yaml file, Using 0.", name[i].c_str());
+                null_Kp_.coeffRef(i, i) = 0;
             }
             else 
             {
-                 ROS_WARN("null_Kv gain set for %s in yaml file, Using %f", joint_handles_[i].getName().c_str(), null_Kv_(i)); 
-            } 
-
+                ROS_WARN("null_Kp gain set for %s in yaml file, Using %f", name[i].c_str(), null_Kp_.coeff(i, i)); 
+            }
+            
+            if ( !null_Kv_handle.getParam(name[i].c_str(), null_Kv_.coeffRef(i, i))) 
+            {
+                ROS_WARN("null_Kv gain not set for %s in yaml file, Using 0.", name[i].c_str());
+                null_Kv_.coeffRef(i, i) = 0;
+            }
+            else 
+            {
+                ROS_WARN("null_Kv gain set for %s in yaml file, Using %f", name[i].c_str(), null_Kv_.coeff(i, i)); 
+            }
+        }
+        for (size_t i = 0; i < joint_handles_.size(); i++)
+        {
             //TODO also need to load the rest joint postures from the parameter server.....
-            
-            
-        } 
+            if ( !rest_postures_handle.getParam(joint_handles_[i].getName().c_str(), q_rest_[i])) 
+            {
+                ROS_WARN("rest posture not set for %s in yaml file, Using 0.", joint_handles_[i].getName().c_str());
+                q_rest_[i] = 0.0;
+            }
+            else
+            {
+                ROS_WARN("rest_posture set for %s in yaml file, Using %f",  joint_handles_[i].getName().c_str(), q_rest_[i]); 
+            }
+        }
+
+        // vector from the wrist to the tool tip (projected in wrist_palm frame)
+        std::vector<double> p_wrist_ee;
+        // vector from the sensor to the contact point
+        std::vector<double> p_sensor_cp; // only for hybrid motion/force control
+        // vector from vito_anchor to the workspace (projected in world frame)
+        std::vector<double> p_base_ws;
+        // rotation of the workspace frame w.r.t. vito_anchor frame
+        std::vector<double> ws_base_angles;
+        
+        n.getParam("p_wrist_ee", p_wrist_ee);
+        n.getParam("p_sensor_cp", p_sensor_cp);
+        n.getParam("p_base_ws", p_base_ws);
+        n.getParam("ws_base_angles", ws_base_angles);
+
+        // set internal members
+        set_p_wrist_ee(p_wrist_ee.at(0), p_wrist_ee.at(1), p_wrist_ee.at(2));
+        set_p_sensor_cp(p_sensor_cp.at(0), p_sensor_cp.at(1), p_sensor_cp.at(2));
+        set_p_base_ws(p_base_ws.at(0), p_base_ws.at(1), p_base_ws.at(2));
+        set_ws_base_angles(ws_base_angles.at(0), ws_base_angles.at(1), ws_base_angles.at(2));
+        
         n.getParam("publish_rate", publish_rate_);
         n.getParam("use_simulation_", use_simulation_);
     }
-    /*
-    void OperationalSpaceImpedanceController::eval_current_point_to_point_traj(const ros::Duration& period,
-                                                                               Eigen::VectorXd& x_des,
-                                                                               Eigen::VectorXd& xdot_des,
-                                                                               Eigen::VectorXd& xdotdot_des)
-    {
-        p2p_traj_mutex_.lock();
-        time_ += period.toSec();
-
-        if (time_ > p2p_traj_duration_)
-        {    
-            time_ = p2p_traj_duration_;
-            //run_spline_ = false;
-        }
-
-        for (int i=0; i<6; i++)
-        {
-	        x_des(i) = p2p_traj_const_(0, i) + p2p_traj_const_(1, i) * pow(time_, 3) + \
-                       p2p_traj_const_(2, i) * pow(time_, 4) + p2p_traj_const_(3, i) * pow(time_, 5);
-
-	        xdot_des(i) = 3 * p2p_traj_const_(1, i) * pow(time_, 2) + \
-                          4 * p2p_traj_const_(2, i) * pow(time_, 3) + 5 * p2p_traj_const_(3, i) * pow(time_, 4);
-
-	        xdotdot_des(i) = 3 * 2 *  p2p_traj_const_(1, i) * time_ + \
-                             4 * 3 * p2p_traj_const_(2, i) * pow(time_, 2) + 5 * 4 * p2p_traj_const_(3, i) * pow(time_, 3);
-        }
-        p2p_traj_mutex_.unlock();
-    }
-    */
-    /*
-    void OperationalSpaceImpedanceController::eval_point_to_point_traj_constants(Eigen::Vector3d& desired_trans,					    
-                                                                                 Eigen::Vector3d& desired_rot,
-                                                                                 double duration)
-    {
-        // evaluate common part of constants
-        double constant_0, constant_1, constant_2;
-        constant_0 = P2P_COEFF_3 / pow(duration, 3);
-        constant_1 = P2P_COEFF_4 / pow(duration, 4);
-        constant_2 = P2P_COEFF_5 / pow(duration, 5);
-
-        // evaluate constants for x and y trajectories
-        for (int i=0; i<3; i++)
-        {
-	        double error = desired_trans(i) - prev_trans_setpoint_(i);
-	        p2p_traj_const_(0, i) = prev_trans_setpoint_(i);
-	        p2p_traj_const_(1, i) = error * constant_0;
-	        p2p_traj_const_(2, i) = error * constant_1;
-	        p2p_traj_const_(3, i) = error * constant_2;
-        }
-        prev_trans_setpoint_ = desired_trans;
-
-        // evaluate constants alpha, beta and gamma trajectories
-        double alpha_cmd, beta_cmd, gamma_cmd;
-        KDL::Rotation::EulerZYX(desired_rot(2),
-			                    desired_rot(1),
-			                    desired_rot(0)).GetEulerZYX(alpha_cmd, beta_cmd, gamma_cmd);
-        Eigen::Vector3d des_attitude_fixed;
-        des_attitude_fixed << gamma_cmd, beta_cmd, alpha_cmd;
-        for (int i=0; i<3; i++)
-        {
-            double error = angles::normalize_angle(des_attitude_fixed(i) - prev_rot_setpoint_(i));
-	        p2p_traj_const_(0, i + 3) = prev_rot_setpoint_(i);
-	        p2p_traj_const_(1, i + 3) = error * constant_0;
-	        p2p_traj_const_(2, i + 3) = error * constant_1;
-	        p2p_traj_const_(3, i + 3) = error * constant_2;
-        }
-        prev_rot_setpoint_ = des_attitude_fixed;
-        run_spline_ = true;
-    }
-    */
+    
+    
     void OperationalSpaceImpedanceController::set_cmd_traj_point(geometry_msgs::Vector3 position, wam_dmp_controller::RPY orientation)
     {
         command_struct_.trans_xyz_command_[0] = position.x;
@@ -717,6 +639,60 @@ namespace wam_dmp_controller
         set_cmd_traj_point(msg->position, msg->orientation);
     }
 
+    bool OperationalSpaceImpedanceController::set_cmd_gains(wam_dmp_controller::ImpedanceControllerGains::Request &req, wam_dmp_controller::ImpedanceControllerGains::Response &res)
+    {
+        // First check the size of the request 
+        if (req.Kp_gains.size() != 6)
+        {
+            ROS_WARN("Kp_gains size is not 6, but %lu instead.", req.Kp_gains.size());
+            res.accepted = false;
+        }
+        else if (req.Kv_gains.size() != 6)
+        {
+            ROS_WARN("Kv_gains size is not 6, but %lu instead.", req.Kv_gains.size());
+            res.accepted = false;
+        }
+        else if (req.null_Kp_gains.size() != 6)
+        {
+            ROS_WARN("null_Kp_gains size is not 6, but %lu instead.", req.null_Kp_gains.size());
+            res.accepted = false; 
+        }
+        else if (req.null_Kv_gains.size() != 6)
+        {
+            ROS_WARN("null_Kv_gains size is not 6, but %lu instead.", req.null_Kv_gains.size());
+            res.accepted = false; 
+        }
+        else
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                Kp_.coeffRef(i, i) = req.Kp_gains[i];
+                Kv_.coeffRef(i, i) = req.Kv_gains[i];
+                null_Kp_.coeffRef(i, i) = req.null_Kp_gains[i];
+                null_Kv_.coeffRef(i, i) = req.null_Kv_gains[i];
+            }
+            res.accepted = true;
+        }
+
+        return res.accepted;   
+    }
+
+    bool OperationalSpaceImpedanceController::get_cmd_gains(wam_dmp_controller::ImpedanceControllerGains::Request &req, 
+                                                            wam_dmp_controller::ImpedanceControllerGains::Response &res)
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            res.Kp_gains.push_back(Kp_.coeff(i, i));
+            res.Kv_gains.push_back(Kv_.coeff(i, i));
+            res.null_Kp_gains.push_back(null_Kp_.coeff(i, i));
+            res.null_Kv_gains.push_back(null_Kv_.coeff(i, i));
+        }
+        res.accepted = true;
+        return res.accepted;
+    }
+
+
+
     void OperationalSpaceImpedanceController::setCommandRT(Eigen::Vector3d trans_des, Eigen::Vector3d trans_dot_des, Eigen::Vector3d trans_dotdot_des, 
                       Eigen::Vector3d rot_des, Eigen::Vector3d rot_dot_des, Eigen::Vector3d rot_dotdot_des)
     {
@@ -729,62 +705,26 @@ namespace wam_dmp_controller
 
         command_buffer_.initRT(command_struct_);
     }
-    /*
-    bool OperationalSpaceImpedanceController::set_cmd_traj_spline_srv(wam_dmp_controller::PoseRPYCommand::Request &req, 
-                                                                      wam_dmp_controller::PoseRPYCommand::Response &res)
+    
+    void OperationalSpaceImpedanceController::set_p_sensor_cp(double x, double y, double z)
     {
-        if (time_ < p2p_traj_duration_)
-        {
-	        res.command.elapsed_time = time_;
-	        res.command.accepted = false;
-	        res.command.p2p_traj_duration = p2p_traj_duration_;
-
-	        return true;
-        }
-        res.command.accepted = true;
-
-        // set requested position and attitude
-        command_struct_.trans_xyz_command_[0] = req.command.position.x;
-        command_struct_.trans_xyz_command_[1] = req.command.position.y;
-        command_struct_.trans_xyz_command_[2] = req.command.position.z;
-        command_struct_.rot_xyz_command_[0] = req.command.orientation.roll;
-        command_struct_.rot_xyz_command_[1] = req.command.orientation.yaw;
-        command_struct_.rot_xyz_command_[2] = req.command.orientation.pitch;
-
-        p2p_traj_mutex_.lock();
-
-        p2p_traj_duration_ = req.command.p2p_traj_duration;
-        //command_buffer_.writeFromNonRT(command_struct_); Don't do this when set a spline!!!!!! 
-        eval_point_to_point_traj_constants(command_struct_.trans_xyz_command_, command_struct_.rot_xyz_command_, p2p_traj_duration_);
-        time_ = 0;
-
-        p2p_traj_mutex_.unlock();
-
-        return true;
+        p_sensor_cp_ = KDL::Vector(x, y, z);
     }
-    */
-    /*
-    bool OperationalSpaceImpedanceController::get_cmd_traj_spline_srv(wam_dmp_controller::PoseRPYCommand::Request &req, 
-                                                                      wam_dmp_controller::PoseRPYCommand::Response &res)
+
+    void OperationalSpaceImpedanceController::get_gains_null(Eigen::Matrix<double, 6, 6>& null_Kp, 
+                                                            Eigen::Matrix<double, 6, 6>& null_Kv)
     {
-        // get translation
-        res.command.position.x = prev_trans_setpoint_[0];
-        res.command.position.y = prev_trans_setpoint_[1];
-        res.command.position.z = prev_trans_setpoint_[2];
-        res.command.p2p_traj_duration = p2p_traj_duration_;
-
-        // get rotation
-        res.command.orientation.roll = prev_rot_setpoint_[0];
-        res.command.orientation.yaw = prev_rot_setpoint_[1];
-        res.command.orientation.pitch = prev_rot_setpoint_[2];
-
-        // get elapsed time
-        res.command.elapsed_time = time_;
-
-        return true;
+        null_Kp = null_Kp_;
+        null_Kv = null_Kv_;
     }
-    */
 
+    void OperationalSpaceImpedanceController::set_gains_null(Eigen::Matrix<double, 6, 6> null_Kp, 
+                                                            Eigen::Matrix<double, 6, 6> null_Kv)
+    {
+        null_Kp_ = null_Kp;
+        null_Kv_ = null_Kv;
+    }
+    
     void OperationalSpaceImpedanceController::set_p_wrist_ee(double x, double y, double z)
     {
         p_wrist_ee_ = KDL::Vector(x, y, z);

@@ -15,6 +15,7 @@
 #include <wam_dmp_controller/RPY.h>
 #include <wam_dmp_controller/PoseRPY.h>
 #include <wam_dmp_controller/PoseRPYCommand.h>
+#include <wam_dmp_controller/ImpedanceControllerGains.h>
 
 //KDL include
 #include <kdl/chainjnttojacsolver.hpp>
@@ -35,14 +36,7 @@ namespace wam_dmp_controller
   			bool init(hardware_interface::EffortJointInterface* hw, ros::NodeHandle &n);
   			void starting(const ros::Time& time);
   			void update(const ros::Time& time, const ros::Duration& period);
-
-  			//void get_gains_inertia(double& kp_z, double& kp_gamma, double& kd_pos, double& kd_att);
-    		//void set_gains_inertia(double kp_z, double kp_gamma, double kd_pos, double kd_att);
-    		void set_p_wrist_ee(double x, double y, double z);
-    		void set_p_base_ws(double x, double y, double z);
-    		void set_ws_base_angles(double alpha, double beta, double gamma);
-            void setCommandRT(Eigen::Vector3d trans_des, Eigen::Vector3d trans_dot_des, Eigen::Vector3d trans_dotdot_des, 
-                              Eigen::Vector3d rot_des, Eigen::Vector3d rot_dot_des, Eigen::Vector3d rot_dotdot_des);
+            
             //void setCommand(geometry_msgs::Vector3 xyz, wam_dmp_controller::RPY rpy);
             //void setCommand(geometry_msgs::Vector3 xyz, wam_dmp_controller::RPY dxyz);
             //void setCommand(geometry_msgs::Vector3 xyz, geometry_msgs::Vector3 dxyz, wam_dmp_controller::RPY rpy, wam_dmp_controller::drpy);
@@ -65,6 +59,8 @@ namespace wam_dmp_controller
 
 
     	private:
+            ros::ServiceServer set_cmd_gains_service_;
+            ros::ServiceServer get_cmd_gains_service_;
     		//void update_inertia_matrix(Eigen::MatrixXd& inertia_matrix);
     		//void extend_chain(ros::NodeHandle &n);
 
@@ -80,6 +76,12 @@ namespace wam_dmp_controller
     		// E: matrix that mapps Geometrix Jacobian back to Analytic jacobian  
             void set_cmd_traj_point(geometry_msgs::Vector3 position, wam_dmp_controller::RPY orientation);
             void set_cmd_traj_callback(const wam_dmp_controller::PoseRPYConstPtr& msg);
+            bool set_cmd_gains(wam_dmp_controller::ImpedanceControllerGains::Request &req, 
+                               wam_dmp_controller::ImpedanceControllerGains::Response &res);     
+            bool get_cmd_gains(wam_dmp_controller::ImpedanceControllerGains::Request &req, 
+                               wam_dmp_controller::ImpedanceControllerGains::Response &res);   
+            void setCommandRT(Eigen::Vector3d trans_des, Eigen::Vector3d trans_dot_des, Eigen::Vector3d trans_dotdot_des, 
+                              Eigen::Vector3d rot_des, Eigen::Vector3d rot_dot_des, Eigen::Vector3d rot_dotdot_des);
             //void set_cmd_traj_spline(geometry_msgs::Vector3 position, wam_dmp_controller::RPY orientation);
             //void set_cmd_traj_spline_callback(const wam_dmp_controller::PoseRPYConstPtr& msg);
             /*
@@ -91,6 +93,13 @@ namespace wam_dmp_controller
             */
             void get_parameters(ros::NodeHandle &n);
             void publish_info(const ros::Time& time);
+
+            void set_p_sensor_cp(double x, double y, double z); // For hybrid force control
+            void get_gains_null(Eigen::Matrix<double, 6, 6>& null_Kp, Eigen::Matrix<double, 6, 6>& null_Kv);
+            void set_gains_null(Eigen::Matrix<double, 6, 6> null_Kp, Eigen::Matrix<double, 6, 6> null_Kv);
+            void set_p_wrist_ee(double x, double y, double z);
+            void set_p_base_ws(double x, double y, double z);
+            void set_ws_base_angles(double alpha, double beta, double gamma);
             
             /*
             void eval_current_point_to_point_traj(const ros::Duration& period,
@@ -125,6 +134,7 @@ namespace wam_dmp_controller
 
   			KDL::Vector p_wrist_ee_;
     		KDL::Vector p_base_ws_;
+            KDL::Vector p_sensor_cp_;
 
     		// pointers to solvers
     		boost::scoped_ptr<KDL::ChainDynParam> dyn_param_solver_;

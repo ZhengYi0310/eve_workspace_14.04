@@ -55,11 +55,13 @@ add_message_files(DIRECTORY msg FILES
   JointControllerState.msg
   RPY.msg
   PoseRPY.msg
+  PoseRPYCmd.msg
   ArmState.msg
 )
 
 add_service_files(DIRECTORY srv FILES
   PoseRPYCommand.srv
+  ImpedanceControllerGains.srv
 )
 generate_messages(DEPENDENCIES
   geometry_msgs
