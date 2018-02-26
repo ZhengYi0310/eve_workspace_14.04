@@ -42,6 +42,9 @@ else()
   set(EIGEN3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
 endif()
 
+find_package(Boost REQUIRED COMPONENTS thread signals system filesystem)
+add_definitions(${Boost_DEFINITIONS})
+
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS})
 
 add_message_files(DIRECTORY msg FILES

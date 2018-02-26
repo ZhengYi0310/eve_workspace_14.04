@@ -38,7 +38,7 @@ namespace wam_dmp_controller
     		void set_p_wrist_ee(double x, double y, double z);
     		void set_p_base_ws(double x, double y, double z);
     		void set_ws_base_angles(double alpha, double beta, double gamma);
-            //void setCommand(geometry_msgs::Vector3 xyz);
+            void setCommandRT(Eigen::VectorXd x_des, Eigen::VectorXd xdot_des, Eigen::VectorXd Xdotdot_des);
             //void setCommand(geometry_msgs::Vector3 xyz, wam_dmp_controller::RPY rpy);
             //void setCommand(geometry_msgs::Vector3 xyz, wam_dmp_controller::RPY dxyz);
             //void setCommand(geometry_msgs::Vector3 xyz, geometry_msgs::Vector3 dxyz, wam_dmp_controller::RPY rpy, wam_dmp_controller::drpy);
@@ -55,6 +55,8 @@ namespace wam_dmp_controller
                 Eigen::Vector3d rot_xyz_command_;
                 Eigen::Vector3d trans_xyzdot_command_;
                 Eigen::Vector3d rot_xyzdot_command_;
+                Eigen::Vector3d trans_xyzdotdot_command_;
+                Eigen::Vector3d rot_xyzdotdot_command_;
             };
 
 
@@ -71,17 +73,22 @@ namespace wam_dmp_controller
     		// p_x_y: position vector from x to y
     		// ee: Reference point of interest (typically the tool tip)
     		// wrist: tip of the 7th link of the Barrett Wam
-    		// E: matrix that mapps Geometrix Jacobian back to Analytic jacobian 
-            bool set_cmd_traj_srv(wam_dmp_controller::PoseRPYCommand::Request &req, 
-                              wam_dmp_controller::PoseRPYCommand::Response &res);
-            void set_cmd_traj(geometry_msgs::Vector3 position, wam_dmp_controller::RPY orientation);
+    		// E: matrix that mapps Geometrix Jacobian back to Analytic jacobian  
+            void set_cmd_traj_point(geometry_msgs::Vector3 position, wam_dmp_controller::RPY orientation);
             void set_cmd_traj_callback(const wam_dmp_controller::PoseRPYConstPtr& msg);
-            bool get_cmd_traj_srv(wam_dmp_controller::PoseRPYCommand::Request &req, 
+            //void set_cmd_traj_spline(geometry_msgs::Vector3 position, wam_dmp_controller::RPY orientation);
+            //void set_cmd_traj_spline_callback(const wam_dmp_controller::PoseRPYConstPtr& msg);
+            /*
+            bool set_cmd_traj_spline_srv(wam_dmp_controller::PoseRPYCommand::Request &req, 
+                                  wam_dmp_controller::PoseRPYCommand::Response &res);
+            bool get_cmd_traj_spline_srv(wam_dmp_controller::PoseRPYCommand::Request &req, 
                                   wam_dmp_controller::PoseRPYCommand::Response &res);
             void set_default_traj();
+            */
             void get_parameters(ros::NodeHandle &n);
             void publish_info(const ros::Time& time);
-
+            
+            /*
             void eval_current_point_to_point_traj(const ros::Duration& period,
                                                   Eigen::VectorXd& x_des,
                                                   Eigen::VectorXd& xdot_des,
@@ -90,6 +97,8 @@ namespace wam_dmp_controller
                                                     Eigen::Vector3d& desired_rot,
                                                     double duration);
             
+            bool run_spline_;
+            */
             KDL::JntSpaceInertiaMatrix M;
             KDL::JntArray C;
             KDL::JntArray G;
@@ -102,8 +111,8 @@ namespace wam_dmp_controller
             Eigen::VectorXd ws_x_, ws_xdot_;
   			Eigen::Vector3d trans_xyz_ws_, trans_xyzdot_ws_;
             Eigen::Vector3d rot_xyz_ws_, rot_xyzdot_ws_;
-            Eigen::Vector3d trans_xyz_des_ws_, trans_xyzdot_des_ws_, trans_xyz_error_;
-            Eigen::Vector3d rot_xyz_des_ws_, rot_xyzdot_des_ws_, rot_xyz_error_;
+            Eigen::Vector3d trans_xyz_des_ws_, trans_xyzdot_des_ws_, trans_xyzdotdot_des_ws_, trans_xyz_error_;
+            Eigen::Vector3d rot_xyz_des_ws_, rot_xyzdot_des_ws_, rot_xyzdotdot_des_ws_, rot_xyz_error_;
             Eigen::Matrix3d rot_xyz_des_ws_skew_;
             Eigen::Matrix3d rot_xyz_ws_mat_, rot_xyz_des_ws_mat_;
             Eigen::Quaternion<double> rot_xyz_error_qua_, rot_xyz_ws_qua_, rot_xyz_des_ws_qua_;
@@ -132,11 +141,13 @@ namespace wam_dmp_controller
             Eigen::Matrix<double, 6, 6> null_Kp_;
             Eigen::Matrix<double, 6 ,6> null_Kv_;
             Eigen::Matrix<double, 6, 6> lamb_;
+            /*
             double p2p_traj_duration_;
             Eigen::MatrixXf p2p_traj_const_;
             Eigen::Vector3d prev_trans_setpoint_;
             Eigen::Vector3d prev_rot_setpoint_;
             double time_;
+            */
 
             // desired mass matrix, damping and gains of the modeled mechanical system 
             Eigen::Matrix<double, 6, 6> Md_;
@@ -160,20 +171,22 @@ namespace wam_dmp_controller
     		bool use_simulation_;
 
             ros::Subscriber sub_command_;
-
-            // HybridImpiedanceCommand service
+            
+            /*
+            // ImpiedanceCommand service
             ros::ServiceServer set_cmd_traj_pos_service_;
             ros::ServiceServer get_cmd_traj_pos_service_;
-
+            */
             // publisher to monitor data
             ros::Time last_publish_time_;
             double publish_rate_;
             boost::scoped_ptr<realtime_tools::RealtimePublisher<geometry_msgs::WrenchStamped> > pub_ext_force_est_; // If we want to do external force estimation
             boost::scoped_ptr<realtime_tools::RealtimePublisher<wam_dmp_controller::PoseRPY> > pub_cart_des_, pub_cart_dot_des_, pub_cart_dotdot_des_, pub_cart_err_;
             //ros::Publisher pub_error_;
-            // 
+            /* 
             boost::mutex p2p_traj_mutex_;
             boost::mutex force_traj_mutex_;
+            */
   	};
 } 
 #endif

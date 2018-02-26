@@ -65,41 +65,45 @@ namespace wam_dmp_controller
 
 
     	// instantiate state and its derivatives
-        trans_xyz_ws_ = Eigen::Vector3d::Zero();
-        trans_xyzdot_ws_ = Eigen::Vector3d::Zero();
-        rot_xyz_ws_ = Eigen::Vector3d::Zero();
-        rot_xyzdot_ws_ = Eigen::Vector3d::Zero();
-        trans_xyz_des_ws_ = Eigen::Vector3d::Zero();
-        trans_xyzdot_des_ws_ = Eigen::Vector3d::Zero();
-        rot_xyz_des_ws_ = Eigen::Vector3d::Zero();
-        rot_xyzdot_des_ws_ = Eigen::Vector3d::Zero();
-        ws_x_ = Eigen::VectorXd(6);
-        ws_xdot_ = Eigen::VectorXd(6);
-        tau_ = Eigen::VectorXd(kdl_chain_.getNrOfJoints());
-        q_rest_ = Eigen::VectorXd(kdl_chain_.getNrOfJoints());
-        command_filter_ = Eigen::MatrixXd::Zero(kdl_chain_.getNrOfJoints(), 6);
-        F_unit_ = Eigen::VectorXd(6);
-        J_dyn_inv_ = Eigen::MatrixXd::Zero(6, 6);
-        J_dyn_ = Eigen::MatrixXd::Zero(6, 6);
+        trans_xyz_ws_           = Eigen::Vector3d::Zero();
+        trans_xyzdot_ws_        = Eigen::Vector3d::Zero();
+        rot_xyz_ws_             = Eigen::Vector3d::Zero();
+        rot_xyzdot_ws_          = Eigen::Vector3d::Zero();
+        trans_xyz_des_ws_       = Eigen::Vector3d::Zero();
+        trans_xyzdot_des_ws_    = Eigen::Vector3d::Zero();
+        trans_xyzdotdot_des_ws_ = Eigen::Vector3d::Zero();
+        trans_xyz_error_        = Eigen::Vector3d::Zero();
+        rot_xyz_des_ws_         = Eigen::Vector3d::Zero();
+        rot_xyzdot_des_ws_      = Eigen::Vector3d::Zero();
+        rot_xyzdotdot_des_ws_   = Eigen::Vector3d::Zero();
+        rot_xyz_error_          = Eigen::Vector3d::Zero();
+        ws_x_                   = Eigen::VectorXd(6);
+        ws_xdot_                = Eigen::VectorXd(6);
+        tau_                    = Eigen::VectorXd(kdl_chain_.getNrOfJoints());
+        q_rest_                 = Eigen::VectorXd(kdl_chain_.getNrOfJoints());
+        command_filter_         = Eigen::MatrixXd::Zero(kdl_chain_.getNrOfJoints(), 6);
+        F_unit_                 = Eigen::VectorXd(6);
+        J_dyn_inv_              = Eigen::MatrixXd::Zero(6, 6);
+        J_dyn_                  = Eigen::MatrixXd::Zero(6, 6);
 
     	// instantiate analytical to geometric transformation matrices
-    	ws_E_ = Eigen::MatrixXd::Zero(6,6);
-    	ws_E_.block<3,3>(0,0) = Eigen::Matrix<double, 3, 3>::Identity();
-    	ws_E_dot_ = Eigen::MatrixXd::Zero(6,6);
+    	ws_E_                   = Eigen::MatrixXd::Zero(6,6);
+    	ws_E_.block<3,3>(0,0)   = Eigen::Matrix<double, 3, 3>::Identity();
+    	ws_E_dot_               = Eigen::MatrixXd::Zero(6,6);
 
-    	null_Kp_ = Eigen::MatrixXd::Zero(6, 6);
-    	null_Kv_ = Eigen::MatrixXd::Zero(6, 6);
-    	lamb_ = Eigen::MatrixXd::Zero(6, 6);
-
+    	null_Kp_                = Eigen::MatrixXd::Zero(6, 6);
+    	null_Kv_                = Eigen::MatrixXd::Zero(6, 6);
+    	lamb_                   = Eigen::MatrixXd::Zero(6, 6);
+        /*
         p2p_traj_duration_ = DEFAULT_P2P_TRAJ_DURATION;
         p2p_traj_const_ = Eigen::MatrixXf(4, 6);
-
+        */
         get_parameters(n);
-
+        
         // Serivces 
         // advertise HybridImpedanceCommand service
-        set_cmd_traj_pos_service_ = n.advertiseService("set_traj_pos_cmd", &OperationalSpaceImpedanceController::set_cmd_traj_srv, this); 
-        get_cmd_traj_pos_service_ = n.advertiseService("get_traj_pos_cmd", &OperationalSpaceImpedanceController::get_cmd_traj_srv, this);  
+        //set_cmd_traj_pos_service_ = n.advertiseService("set_traj_pos_cmd", &OperationalSpaceImpedanceController::set_cmd_traj_spline_srv, this); 
+        //get_cmd_traj_pos_service_ = n.advertiseService("get_traj_pos_cmd", &OperationalSpaceImpedanceController::get_cmd_traj_spline_srv, this);  
       	// Start command subscriber 
         sub_command_ = n.subscribe("Cartesian_space_command", 10, &OperationalSpaceImpedanceController::set_cmd_traj_callback, this);
         pub_ext_force_est_.reset(new realtime_tools::RealtimePublisher<geometry_msgs::WrenchStamped>(n, "ext_force_est", 100));
@@ -127,7 +131,7 @@ namespace wam_dmp_controller
         //TODO FIGURE OUT HOW TO Initialize SISE_KalmanFIlter
         //
         // set default trajectory (force and position)
-        set_default_traj();
+        //set_default_traj();
 
    		return;
   	}
@@ -145,10 +149,13 @@ namespace wam_dmp_controller
             rot_xyzdot_des_ws_[i] = command_struct_.rot_xyzdot_command_[i];
         }
         */
-        trans_xyz_des_ws_ = command_struct_.trans_xyz_command_;
-        trans_xyzdot_des_ws_ = command_struct_.trans_xyzdot_command_;
-        rot_xyz_des_ws_ = command_struct_.rot_xyz_command_;
-        rot_xyzdot_des_ws_ = command_struct_.rot_xyzdot_command_;
+        trans_xyz_des_ws_       = command_struct_.trans_xyz_command_;
+        trans_xyzdot_des_ws_    = command_struct_.trans_xyzdot_command_;
+        trans_xyzdotdot_des_ws_ = command_struct_.trans_xyzdotdot_command_;
+        rot_xyz_des_ws_         = command_struct_.rot_xyz_command_;
+        rot_xyzdot_des_ws_      = command_struct_.rot_xyzdot_command_;
+        rot_xyzdotdot_des_ws_   = command_struct_.rot_xyzdotdot_command_;
+        
   		//////////////////////////////////////////////////////////////////////////////////
     	//
     	// Robot configuration
@@ -495,6 +502,8 @@ namespace wam_dmp_controller
         //pub_ext_force_est_->unlockAndPublish;
     }
 
+    /*
+
     void OperationalSpaceImpedanceController::set_default_traj()
     {
         p2p_traj_mutex_.lock();
@@ -535,11 +544,13 @@ namespace wam_dmp_controller
 
         // reset the time
         time_ = p2p_traj_duration_;
+        run_spline_ = false;
 
         p2p_traj_mutex_.unlock();
 
     }
-
+    */
+    
     void OperationalSpaceImpedanceController::get_parameters(ros::NodeHandle &n)
     {
         ros::NodeHandle Kp_handle(n, "Kp_Gains");
@@ -611,55 +622,153 @@ namespace wam_dmp_controller
         n.getParam("publish_rate", publish_rate_);
         n.getParam("use_simulation_", use_simulation_);
     }
-
+    /*
     void OperationalSpaceImpedanceController::eval_current_point_to_point_traj(const ros::Duration& period,
-                                          Eigen::VectorXd& x_des,
-                                          Eigen::VectorXd& xdot_des,
-                                         Eigen::VectorXd& xdotdot_des)
+                                                                               Eigen::VectorXd& x_des,
+                                                                               Eigen::VectorXd& xdot_des,
+                                                                               Eigen::VectorXd& xdotdot_des)
     {
-        return; 
-    }
-    
-    void OperationalSpaceImpedanceController::eval_point_to_point_traj_constants(Eigen::Vector3d& desired_trans,					    
-                                            Eigen::Vector3d& desired_rot,
-                                            double duration)
-    {
-        return;
-    }
+        p2p_traj_mutex_.lock();
+        time_ += period.toSec();
 
-    void OperationalSpaceImpedanceController::set_cmd_traj(geometry_msgs::Vector3 position, wam_dmp_controller::RPY orientation)
+        if (time_ > p2p_traj_duration_)
+        {    
+            time_ = p2p_traj_duration_;
+            //run_spline_ = false;
+        }
+
+        for (int i=0; i<6; i++)
+        {
+	        x_des(i) = p2p_traj_const_(0, i) + p2p_traj_const_(1, i) * pow(time_, 3) + \
+                       p2p_traj_const_(2, i) * pow(time_, 4) + p2p_traj_const_(3, i) * pow(time_, 5);
+
+	        xdot_des(i) = 3 * p2p_traj_const_(1, i) * pow(time_, 2) + \
+                          4 * p2p_traj_const_(2, i) * pow(time_, 3) + 5 * p2p_traj_const_(3, i) * pow(time_, 4);
+
+	        xdotdot_des(i) = 3 * 2 *  p2p_traj_const_(1, i) * time_ + \
+                             4 * 3 * p2p_traj_const_(2, i) * pow(time_, 2) + 5 * 4 * p2p_traj_const_(3, i) * pow(time_, 3);
+        }
+        p2p_traj_mutex_.unlock();
+    }
+    */
+    /*
+    void OperationalSpaceImpedanceController::eval_point_to_point_traj_constants(Eigen::Vector3d& desired_trans,					    
+                                                                                 Eigen::Vector3d& desired_rot,
+                                                                                 double duration)
+    {
+        // evaluate common part of constants
+        double constant_0, constant_1, constant_2;
+        constant_0 = P2P_COEFF_3 / pow(duration, 3);
+        constant_1 = P2P_COEFF_4 / pow(duration, 4);
+        constant_2 = P2P_COEFF_5 / pow(duration, 5);
+
+        // evaluate constants for x and y trajectories
+        for (int i=0; i<3; i++)
+        {
+	        double error = desired_trans(i) - prev_trans_setpoint_(i);
+	        p2p_traj_const_(0, i) = prev_trans_setpoint_(i);
+	        p2p_traj_const_(1, i) = error * constant_0;
+	        p2p_traj_const_(2, i) = error * constant_1;
+	        p2p_traj_const_(3, i) = error * constant_2;
+        }
+        prev_trans_setpoint_ = desired_trans;
+
+        // evaluate constants alpha, beta and gamma trajectories
+        double alpha_cmd, beta_cmd, gamma_cmd;
+        KDL::Rotation::EulerZYX(desired_rot(2),
+			                    desired_rot(1),
+			                    desired_rot(0)).GetEulerZYX(alpha_cmd, beta_cmd, gamma_cmd);
+        Eigen::Vector3d des_attitude_fixed;
+        des_attitude_fixed << gamma_cmd, beta_cmd, alpha_cmd;
+        for (int i=0; i<3; i++)
+        {
+            double error = angles::normalize_angle(des_attitude_fixed(i) - prev_rot_setpoint_(i));
+	        p2p_traj_const_(0, i + 3) = prev_rot_setpoint_(i);
+	        p2p_traj_const_(1, i + 3) = error * constant_0;
+	        p2p_traj_const_(2, i + 3) = error * constant_1;
+	        p2p_traj_const_(3, i + 3) = error * constant_2;
+        }
+        prev_rot_setpoint_ = des_attitude_fixed;
+        run_spline_ = true;
+    }
+    */
+    void OperationalSpaceImpedanceController::set_cmd_traj_point(geometry_msgs::Vector3 position, wam_dmp_controller::RPY orientation)
     {
         command_struct_.trans_xyz_command_[0] = position.x;
         command_struct_.trans_xyz_command_[1] = position.y;
         command_struct_.trans_xyz_command_[2] = position.z;
         command_struct_.rot_xyz_command_[0] = orientation.roll;
-        command_struct_.rot_xyz_command_[1] = orientation.pitch;
+        command_struct_.rot_xyz_command_[1]= orientation.pitch;
         command_struct_.rot_xyz_command_[2] = orientation.yaw;
 
         command_struct_.trans_xyzdot_command_ = Eigen::Vector3d::Zero();
         command_struct_.rot_xyzdot_command_ = Eigen::Vector3d::Zero();
-
+        command_struct_.trans_xyzdotdot_command_ = Eigen::Vector3d::Zero();
+        command_struct_.rot_xyzdotdot_command_ = Eigen::Vector3d::Zero();
+        
+        //run_spline_ = false;
         command_buffer_.writeFromNonRT(command_struct_);  
     }
   	// Start command subscriber 
     void OperationalSpaceImpedanceController::set_cmd_traj_callback(const wam_dmp_controller::PoseRPYConstPtr& msg)
     {
-        set_cmd_traj(msg->position, msg->orientation);
+        set_cmd_traj_point(msg->position, msg->orientation);
     }
-
-    bool OperationalSpaceImpedanceController::set_cmd_traj_srv(wam_dmp_controller::PoseRPYCommand::Request &req, 
-                          wam_dmp_controller::PoseRPYCommand::Response &res)
+    /*
+    bool OperationalSpaceImpedanceController::set_cmd_traj_spline_srv(wam_dmp_controller::PoseRPYCommand::Request &req, 
+                                                                      wam_dmp_controller::PoseRPYCommand::Response &res)
     {
-        res.command = req.command;
+        if (time_ < p2p_traj_duration_)
+        {
+	        res.command.elapsed_time = time_;
+	        res.command.accepted = false;
+	        res.command.p2p_traj_duration = p2p_traj_duration_;
+
+	        return true;
+        }
+        res.command.accepted = true;
+
+        // set requested position and attitude
+        command_struct_.trans_xyz_command_[0] = req.command.position.x;
+        command_struct_.trans_xyz_command_[1] = req.command.position.y;
+        command_struct_.trans_xyz_command_[2] = req.command.position.z;
+        command_struct_.rot_xyz_command_[0] = req.command.orientation.roll;
+        command_struct_.rot_xyz_command_[1] = req.command.orientation.yaw;
+        command_struct_.rot_xyz_command_[2] = req.command.orientation.pitch;
+
+        p2p_traj_mutex_.lock();
+
+        p2p_traj_duration_ = req.command.p2p_traj_duration;
+        //command_buffer_.writeFromNonRT(command_struct_); Don't do this when set a spline!!!!!! 
+        eval_point_to_point_traj_constants(command_struct_.trans_xyz_command_, command_struct_.rot_xyz_command_, p2p_traj_duration_);
+        time_ = 0;
+
+        p2p_traj_mutex_.unlock();
+
         return true;
     }
-
-    bool OperationalSpaceImpedanceController::get_cmd_traj_srv(wam_dmp_controller::PoseRPYCommand::Request &req, 
-                          wam_dmp_controller::PoseRPYCommand::Response &res)
+    */
+    /*
+    bool OperationalSpaceImpedanceController::get_cmd_traj_spline_srv(wam_dmp_controller::PoseRPYCommand::Request &req, 
+                                                                      wam_dmp_controller::PoseRPYCommand::Response &res)
     {
-        res.command = req.command;
+        // get translation
+        res.command.position.x = prev_trans_setpoint_[0];
+        res.command.position.y = prev_trans_setpoint_[1];
+        res.command.position.z = prev_trans_setpoint_[2];
+        res.command.p2p_traj_duration = p2p_traj_duration_;
+
+        // get rotation
+        res.command.orientation.roll = prev_rot_setpoint_[0];
+        res.command.orientation.yaw = prev_rot_setpoint_[1];
+        res.command.orientation.pitch = prev_rot_setpoint_[2];
+
+        // get elapsed time
+        res.command.elapsed_time = time_;
+
         return true;
     }
+    */
 
     void OperationalSpaceImpedanceController::set_p_wrist_ee(double x, double y, double z)
     {
