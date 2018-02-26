@@ -54,9 +54,14 @@ add_message_files(DIRECTORY msg FILES
   PoseRPY.msg
   ArmState.msg
 )
+
+add_service_files(DIRECTORY srv FILES
+  PoseRPYCommand.srv
+)
 generate_messages(DEPENDENCIES
   geometry_msgs
   std_msgs
+  sensor_msgs
 )
 
 # Declare catkin package
@@ -103,6 +108,7 @@ add_library(${PROJECT_NAME}
   src/gravity_compensation.cpp
   src/arm_state_controller.cpp
   src/operational_space_controller.cpp
+  src/operational_space_impedance_controller.cpp
   src/SISE_kalman_filter.cpp
 )
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
