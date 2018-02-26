@@ -21,10 +21,13 @@
 #include <kdl/chainfksolverpos_recursive.hpp>
 #include <kdljacdot/chainjnttojacdotsolver.hpp>
 
+#include <Eigen/Geometry>
+
 namespace wam_dmp_controller
 {
  	class OperationalSpaceImpedanceController : public wam_dmp_controller::KinematicChainControllerBase<hardware_interface::EffortJointInterface>
  	{
+        friend class OperationalSpaceImpedanceSplineController;
   		public:
   			OperationalSpaceImpedanceController();
   			~OperationalSpaceImpedanceController();
@@ -38,7 +41,8 @@ namespace wam_dmp_controller
     		void set_p_wrist_ee(double x, double y, double z);
     		void set_p_base_ws(double x, double y, double z);
     		void set_ws_base_angles(double alpha, double beta, double gamma);
-            void setCommandRT(Eigen::VectorXd x_des, Eigen::VectorXd xdot_des, Eigen::VectorXd Xdotdot_des);
+            void setCommandRT(Eigen::Vector3d trans_des, Eigen::Vector3d trans_dot_des, Eigen::Vector3d trans_dotdot_des, 
+                              Eigen::Vector3d rot_des, Eigen::Vector3d rot_dot_des, Eigen::Vector3d rot_dotdot_des);
             //void setCommand(geometry_msgs::Vector3 xyz, wam_dmp_controller::RPY rpy);
             //void setCommand(geometry_msgs::Vector3 xyz, wam_dmp_controller::RPY dxyz);
             //void setCommand(geometry_msgs::Vector3 xyz, geometry_msgs::Vector3 dxyz, wam_dmp_controller::RPY rpy, wam_dmp_controller::drpy);

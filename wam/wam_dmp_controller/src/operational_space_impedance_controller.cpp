@@ -51,6 +51,8 @@ namespace wam_dmp_controller
         command_struct_.rot_xyz_command_ = Eigen::Vector3d::Zero();
         command_struct_.trans_xyzdot_command_ = Eigen::Vector3d::Zero();
         command_struct_.rot_xyzdot_command_ = Eigen::Vector3d::Zero();
+        command_struct_.trans_xyzdotdot_command_ = Eigen::Vector3d::Zero();
+        command_struct_.rot_xyzdotdot_command_ = Eigen::Vector3d::Zero();
     	// instantiate solvers
     	dyn_param_solver_.reset(new KDL::ChainDynParam(kdl_chain_, gravity_));
     	ee_jacobian_solver_.reset(new KDL::ChainJntToJacSolver(extended_chain_));
@@ -713,6 +715,19 @@ namespace wam_dmp_controller
     void OperationalSpaceImpedanceController::set_cmd_traj_callback(const wam_dmp_controller::PoseRPYConstPtr& msg)
     {
         set_cmd_traj_point(msg->position, msg->orientation);
+    }
+
+    void OperationalSpaceImpedanceController::setCommandRT(Eigen::Vector3d trans_des, Eigen::Vector3d trans_dot_des, Eigen::Vector3d trans_dotdot_des, 
+                      Eigen::Vector3d rot_des, Eigen::Vector3d rot_dot_des, Eigen::Vector3d rot_dotdot_des)
+    {
+        command_struct_.trans_xyz_command_ = trans_des;
+        command_struct_.rot_xyz_command_ = rot_des;
+        command_struct_.trans_xyzdot_command_ = trans_dot_des;
+        command_struct_.rot_xyzdot_command_ = rot_dot_des;
+        command_struct_.trans_xyzdotdot_command_ = trans_dotdot_des;
+        command_struct_.rot_xyzdotdot_command_ = rot_dotdot_des;
+
+        command_buffer_.initRT(command_struct_);
     }
     /*
     bool OperationalSpaceImpedanceController::set_cmd_traj_spline_srv(wam_dmp_controller::PoseRPYCommand::Request &req, 

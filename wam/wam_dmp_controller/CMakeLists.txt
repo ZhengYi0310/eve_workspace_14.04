@@ -112,6 +112,7 @@ add_library(${PROJECT_NAME}
   src/arm_state_controller.cpp
   src/operational_space_controller.cpp
   src/operational_space_impedance_controller.cpp
+  src/operational_space_impedance_spline_controller.cpp
   src/SISE_kalman_filter.cpp
 )
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)

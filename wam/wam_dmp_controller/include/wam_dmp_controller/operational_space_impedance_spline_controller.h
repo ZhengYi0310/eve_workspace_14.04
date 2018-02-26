@@ -10,7 +10,7 @@
 
 #include "wam_dmp_controller/operational_space_impedance_controller.h"
 #include <wam_dmp_controller/PoseRPYCommand.h>
-#include <wam_dmp_controller/GainsCommand.h>
+//#include <wam_dmp_controller/GainsCommand.h>
 #include <geometry_msgs/WrenchStamped.h>
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
@@ -27,6 +27,8 @@ namespace wam_dmp_controller
   			void starting(const ros::Time& time);
   			void update(const ros::Time& time, const ros::Duration& period);
 
+
+        private:
             void set_default_pos_traj();
             bool set_cmd_traj_spline_srv(wam_dmp_controller::PoseRPYCommand::Request &req, 
                                          wam_dmp_controller::PoseRPYCommand::Response &res);
@@ -34,11 +36,13 @@ namespace wam_dmp_controller
                                      wam_dmp_controller::PoseRPYCommand::Response &res);
 
             //void get_parameters(ros::NodeHandle &n);
-            void set_p_sensor_cp(double x, double y, double z);
             void eval_current_point_to_point_traj(const ros::Duration& period,
-                                                  Eigen::VectorXd& x_des,
-                                                  Eigen::VectorXd& xdot_des,
-                                                  Eigen::VectorXd& xdotdot_des);
+                                                  Eigen::Vector3d& trans_des,
+                                                  Eigen::Vector3d& trans_dot_des,
+                                                  Eigen::Vector3d& trans_dotdot_des, 
+                                                  Eigen::Vector3d& rot_des, 
+                                                  Eigen::Vector3d& rot_dot_des, 
+                                                  Eigen::Vector3d& rot_dotdot_des);
 
             void eval_point_to_point_traj_constants(Eigen::Vector3d& desired_trans,
                                                     Eigen::Vector3d& desired_rot,
@@ -47,13 +51,21 @@ namespace wam_dmp_controller
             ros::ServiceServer set_cmd_traj_pos_service_;     
             ros::ServiceServer get_cmd_traj_pos_service_;
 
+            Eigen::Vector3d trans_des_;
+            Eigen::Vector3d trans_dot_des_;
+            Eigen::Vector3d trans_dotdot_des_;
+            Eigen::Vector3d rot_des_;
+            Eigen::Vector3d rot_dot_des_;
+            Eigen::Vector3d rot_dotdot_des_;
+
             double p2p_traj_spline_duration_;
             Eigen::MatrixXf p2p_traj_const_;
             Eigen::Vector3d prev_trans_setpoint_;
             Eigen::Vector3d prev_rot_setpoint_;
             double time_;
-
-            //boost::shared_ptr<OperationalSpaceImpedanceController> ops_imp_controller_; 
-    }
+                
+            //boost::shared_ptr<OperationalSpaceImpedanceController> ops_imp_controller_;
+            boost::mutex p2p_traj_mutex_;
+    };
 }
 #endif
