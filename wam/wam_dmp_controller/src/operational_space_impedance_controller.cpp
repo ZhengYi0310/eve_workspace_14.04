@@ -465,11 +465,17 @@ namespace wam_dmp_controller
     	//
     	//////////////////////////////////////////////////////////////////////////////////
         /* An easier approch based on RPY angles and no clipping 
-         * trans_xyz_error_ = trans_xyz_des_ws_ - trans_xyz_ws_;
-         * rot_xyz_ws_ = rot_xyz_des_ws_ - rot_xyz_ws_;
-         * rot_xyz_ws_[0] = angles::normalize_angle(rot_xyz_ws_[0]);
-         * rot_xyz_ws_[1] = angles::normalize_angle(rot_xyz_ws_[1]);
-         * rot_xyz_ws_[2] = angles::normalize_angle(rot_xyz_ws_[2]);
+         * 
+         * tau_trans_ = trans_xyzdotdot_des_ws_ + Kp_.block(0, 0, 3, 3) * (trans_xyz_des_ws_ - trans_xyz_ws_) + Kv_.block(0, 0, 3, 3) * (trans_xyzdot_des_ws_ - trans_xyzdot_ws_);
+         * rot_xyz_error_ = rot_xyz_des_ws_ - rot_xyz_ws_;
+         * for (int i = 0; i < 3; i++)
+         * {
+         *      rot_xyz_error_(i) = angles::normalize_angle(rot_xyz_error_(i)); 
+         * }
+         * tau_rot_ = rot_xyzdotdot_des_ws_ + Kp_.block(3, 3, 3, 3) * rot_xyz_error_ + Kv_.block(3, 3, 3, 3) * (rot_xyzdot_des_ws_ - rot_xyzdot_ws_);
+         *  F_unit_.block(0, 0, 3, 1) = tau_trans_;
+            F_unit_.block(3, 0, 3, 1) = tau_rot_;
+         * 
          *
          */
         trans_xyz_error_ = Kp_.block(0, 0, 3, 3) * (trans_xyz_des_ws_ - trans_xyz_ws_);
