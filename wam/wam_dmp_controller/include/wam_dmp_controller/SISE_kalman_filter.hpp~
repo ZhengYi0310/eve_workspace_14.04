@@ -21,7 +21,7 @@ namespace wam_dmp_controller
                                        const Eigen::MatrixXd& V);
             void InitializeEstimator(Eigen::MatrixXd x_mean_0, Eigen::MatrixXd P_xx_0);
             void updateCtrlMatrix(const Eigen::MatrixXd& coeff_of_ctrl_data);
-            void estimate(const Eigen::MatrixXd& msr_data_curr, const Eigen::MatrixXd& msr_data_last);
+            void estimate(const Eigen::MatrixXd& msr_data_curr, const Eigen::MatrixXd& msr_data_last, NormalDistributionPtr& state);
 
             const NormalDistributionPtr& getState() const 
             {

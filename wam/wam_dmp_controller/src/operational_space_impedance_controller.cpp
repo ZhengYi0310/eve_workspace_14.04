@@ -88,6 +88,21 @@ namespace wam_dmp_controller
         J_dyn_inv_              = Eigen::MatrixXd::Zero(6, 6);
         J_dyn_                  = Eigen::MatrixXd::Zero(6, 6);
 
+        // For external force estimation 
+
+        ext_f_last_ = Eigen::VectorXd(6);
+        ext_f_last_.setZero();
+        ext_f_curr_ = Eigen::VectorXd(6);
+        ext_f_curr_.setZero();
+        pub_ext_force_est_.reset(new realtime_tools::RealtimePublisher<geometry_msgs::WrenchStamped>(n, "ext_force_est", 100));
+        SISE_KalmanFilterPtr.reset(new SISE_KalmanFilter());
+        J_curr_.resize(kdl_chain_.getNrOfJoints());
+        J_last_.resize(kdl_chain_.getNrOfJoints());
+        joint_acc_curr_    = Eigen::MatrixXd::Zero(kdl_chain_.getNrOfJoints(), 1);
+        joint_acc_last_    = Eigen::MatrixXd::Zero(kdl_chain_.getNrOfJoints(), 1);
+        joint_torque_curr_ = Eigen::MatrixXd::Zero(kdl_chain_.getNrOfJoints(), 1);
+        joint_torque_last_ = Eigen::MatrixXd::Zero(kdl_chain_.getNrOfJoints(), 1);
+        input_est_         = Eigen::MatrixXd::Zero(kdl_chain_.getNrOfJoints(), 1);
     	// instantiate analytical to geometric transformation matrices
     	ws_E_                   = Eigen::MatrixXd::Zero(6,6);
     	ws_E_.block<3,3>(0,0)   = Eigen::Matrix<double, 3, 3>::Identity();
@@ -113,12 +128,11 @@ namespace wam_dmp_controller
         get_cmd_gains_service_ = n.advertiseService("get_impedance_gains", 
                                                     &OperationalSpaceImpedanceController::get_cmd_gains, this);
         sub_command_ = n.subscribe("Cartesian_space_command", 10, &OperationalSpaceImpedanceController::set_cmd_traj_callback, this);
-        pub_ext_force_est_.reset(new realtime_tools::RealtimePublisher<geometry_msgs::WrenchStamped>(n, "ext_force_est", 100));
+  
         pub_cart_des_.reset(new realtime_tools::RealtimePublisher<wam_dmp_controller::PoseRPY>(n, "des_cart_pos", 100));
         pub_cart_dot_des_.reset(new realtime_tools::RealtimePublisher<wam_dmp_controller::PoseRPY>(n, "des_cart_vel", 100));
         pub_cart_dotdot_des_.reset(new realtime_tools::RealtimePublisher<wam_dmp_controller::PoseRPY>(n, "des_cart_acc", 100));
         pub_cart_err_.reset(new realtime_tools::RealtimePublisher<wam_dmp_controller::PoseRPY>(n, "cart_err", 100));
-
 
       	return true;
   	}
@@ -135,7 +149,53 @@ namespace wam_dmp_controller
 			joint_msr_states_.qdot(i) = joint_handles_[i].getVelocity();   
       	}
 
-        //TODO FIGURE OUT HOW TO Initialize SISE_KalmanFIlter
+        if (ext_f_est_)
+        {
+            // Initialize the SISE Kalman Filter 
+            SISE_KalmanFilterPtr->InitializeLinearModel(A_, B_, C_, W_, V_);
+            SISE_KalmanFilterPtr->InitializeEstimator(x0_, P_xx_0_);
+            SISE_KalmanFilterPtr->updateCtrlMatrix(M_star_);
+            KDL::Jacobian base_J_ee;
+    	    base_J_ee.resize(kdl_chain_.getNrOfJoints());
+    	    ee_jacobian_solver_->JntToJac(joint_msr_states_.q, base_J_ee);
+
+    	    KDL::Frame ee_fk_frame;
+    	    ee_fk_solver_->JntToCart(joint_msr_states_.q, ee_fk_frame);
+    	
+    	    // get the current ZYX representation PHI from R_ws_base * ee_fk_frame.M
+    	    double alpha, beta, gamma;
+    	    R_ws_ee_ = R_ws_base_ * ee_fk_frame.M;
+    	    p_ws_ee_ = p_ws_base_ + ee_fk_frame.p;
+
+    	    R_ws_ee_.GetEulerZYX(alpha, beta, gamma);
+
+    	    // evaluate the transformation matrix between 
+    	    // the geometric and analytical jacobian TA
+    	    //
+    	    // ws_E = [eye(3), zeros(3);
+    	    //        zeros(3), inv(E(PHI))]
+    	    // where E is the Euler Kinematical Matrix
+    	    //
+    	    Eigen::Matrix3d E;
+            E = Eigen::Matrix3d::Identity();
+    	    eul_kin_RPY(beta, alpha, E);
+    	    ws_E_.block<3,3>(3,3) = E.inverse();
+
+    	    // evaluate ws_J_ee
+    	    KDL::Jacobian ws_J_ee;
+    	    ws_J_ee.resize(kdl_chain_.getNrOfJoints());
+    	    KDL::changeBase(base_J_ee, R_ws_base_, ws_J_ee);
+
+    	    for(size_t i=0; i<kdl_chain_.getNrOfJoints(); i++)
+      	    {
+			    joint_torque_curr_(i) = joint_handles_[i].getEffort();
+			    joint_torque_last_(i) = joint_handles_[i].getEffort();  
+                joint_acc_curr_(i) = joint_acceleration_handles_[i].getPosition();
+                joint_acc_last_(i) = joint_acceleration_handles_[i].getPosition();
+      	    }
+            J_curr_.data = ws_J_ee.data;
+            J_last_.data = ws_J_ee.data;
+        }
         //
         // set default trajectory (force and position)
         //set_default_traj();
@@ -145,6 +205,7 @@ namespace wam_dmp_controller
 
     void OperationalSpaceImpedanceController::update(const ros::Time& time, const ros::Duration& period)
   	{
+
 
         command_struct_ = *(command_buffer_.readFromRT());    
         /*
@@ -162,7 +223,7 @@ namespace wam_dmp_controller
         rot_xyz_des_ws_         = command_struct_.rot_xyz_command_;
         rot_xyzdot_des_ws_      = command_struct_.rot_xyzdot_command_;
         rot_xyzdotdot_des_ws_   = command_struct_.rot_xyzdotdot_command_;
-        
+        ////////////////////////////// 
   		//////////////////////////////////////////////////////////////////////////////////
     	//
     	// Robot configuration
@@ -174,7 +235,7 @@ namespace wam_dmp_controller
     	for(size_t i=0; i<kdl_chain_.getNrOfJoints(); i++)
       	{
 			joint_msr_states_.q(i) = joint_handles_[i].getPosition();
-			joint_msr_states_.qdot(i) = joint_handles_[i].getVelocity();
+			joint_msr_states_.qdot(i) = joint_handles_[i].getVelocity(); 
       	}
 
       	//
@@ -196,6 +257,23 @@ namespace wam_dmp_controller
 
         // gravity compensation
         dyn_param_solver_->JntToGravity(joint_msr_states_.q, G);
+        ////////////////////////////////////////////////////////////
+        if (ext_f_est_)
+        {
+    	    for(size_t i=0; i<kdl_chain_.getNrOfJoints(); i++)
+      	    {
+			    joint_torque_curr_(i) = joint_handles_[i].getEffort();
+                joint_acc_curr_(i) = joint_acceleration_handles_[i].getPosition();
+      	    }
+            
+            SISE_KalmanFilterPtr->estimate(joint_torque_curr_, joint_torque_last_);
+            input_est_ = SISE_KalmanFilterPtr->getInput()->getMean().block(0, 0, state_dim_ ,1);
+            input_est_ -= joint_acc_curr_;
+            input_est_ += joint_acc_last_;
+            input_est_ = M_star_ * input_est_;
+            input_est_ += J_last_.data.transpose() * ext_f_last_; 
+        }
+        ////////////////////////////////////////////////////////////
 
     	//////////////////////////////////////////////////////////////////////////////////
 
@@ -222,6 +300,7 @@ namespace wam_dmp_controller
     	//
     	// Forward Kinematics
     	//
+
     	//////////////////////////////////////////////////////////////////////////////////
     	//
     	// end effector
@@ -309,6 +388,13 @@ namespace wam_dmp_controller
         
         J_dyn_inv_ = M.data.inverse() * ws_J_ee.data.transpose() * J_dyn_inv_;
 
+        /////////////////////////////
+        if (ext_f_est_)
+        {
+            ext_f_curr_ = J_dyn_inv_.transpose() * input_est_;
+            J_last_.data = ws_J_ee.data;
+        } 
+        /////////////////////////////
     	//////////////////////////////////////////////////////////////////////////////////
 
     	//////////////////////////////////////////////////////////////////////////////////
@@ -364,6 +450,12 @@ namespace wam_dmp_controller
       		tau_ = C.data * joint_msr_states_.qdot.data + G.data - command_filter_ * ws_JA_ee_dot * joint_msr_states_.qdot.data;
     	else  // gravity handled by the hardware interface itself when not using simulation 
       		tau_ = C.data * joint_msr_states_.qdot.data - command_filter_ * ws_JA_ee_dot * joint_msr_states_.qdot.data;
+        /////////////////////////////////////////////
+        if (ext_f_est_)
+        {
+            tau_ += input_est_;
+        }
+        /////////////////////////////////////////////
     	//////////////////////////////////////////////////////////////////////////////////
     	//
     	// 
@@ -412,7 +504,7 @@ namespace wam_dmp_controller
         if(norm != 0.0)
         {
             c = 2.0 * acos(rot_xyz_error_qua_.w()) / norm;
-
+            
             if(c > rot_vmax_)
                 c = rot_vmax_;
             else if(c < -rot_vmax_)
@@ -433,6 +525,7 @@ namespace wam_dmp_controller
         KDL::Vector p_ws_ee;
         p_ws_ee = R_ws_base_ * (ee_fk_frame.p - p_base_ws_);
     
+
         // evaluate the state
         ws_x_ << p_ws_ee(0), p_ws_ee(1), p_ws_ee(2), gamma, beta, alpha;
     	// set joint efforts
@@ -451,7 +544,14 @@ namespace wam_dmp_controller
             last_publish_time_ += ros::Duration(1.0 / publish_rate_);
             publish_info(time);
         }
-  	}
+
+        if (ext_f_est_)
+        {
+            joint_acc_last_ = joint_acc_curr_;
+            joint_torque_last_ = joint_torque_curr_;            
+            ext_f_last_ = ext_f_curr_;
+        }
+    }
 
     void OperationalSpaceImpedanceController::publish_info(const ros::Time& time)
     {
@@ -506,6 +606,21 @@ namespace wam_dmp_controller
         pub_cart_dot_des_->unlockAndPublish();
         //pub_cart_dotdot_des_->unlockAndPublish();
         pub_cart_err_->unlockAndPublish();
+
+        if (ext_f_est_)
+        {
+            if (pub_ext_force_est_ && pub_ext_force_est_->trylock())
+            {
+                pub_ext_force_est_->msg_.header.stamp = time;
+                pub_ext_force_est_->msg_.wrench.force.x = ext_f_curr_[0];
+                pub_ext_force_est_->msg_.wrench.force.y = ext_f_curr_[1];
+                pub_ext_force_est_->msg_.wrench.force.z = ext_f_curr_[2];
+                pub_ext_force_est_->msg_.wrench.torque.x = ext_f_curr_[3];
+                pub_ext_force_est_->msg_.wrench.torque.y = ext_f_curr_[4];
+                pub_ext_force_est_->msg_.wrench.torque.z = ext_f_curr_[5];
+            }
+            pub_ext_force_est_->unlockAndPublish();
+        }
         //pub_ext_force_est_->unlockAndPublish;
     }
     
@@ -613,6 +728,98 @@ namespace wam_dmp_controller
         
         n.getParam("publish_rate", publish_rate_);
         n.getParam("use_simulation_", use_simulation_);
+        n.getParam("external_force_estimation_", ext_f_est_); // Whetherto do external force estimation.
+
+        if (ext_f_est_)
+        {
+            ros::NodeHandle SISE_handle(n, "SISE");
+            get_estimator_parameters(SISE_handle);
+        }
+    }
+
+    void OperationalSpaceImpedanceController::get_estimator_parameters(ros::NodeHandle &n_estimators)
+    {       
+        if (n_estimators.getParam("state_dim", state_dim_))
+        {
+            ROS_ERROR("state dimension not specified!");
+            return;
+        }
+        else 
+        {
+            ROS_INFO("state dimension is set to %f", state_dim_);
+        }
+
+        if (n_estimators.getParam("input_dim", input_dim_))
+        {
+            ROS_ERROR("input dimension not specified!");
+            return;             
+        }
+        else 
+        {
+            ROS_INFO("input dimension is set to %f", state_dim_);
+        }
+
+        if (n_estimators.getParam("measurement_dim", measurement_dim_))
+        {
+            ROS_ERROR("measurement dimension not specified!");
+            return;             
+        }
+        else 
+        {
+            ROS_INFO("measurement dimension is set to %f", measurement_dim_);
+        }
+        A_      = Eigen::MatrixXd::Zero(state_dim_, state_dim_);
+        B_      = Eigen::MatrixXd::Zero(state_dim_, input_dim_);
+        C_      = Eigen::MatrixXd::Zero(measurement_dim_, state_dim_);
+        W_      = Eigen::MatrixXd::Zero(state_dim_, state_dim_);
+        V_      = Eigen::MatrixXd::Zero(measurement_dim_, measurement_dim_);
+        P_xx_0_ = Eigen::MatrixXd::Zero(state_dim_, state_dim_);
+        x0_     = Eigen::MatrixXd::Zero(state_dim_, 1);
+        M_gain_ = Eigen::MatrixXd::Zero(state_dim_, state_dim_);
+
+        std::vector<double> A_vec;
+        std::vector<double> B_vec;
+        std::vector<double> C_vec;
+        std::vector<double> W_vec;
+        std::vector<double> V_vec;
+        std::vector<double> Pxx0_vec;
+        std::vector<double> x0_vec;
+        std::vector<double> M_gain_vec;
+
+        n_estimators.getParam("A", A_vec);
+        n_estimators.getParam("B", B_vec);
+        n_estimators.getParam("C", C_vec);
+        n_estimators.getParam("W", W_vec);
+        n_estimators.getParam("V", V_vec);
+        n_estimators.getParam("P_xx_0", Pxx0_vec);
+        n_estimators.getParam("x0", x0_vec);
+        n_estimators.getParam("M_gain_", M_gain_vec);
+        
+        for (int i = 0; i < A_vec.size(); i++)
+        {
+            A_ << A_vec[i];
+        }
+        
+        for (int i = 0; i < B_vec.size(); i++)
+        {
+            B_ << B_vec[i];
+        }
+        for (int i = 0; i < C_vec.size(); i++)
+        {
+            C_ << C_vec[i];
+        }
+        for (int i = 0; i < x0_vec.size(); i++)
+        {
+            x0_ << x0_vec[i];
+        }
+        
+        
+        W_      = Eigen::Map<Eigen::VectorXd>(&W_vec[0], W_vec.size()).asDiagonal();
+        V_      = Eigen::Map<Eigen::VectorXd>(&V_vec[0], V_vec.size()).asDiagonal();
+        P_xx_0_ = Eigen::Map<Eigen::VectorXd>(&Pxx0_vec[0], Pxx0_vec.size()).asDiagonal();
+        M_gain_ = Eigen::Map<Eigen::VectorXd>(&M_gain_vec[0], M_gain_vec.size()).asDiagonal();
+
+        M_star_ << M_gain_, Eigen::MatrixXd::Ones(state_dim_, state_dim_);
     }
     
     
@@ -637,6 +844,7 @@ namespace wam_dmp_controller
     void OperationalSpaceImpedanceController::set_cmd_traj_callback(const wam_dmp_controller::PoseRPYConstPtr& msg)
     {
         set_cmd_traj_point(msg->position, msg->orientation);
+
     }
 
     bool OperationalSpaceImpedanceController::set_cmd_gains(wam_dmp_controller::ImpedanceControllerGains::Request &req, wam_dmp_controller::ImpedanceControllerGains::Response &res)

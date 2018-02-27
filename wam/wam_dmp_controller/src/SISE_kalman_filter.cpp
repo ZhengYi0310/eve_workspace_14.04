@@ -12,30 +12,32 @@
 using namespace wam_dmp_controller;
 using namespace std;
 
-void SISE_KalmanFilter::setRandomVariables(const NormalDistributionPtr& state,
-                                      const NormalDistributionPtr& state_uncertainty,
-                                      const NormalDistributionPtr& msr_noise)
+void SISE_KalmanFilter::setRandomVariables(const NormalDistributionPtr& state_uncertainty,
+                                           const NormalDistributionPtr& msr_noise)
 {
-    state_ = state;
+    //state_ = state;
     state_uncertainty_ = state_uncertainty;
     msr_noise_ = msr_noise;
     
     predicted_state_.reset(new NormalDistribution(state_->getMean(), state_->getVariance()));
 }
 
-void SISE_KalmanFilter::InitializeLinearModel(const Eigen::MatrixXd& coeff_of_mean,
-                                  const Eigen::MatrixXd& coeff_of_ctrl_data,
-                                  const Eigen::MatrixXd& coeff_of_msr_data)
+void SISE_KalmanFilter::InitializeLinearModel(const Eigen::MatrixXd& A,
+                                              const Eigen::MatrixXd& B,
+                                              const Eigen::MatrixXd& C,
+                                              const Eigen::MatrixXd& W,
+                                              const Eigen::MatrixXd& V)
 {
-    if (coeff_of_mean.rows() != coeff_of_mean.cols())
+    if (A.rows() != A.cols())
     {
         std::stringstream msg;
-        msg << "coeff_of_mean.rows() != coeff_of_mean.cols()" << std::endl
-            << "coeff_of_mean.rows() : " << coeff_of_mean.rows() << std::endl
-            << "coeff_of_mean.cols() : " << coeff_of_mean.cols();
-        throw wam_dmp_controller::Exception("KalmanFilter::setLinearModel", msg.str());
+        msg << "A.rows() != A.cols()" << std::endl
+            << "A.rows() : " << A.rows() << std::endl
+            << "A.cols() : " << A.cols();
+        throw wam_dmp_controller::Exception("SISE_KalmanFilter::setLinearModel", msg.str());
     }
-
+    
+    /*
     if (coeff_of_msr_data.rows() != coeff_of_msr_data.cols())
     {
         std::stringstream msg;
@@ -44,14 +46,19 @@ void SISE_KalmanFilter::InitializeLinearModel(const Eigen::MatrixXd& coeff_of_me
             << "coeff_of_mean.cols() : " << coeff_of_mean.cols();
         throw wam_dmp_controller::Exception("KalmanFilter::setLinearModel", msg.str());
     }
+    */
     
 
-    A_ = coeff_of_mean;
-    B_ = coeff_of_ctrl_data;
-    C_ = coeff_of_msr_data;
-    state_dim_ = coeff_of_mean.rows();
-    measurement_dim_ = coeff_of_msr_data.rows();
-    input_dim_ = coeff_of_ctrl_data.cols();
+    A_ = A;
+    B_ = B;
+    C_ = C;
+    state_dim_ = A.rows();
+    measurement_dim_ = C.rows();
+    input_dim_ = B.cols();
+
+    const NormalDistributionPtr state_uncertainty(new NormalDistribution(Eigen::MatrixXd::Zero(state_dim_, state_dim_), W));
+    const NormalDistributionPtr msr_noise(new NormalDistribution(Eigen::MatrixXd::Zero(measurement_dim_, state_dim_), V));
+    setRandomVariables(state_uncertainty, msr_noise);
 
     P_xx_ = Eigen::MatrixXd::Zero(state_dim_, state_dim_);
     P_uu_ = Eigen::MatrixXd::Zero(input_dim_, input_dim_);
@@ -74,12 +81,12 @@ void SISE_KalmanFilter::InitializeEstimator(Eigen::MatrixXd x_mean_0, Eigen::Mat
     P_xx_ = P_xx_0;
 }
 
-void SISE_KalmanFilter::updateCtrlMatrix(const Eigen::MatrixXd& coeff_of_ctrl_data)
+void SISE_KalmanFilter::updateCtrlMatrix(const Eigen::MatrixXd& B)
 {
-    B_ = coeff_of_ctrl_data; 
+    B_ = B; 
 }
 
-void SISE_KalmanFilter::estimate(const Eigen::MatrixXd& ctrl_input, const Eigen::MatrixXd& msr_data_curr, const Eigen::MatrixXd& msr_data_last, NormalDistributionPtr& state)
+void SISE_KalmanFilter::estimate(const Eigen::MatrixXd& msr_data_curr, const Eigen::MatrixXd& msr_data_last)
 {
     /*
     Eigen::MatrixXd mean = A_ * state_->getMean() + B_ * ctrl_input;
@@ -95,7 +102,7 @@ void SISE_KalmanFilter::estimate(const Eigen::MatrixXd& ctrl_input, const Eigen:
     state->set(mean, variance);
     state_ = state;
     */
-    Q_ = C_ * P_  * C_.transpose(  ) + C_ * state_uncertainty_->getVariance() * C_.transpose() + msr_noise_->getVariance();
+    Q_ = C_ * P_xx_  * C_.transpose(  ) + C_ * state_uncertainty_->getVariance() * C_.transpose() + msr_noise_->getVariance();
     Q_inverse_ = Q_.inverse();
     H_ = B_.transpose() * C_.transpose() * Q_inverse_ * C_ * B_;
     H_ = H_.inverse() * B_.transpose() * C_.transpose() * Q_inverse_;
@@ -113,11 +120,11 @@ void SISE_KalmanFilter::estimate(const Eigen::MatrixXd& ctrl_input, const Eigen:
     K_.block(0, measurement_dim_ + 1,  measurement_dim_, input_dim_) = Eigen::MatrixXd::Zero(measurement_dim_, input_dim_);
     S_ = G_ * P_ * G_.transpose();
     T_ = G_ * P_ * K_.transpose();
-    U_ = K_ * P_ * K_.transpose();
+    U_ = K_ * P_ * K_.transpose() + msr_noise_->getVariance();
     L_ = T_ * U_.inverse();
 
     x_mean_ = A_ * state_->getMean() + B_ * u_mean_ + L_ * (msr_data_last - C_ * state_->getMean());
-    P_xx_ = S_ - L_ * U_.inverse() * input_->getVariance();
+    P_xx_ = S_ - L_ * T_.transpose() + input_->getVariance();
     
     state_->set(x_mean_, P_xx_);
     input_->set(u_mean_, P_uu_);
@@ -125,7 +132,7 @@ void SISE_KalmanFilter::estimate(const Eigen::MatrixXd& ctrl_input, const Eigen:
 
 void SISE_KalmanFilter::checkMatrixSize(const Eigen::MatrixXd& ctrl_data, const Eigen::MatrixXd& msr_data)
 {
-    std::string src = "KalmanFilter::checkMatrixSize";
+    std::string src = "SISE_KalmanFilter::checkMatrixSize";
 
     if (A_.cols() != state_->getMean().rows())
     {

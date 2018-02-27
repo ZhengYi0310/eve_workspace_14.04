@@ -9,7 +9,6 @@ bool KinematicChainControllerBase<hardware_interface::EffortJointInterface>::get
     	if ( it->getJoint().getType() != KDL::Joint::None )
         {
 	        joint_handles_.push_back(robot->getHandle(it->getJoint().getName()));
-                joint_acceleration_handles_.push_back(robot->getHandle(it->getJoint().getName() + std::string("_acc"))); // For acceleration reading
 	        joint_stiffness_handles_.push_back(robot->getHandle(it->getJoint().getName() + std::string("_stiffness")));
 	        joint_damping_handles_.push_back(robot->getHandle(it->getJoint().getName() + std::string("_damping")));
 	        joint_set_point_handles_.push_back(robot->getHandle(it->getJoint().getName() + std::string("_set_point")));

@@ -52,6 +52,7 @@ namespace wam_dmp_controller
 				} joint_limits_;
 
 				std::vector<typename JI::ResourceHandleType> joint_handles_;
+                        std::vector<typename JI::ResourceHandleType> joint_acceleration_handles_; // For acceleration reading
         		std::vector<typename JI::ResourceHandleType> joint_stiffness_handles_;
         		std::vector<typename JI::ResourceHandleType> joint_damping_handles_;
         		std::vector<typename JI::ResourceHandleType> joint_set_point_handles_;

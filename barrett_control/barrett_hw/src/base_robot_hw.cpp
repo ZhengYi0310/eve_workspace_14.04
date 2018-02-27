@@ -53,6 +53,8 @@ namespace barrett_hw
         joint_position_.resize(n_joints_);
         joint_position_prev_.resize(n_joints_);
         joint_velocity_.resize(n_joints_);
+        joint_velocity_prev_.resize(n_joints_);
+        joint_acceleration_.resize(n_joints_);
         joint_effort_.resize(n_joints_);
         joint_stiffness_.resize(n_joints_);
         joint_damping_.resize(n_joints_);
@@ -139,6 +141,8 @@ namespace barrett_hw
             joint_position_[j] = 0.0;
             joint_position_prev_[j] = 0.0;
             joint_velocity_[j] = 0.0;
+            joint_velocity_prev_[j] = 0.0;
+            joint_acceleration_[j] = 0.0;
             joint_effort_[j] = 0.0;
             joint_stiffness_[j] = 0.0;
             joint_damping_[j] = 0.0;
@@ -232,6 +236,13 @@ namespace barrett_hw
 
             // Create joint state interface for all joints
             state_interface_.registerHandle(hardware_interface::JointStateHandle(joint_names_[j], &joint_position_[j], &joint_velocity_[j], &joint_effort_[j]));
+
+            ///////////////////////////////////////////////////////////////////////////////////// hack to get the acceleration value 
+            state_interface_acc_.registerHandle(hardware_interface::JointStateHandle(joint_names_[j] + "_acc", &joint_acceleration_[j], &joint_acceleration_[j], &joint_acceleration_[j]));
+            hardware_interface::JointHandle joint_handle_acc;
+            joint_handle_acc = hardware_interface::JointHandle(state_interface_acc_.getHandle(joint_names_[j]), &joint_acceleration_command_[j]);
+            effort_interface_.registerHandle(joint_handle_acc);
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             // Decide what kind of command interface this actuator/joint has
             hardware_interface::JointHandle joint_handle_effort;

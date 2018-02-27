@@ -79,6 +79,7 @@ namespace barrett_hw
 
             // Hardware interfaces
             hardware_interface::JointStateInterface state_interface_;
+            hardware_interface::JointStateInterface state_interface_acc_;
             hardware_interface::EffortJointInterface effort_interface_;
             hardware_interface::PositionJointInterface position_interface_;
             barrett_model::CartesianStateInterface cart_interface_;
@@ -122,12 +123,15 @@ namespace barrett_hw
             joint_position_,
             joint_position_prev_,
             joint_velocity_,
+            joint_velocity_prev_,
+            joint_acceleration_,
             joint_effort_,
             joint_stiffness_,
             joint_damping_,
             joint_position_command_,
             joint_set_point_command_,
             joint_velocity_command_,
+            joint_acceleration_command_,
             joint_stiffness_command_,
             joint_damping_command_,
             joint_effort_command_,

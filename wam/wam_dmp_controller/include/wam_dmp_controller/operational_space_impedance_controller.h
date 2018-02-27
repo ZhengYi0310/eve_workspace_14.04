@@ -16,6 +16,7 @@
 #include <wam_dmp_controller/PoseRPY.h>
 #include <wam_dmp_controller/PoseRPYCommand.h>
 #include <wam_dmp_controller/ImpedanceControllerGains.h>
+#include <wam_dmp_controller/SISE_kalman_filter.hpp>
 
 //KDL include
 #include <kdl/chainjnttojacsolver.hpp>
@@ -37,16 +38,6 @@ namespace wam_dmp_controller
   			void starting(const ros::Time& time);
   			void update(const ros::Time& time, const ros::Duration& period);
             
-            //void setCommand(geometry_msgs::Vector3 xyz, wam_dmp_controller::RPY rpy);
-            //void setCommand(geometry_msgs::Vector3 xyz, wam_dmp_controller::RPY dxyz);
-            //void setCommand(geometry_msgs::Vector3 xyz, geometry_msgs::Vector3 dxyz, wam_dmp_controller::RPY rpy, wam_dmp_controller::drpy);
-    		//void setCommand(double x, double y, double z, double raw, double yaw, double pitch);
-            //void setCommand(double x, double y, double z, double roll, double yaw, doubl);
-    		//void load_calib_data(double& total_mass, KDL::Vector& p_sensor_tool_com);
-
-            /**
-             * \brief Store position and velocity command in struct to allow easier realtime buffer usage 
-            */
             struct Commands
             {
                 Eigen::Vector3d trans_xyz_command_;
@@ -61,19 +52,7 @@ namespace wam_dmp_controller
     	private:
             ros::ServiceServer set_cmd_gains_service_;
             ros::ServiceServer get_cmd_gains_service_;
-    		//void update_inertia_matrix(Eigen::MatrixXd& inertia_matrix);
-    		//void extend_chain(ros::NodeHandle &n);
-
-    		// params syntax
-  			// x_J_y: Geometric Jacobian w.r.t reference point y expressed in the base frame x
-  			// x_AJ_y: Analytic Jacobian w.r.t reference point y expressed in the base frame x
-  			// R_x_y: Rotation from base frame y to base frame x
-  			// x_wrench_y:  Wrench w.r.t reference point y expressed in the base frame x
-  			// x_vector: vector expressed in basis x
-    		// p_x_y: position vector from x to y
-    		// ee: Reference point of interest (typically the tool tip)
-    		// wrist: tip of the 7th link of the Barrett Wam
-    		// E: matrix that mapps Geometrix Jacobian back to Analytic jacobian  
+            
             void set_cmd_traj_point(geometry_msgs::Vector3 position, wam_dmp_controller::RPY orientation);
             void set_cmd_traj_callback(const wam_dmp_controller::PoseRPYConstPtr& msg);
             bool set_cmd_gains(wam_dmp_controller::ImpedanceControllerGains::Request &req, 
@@ -82,16 +61,8 @@ namespace wam_dmp_controller
                                wam_dmp_controller::ImpedanceControllerGains::Response &res);   
             void setCommandRT(Eigen::Vector3d trans_des, Eigen::Vector3d trans_dot_des, Eigen::Vector3d trans_dotdot_des, 
                               Eigen::Vector3d rot_des, Eigen::Vector3d rot_dot_des, Eigen::Vector3d rot_dotdot_des);
-            //void set_cmd_traj_spline(geometry_msgs::Vector3 position, wam_dmp_controller::RPY orientation);
-            //void set_cmd_traj_spline_callback(const wam_dmp_controller::PoseRPYConstPtr& msg);
-            /*
-            bool set_cmd_traj_spline_srv(wam_dmp_controller::PoseRPYCommand::Request &req, 
-                                  wam_dmp_controller::PoseRPYCommand::Response &res);
-            bool get_cmd_traj_spline_srv(wam_dmp_controller::PoseRPYCommand::Request &req, 
-                                  wam_dmp_controller::PoseRPYCommand::Response &res);
-            void set_default_traj();
-            */
             void get_parameters(ros::NodeHandle &n);
+            void get_estimator_parameters(ros::NodeHandle &n_estimator);
             void publish_info(const ros::Time& time);
 
             void set_p_sensor_cp(double x, double y, double z); // For hybrid force control
@@ -101,17 +72,6 @@ namespace wam_dmp_controller
             void set_p_base_ws(double x, double y, double z);
             void set_ws_base_angles(double alpha, double beta, double gamma);
             
-            /*
-            void eval_current_point_to_point_traj(const ros::Duration& period,
-                                                  Eigen::VectorXd& x_des,
-                                                  Eigen::VectorXd& xdot_des,
-                                                  Eigen::VectorXd& xdotdot_des);
-            void eval_point_to_point_traj_constants(Eigen::Vector3d& desired_trans,					    
-                                                    Eigen::Vector3d& desired_rot,
-                                                    double duration);
-            
-            bool run_spline_;
-            */
             KDL::JntSpaceInertiaMatrix M;
             KDL::JntArray C;
             KDL::JntArray G;
@@ -155,14 +115,7 @@ namespace wam_dmp_controller
             Eigen::Matrix<double, 6, 6> null_Kp_;
             Eigen::Matrix<double, 6 ,6> null_Kv_;
             Eigen::Matrix<double, 6, 6> lamb_;
-            /*
-            double p2p_traj_duration_;
-            Eigen::MatrixXf p2p_traj_const_;
-            Eigen::Vector3d prev_trans_setpoint_;
-            Eigen::Vector3d prev_rot_setpoint_;
-            double time_;
-            */
-
+            
             // desired mass matrix, damping and gains of the modeled mechanical system 
             Eigen::Matrix<double, 6, 6> Md_;
             Eigen::Matrix<double, 6, 6> Dd_;
@@ -186,21 +139,29 @@ namespace wam_dmp_controller
 
             ros::Subscriber sub_command_;
             
-            /*
-            // ImpiedanceCommand service
-            ros::ServiceServer set_cmd_traj_pos_service_;
-            ros::ServiceServer get_cmd_traj_pos_service_;
-            */
-            // publisher to monitor data
             ros::Time last_publish_time_;
             double publish_rate_;
-            boost::scoped_ptr<realtime_tools::RealtimePublisher<geometry_msgs::WrenchStamped> > pub_ext_force_est_; // If we want to do external force estimation
+
+            /// For external force estimation/////////////////////////////////////////////////////////////////
+            Eigen::MatrixXd A_, B_, C_, W_, V_, P_xx_0_, x0_, M_gain_, M_star_;
+            Eigen::MatrixXd input_est_;
+            KDL::Jacobian J_curr_, J_last_;
+            double state_dim_;
+            double input_dim_;
+            double measurement_dim_;
+            Eigen::VectorXd ext_f_last_;
+            Eigen::VectorXd ext_f_curr_;
+            Eigen::MatrixXd joint_acc_curr_; // From exponential smoothing
+            Eigen::MatrixXd joint_acc_last_;
+            Eigen::MatrixXd joint_torque_curr_;
+            Eigen::MatrixXd joint_torque_last_;
+            bool ext_f_est_;
+            boost::scoped_ptr<realtime_tools::RealtimePublisher<geometry_msgs::WrenchStamped> > pub_ext_force_est_;
+            boost::scoped_ptr<SISE_KalmanFilter> SISE_KalmanFilterPtr;
+            /// For external force estimation////////////////////////////////////////////////////////////////
+            
+
             boost::scoped_ptr<realtime_tools::RealtimePublisher<wam_dmp_controller::PoseRPY> > pub_cart_des_, pub_cart_dot_des_, pub_cart_dotdot_des_, pub_cart_err_;
-            //ros::Publisher pub_error_;
-            /* 
-            boost::mutex p2p_traj_mutex_;
-            boost::mutex force_traj_mutex_;
-            */
   	};
 } 
 #endif
