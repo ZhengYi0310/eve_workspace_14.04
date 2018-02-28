@@ -28,12 +28,14 @@ namespace wam_dmp_controller
 		M_.resize(kdl_chain_.getNrOfJoints());
 		C_.resize(kdl_chain_.getNrOfJoints());
 		G_.resize(kdl_chain_.getNrOfJoints());
+        home_.resize(kdl_chain_.getNrOfJoints());
         joint_initial_states_.resize(kdl_chain_.getNrOfJoints());
         current_cmd_.resize(kdl_chain_.getNrOfJoints());
         command_struct_.positions_.resize(kdl_chain_.getNrOfJoints());
         // Read the Kq and Kv gains from the coniguration file
         ros::NodeHandle Kp_handle(n, "Kp_Gains");
         ros::NodeHandle Kv_handle(n, "Kv_Gains");
+        ros::NodeHandle home_handle(n, "home_pos");
         
         for (size_t i = 0; i < joint_handles_.size(); i++)
         {
@@ -56,10 +58,22 @@ namespace wam_dmp_controller
             else 
             {
                  ROS_WARN("Kv gain set for %s in yaml file, Using %f", joint_handles_[i].getName().c_str(), Kv_(i)); 
+            }
+
+            if ( !home_handle.getParam(joint_handles_[i].getName().c_str(), home_(i))) 
+            {
+                ROS_WARN("home pos not set for %s in yaml file, Using 0.0.", joint_handles_[i].getName().c_str());
+                home_(i) = 0.0;
+            }
+            else 
+            {
+                 ROS_WARN("home pos set for %s in yaml file, Using %f", joint_handles_[i].getName().c_str(), home_(i)); 
             }            
         }
-		sub_posture_ = nh_.subscribe("command", 1, &JointSpaceController::command, this);
-		sub_gains_ = nh_.subscribe("set_gains", 1, &JointSpaceController::set_gains, this);
+        sub_posture_ = nh_.subscribe("command", 1, &JointSpaceController::command, this);
+		set_posture_service_ = nh_.advertiseService("set_joint_pos", &JointSpaceController::set_joint_pos, this);
+		set_gains_service_ = nh_.advertiseService("set_gains", &JointSpaceController::set_gains, this);
+        go_home_service_ = nh_.advertiseService("go_home", &JointSpaceController::go_home, this);
 		return true;		
 	}
 
@@ -175,24 +189,86 @@ namespace wam_dmp_controller
 
 	}
 
-    void JointSpaceController::set_gains(const std_msgs::Float64MultiArray::ConstPtr &msg)
+    bool JointSpaceController::set_joint_pos(wam_dmp_controller::SetJointPos::Request &req,
+                                             wam_dmp_controller::SetJointPos::Response &res)
+    {
+        if(req.joint_pos.size() == 0)
+    	{
+            ROS_INFO("Joint posture array must be of dimension %lu", joint_handles_.size());
+            return res.state = false;
+        }
+    	else if(req.joint_pos.size() != joint_handles_.size())
+    	{
+    		ROS_ERROR("Joint posture array had the wrong size: %u", (unsigned int)req.joint_pos.size());
+    		return res.state = false;
+    	}
+    	else
+    	{
+    		for (unsigned int i = 0; i<joint_handles_.size(); i++)
+    		{	
+                command_struct_.positions_[i] = req.joint_pos[i];
+            }
+            command_buffer_.writeFromNonRT(command_struct_);
+    		cmd_flag_ = 1;
+            // when a new command is set, steps should be reset to avoid jumps in the update
+            step_ = 0;
+
+            res.state = true;
+    	}
+        return res.state;
+	}
+
+    bool JointSpaceController::go_home(wam_dmp_controller::GoHome::Request &req,
+                                       wam_dmp_controller::GoHome::Response &res)
+    {
+    	for (unsigned int i = 0; i<joint_handles_.size(); i++)
+    	{	
+            command_struct_.positions_[i] = home_(i);
+        }
+        command_buffer_.writeFromNonRT(command_struct_);
+    	cmd_flag_ = 1;
+        // when a new command is set, steps should be reset to avoid jumps in the update
+        step_ = 0;
+        
+        res.state = true;
+        return res.state;
+    }
+
+    bool JointSpaceController::set_gains(wam_dmp_controller::SetJointGains::Request &req,
+                                         wam_dmp_controller::SetJointGains::Response &res)
 	{
-		if(msg->data.size() == 2*joint_handles_.size())
+        if(req.Kp_gains.size() == 0)
+    	{
+            ROS_INFO("Desired Kp array must be of dimension %lu", joint_handles_.size());
+            return res.state = false;
+        }
+    	else if(req.Kp_gains.size() != joint_handles_.size())
+    	{
+    		ROS_ERROR("Kp array had the wrong size: %u", (unsigned int)req.Kp_gains.size());
+    		return res.state = false;
+    	}
+
+        if(req.Kv_gains.size() == 0)
+    	{
+            ROS_INFO("Desired Kv array must be of dimension %lu", joint_handles_.size());
+            return res.state = false;
+        }
+    	else if(req.Kp_gains.size() != joint_handles_.size())
+    	{
+    		ROS_ERROR("Kv array had the wrong size: %u", (unsigned int)req.Kv_gains.size());
+    		return res.state = false;
+    	}
+		
+		for(unsigned int i = 0; i < joint_handles_.size(); i++)
 		{
-			for(unsigned int i = 0; i < joint_handles_.size(); i++)
-			{
-				Kp_(i) = msg->data[i];
-				Kv_(i) = msg->data[i + joint_handles_.size()];
-			}
+				Kp_(i) = req.Kp_gains[i];
+				Kv_(i) = req.Kv_gains[i];
 		}
-		else
-			ROS_INFO("Number of Joint handles = %lu", joint_handles_.size());
-
-		ROS_INFO("Num of Joint handles = %lu, dimension of message = %lu", joint_handles_.size(), msg->data.size());
-
+		
 		ROS_INFO("New gains Kp: %.1lf, %.1lf, %.1lf %.1lf, %.1lf, %.1lf, %.1lf", Kp_(0), Kp_(1), Kp_(2), Kp_(3), Kp_(4), Kp_(5), Kp_(6));
 		ROS_INFO("New gains Kv: %.1lf, %.1lf, %.1lf %.1lf, %.1lf, %.1lf, %.1lf", Kv_(0), Kv_(1), Kv_(2), Kv_(3), Kv_(4), Kv_(5), Kv_(6));
-
+        res.state = true;
+        return res.state;
 	}
 }
 PLUGINLIB_EXPORT_CLASS(wam_dmp_controller::JointSpaceController, controller_interface::ControllerBase)

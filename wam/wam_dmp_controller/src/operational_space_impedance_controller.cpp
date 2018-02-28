@@ -447,9 +447,9 @@ namespace wam_dmp_controller
       	//command_filter_ = ws_JA_ee.transpose() * Lambda;
         command_filter_ = ws_J_ee.data.transpose() * Lambda;
     	if(use_simulation_)
-      		tau_ = C.data * joint_msr_states_.qdot.data + G.data - command_filter_ * ws_JA_ee_dot * joint_msr_states_.qdot.data;
+      		tau_ = C.data + G.data - command_filter_ * ws_JA_ee_dot * joint_msr_states_.qdot.data;
     	else  // gravity handled by the hardware interface itself when not using simulation 
-      		tau_ = C.data * joint_msr_states_.qdot.data - command_filter_ * ws_JA_ee_dot * joint_msr_states_.qdot.data;
+      		tau_ = C.data - command_filter_ * ws_JA_ee_dot * joint_msr_states_.qdot.data;
         /////////////////////////////////////////////
         if (ext_f_est_)
         {

@@ -25,6 +25,14 @@ barrett_hw:
         left_wam/wrist_yaw_joint: 0.5
         left_wam/wrist_pitch_joint: 0.5
         left_wam/palm_yaw_joint: 1
+    home_pos:
+        left_wam/base_yaw_joint: 1.574388859
+        left_wam/shoulder_pitch_joint: -1.629941524
+        left_wam/shoulder_yaw_joint: -0.06294470833
+        left_wam/elbow_pitch_joint: 0.3082449174
+        left_wam/wrist_yaw_joint: -0.04514964065
+        left_wam/wrist_pitch_joint: -0.2571394599
+        left_wam/palm_yaw_joint: -0.5003674773
 
   gravity_compensation_controller:
     type: wam_dmp_controller/GravityCompensation

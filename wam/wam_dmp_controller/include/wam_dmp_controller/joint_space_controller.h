@@ -11,6 +11,9 @@
 #include "KinematicChainControllerBase.h"
 
 #include <std_msgs/Float64MultiArray.h>
+#include <wam_dmp_controller/SetJointPos.h>
+#include <wam_dmp_controller/SetJointGains.h>
+#include <wam_dmp_controller/GoHome.h>
 
 #include <boost/scoped_ptr.hpp>
 /*
@@ -29,17 +32,25 @@ namespace wam_dmp_controller
 		    bool init(hardware_interface::EffortJointInterface *robot, ros::NodeHandle &n);
 		    void starting(const ros::Time& time);
 		    void update(const ros::Time& time, const ros::Duration& period);
-		    void command(const std_msgs::Float64MultiArray::ConstPtr &msg);
-		    void set_gains(const std_msgs::Float64MultiArray::ConstPtr &msg);
             
             struct Commands
             {
                 std::vector<double> positions_;
             };
 	    private:
+            bool go_home(wam_dmp_controller::GoHome::Request &req,
+                         wam_dmp_controller::GoHome::Response &res);
+		    bool set_joint_pos(wam_dmp_controller::SetJointPos::Request &req,
+                               wam_dmp_controller::SetJointPos::Response &res);
+		    bool set_gains(wam_dmp_controller::SetJointGains::Request &req,
+                           wam_dmp_controller::SetJointGains::Response &res);
 
-		    ros::Subscriber sub_posture_;
-		    ros::Subscriber sub_gains_;
+            void command(const std_msgs::Float64MultiArray::ConstPtr &msg);
+           
+            ros::Subscriber sub_posture_;
+		    ros::ServiceServer set_posture_service_;
+		    ros::ServiceServer set_gains_service_;
+            ros::ServiceServer go_home_service_;
         
 		    KDL::JntArray cmd_states_;
 		    int cmd_flag_;	// discriminate if a user command arrived
@@ -52,6 +63,7 @@ namespace wam_dmp_controller
 		    KDL::JntSpaceInertiaMatrix M_; //Inertia matrix
 		    KDL::JntArray C_, G_;	//Coriolis and Gravitational matrices
 		    KDL::JntArray Kp_, Kv_;	//Position and Velocity gains
+            KDL::JntArray home_;
 
 		    boost::scoped_ptr<KDL::ChainDynParam> id_solver_;
 

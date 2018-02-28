@@ -238,9 +238,12 @@ namespace barrett_hw
             state_interface_.registerHandle(hardware_interface::JointStateHandle(joint_names_[j], &joint_position_[j], &joint_velocity_[j], &joint_effort_[j]));
 
             ///////////////////////////////////////////////////////////////////////////////////// hack to get the acceleration value 
-            state_interface_acc_.registerHandle(hardware_interface::JointStateHandle(joint_names_[j] + "_acc", &joint_acceleration_[j], &joint_acceleration_[j], &joint_acceleration_[j]));
+            //state_interface_acc_.registerHandle(hardware_interface::JointStateHandle(joint_names_[j] + "_acc", &joint_acceleration_[j], &joint_acceleration_[j], &joint_acceleration_[j]));
             hardware_interface::JointHandle joint_handle_acc;
-            joint_handle_acc = hardware_interface::JointHandle(state_interface_acc_.getHandle(joint_names_[j]), &joint_acceleration_command_[j]);
+            joint_handle_acc = hardware_interface::JointHandle(hardware_interface::JointStateHandle(
+                                                               joint_names_[j]+std::string("_acc"),
+                                                               &joint_acceleration_[j], &joint_velocity_[j], &joint_effort_[j]),
+                                                               &joint_set_point_command_[j]);
             effort_interface_.registerHandle(joint_handle_acc);
             ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
