@@ -30,6 +30,8 @@ namespace wam_dmp_controller
                                                        &JointSpaceSplineController::set_cmd_traj_spline_srv, this);
         get_cmd_traj_pos_service_ = n.advertiseService("set_traj_pos_cmd",
                                                        &JointSpaceSplineController::get_cmd_traj_spline_srv, this);
+        go_home_traj_service_ =  n.advertiseService("go_home_traj_cmd",
+                                                    &JointSpaceSplineController::go_home_traj_spline_srv, this); 
 
         // set trajectory duration
         p2p_traj_spline_duration_ = DEFAULT_P2P_TRAJ_DURATION;
@@ -178,6 +180,43 @@ namespace wam_dmp_controller
         p2p_traj_mutex_.lock();
 
         p2p_traj_spline_duration_ = req.command.p2p_traj_duration;
+
+        //command_buffer_.writeFromNonRT(command_struct_); Don't do this when set a spline!!!!!! 
+        eval_point_to_point_traj_constants(curr_command_, p2p_traj_spline_duration_);
+        time_ = 0;
+
+        p2p_traj_mutex_.unlock();
+
+        return true; 
+    }
+
+     bool JointSpaceSplineController::go_home_traj_spline_srv(wam_dmp_controller::GoHomeSpline::Request &req, 
+                                                              wam_dmp_controller::GoHomeSpline::Response &res)
+    {
+        if (command_struct_.positions_.size() != kdl_chain_.getNrOfJoints())
+        {
+            ROS_ERROR("command struct has size %lu, home posture has size %u, they are not equal", 
+                      command_struct_.positions_.size(), 
+                      kdl_chain_.getNrOfJoints());
+        }
+        if (time_ < p2p_traj_spline_duration_)
+        {
+            res.command.elapsed_time = time_;
+            res.command.accepted = false;
+            res.command.p2p_traj_duration = p2p_traj_spline_duration_;
+            
+            return true;
+        }
+        res.command.accepted = true;
+
+        for (int i = 0; i < kdl_chain_.getNrOfJoints(); i++)
+        {
+            command_struct_.positions_[i] = home_(i);
+        }
+        curr_command_ = Eigen::Map<Eigen::VectorXd>(&command_struct_.positions_[0], command_struct_.positions_.size());
+        p2p_traj_mutex_.lock();
+
+        p2p_traj_spline_duration_ = DEFAULT_P2P_TRAJ_DURATION;
 
         //command_buffer_.writeFromNonRT(command_struct_); Don't do this when set a spline!!!!!! 
         eval_point_to_point_traj_constants(curr_command_, p2p_traj_spline_duration_);

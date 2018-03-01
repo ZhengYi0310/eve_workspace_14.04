@@ -125,6 +125,7 @@ namespace wam_dmp_controller
     		joint_msr_states_.qdot(i) = joint_handles_[i].getVelocity();
     		joint_msr_states_.qdotdot(i) = 0.0;
     		joint_des_states_.q(i) = joint_msr_states_.q(i);
+            command_struct_.positions_[i] = joint_des_states_.q(i);
             //command_buffer_.initRT(command_struct_);
     	}
         command_buffer_.initRT(command_struct_);

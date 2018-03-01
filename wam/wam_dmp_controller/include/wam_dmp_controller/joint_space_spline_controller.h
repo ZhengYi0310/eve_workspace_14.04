@@ -10,6 +10,7 @@
 #include "wam_dmp_controller/joint_space_controller.h"
 #include <wam_dmp_controller/JointPosSpline.h>
 #include <wam_dmp_controller/JointPosSplineMsg.h>
+#include <wam_dmp_controller/GoHomeSpline.h>
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -31,6 +32,8 @@ namespace wam_dmp_controller
                                          wam_dmp_controller::JointPosSpline::Response &res);
             bool get_cmd_traj_spline_srv(wam_dmp_controller::JointPosSpline::Request &req,
                                          wam_dmp_controller::JointPosSpline::Response &res);
+            bool go_home_traj_spline_srv(wam_dmp_controller::GoHomeSpline::Request &req,
+                                         wam_dmp_controller::GoHomeSpline::Response &res);
 
             //void get_parameters(ros::NodeHandle &n);
             void eval_current_point_to_point_traj(const ros::Duration& period,
@@ -43,6 +46,7 @@ namespace wam_dmp_controller
 
             ros::ServiceServer set_cmd_traj_pos_service_;     
             ros::ServiceServer get_cmd_traj_pos_service_;
+            ros::ServiceServer go_home_traj_service_;
 
             Eigen::VectorXd q_des_;
             Eigen::VectorXd q_dot_des_;

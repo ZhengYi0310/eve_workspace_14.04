@@ -67,6 +67,7 @@ add_message_files(DIRECTORY msg FILES
 add_service_files(DIRECTORY srv FILES
   PoseRPYCommand.srv
   ImpedanceControllerGains.srv
+  GoHomeSpline.srv
   GoHome.srv
   GetJointPos.srv
   SetJointPos.srv
