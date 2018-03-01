@@ -8,4 +8,6 @@
   <class name="wam_dmp_controller/ArmStateController" type="wam_dmp_controller::ArmStateController" base_class_type="controller_interface::ControllerBase" />
   <class name="wam_dmp_controller/OperationalSpaceController" type="wam_dmp_controller::OperationalSpaceController" base_class_type="controller_interface::ControllerBase" />
   <class name="wam_dmp_controller/OperationalSpaceImpedanceController" type="wam_dmp_controller::OperationalSpaceImpedanceController" base_class_type="controller_interface::ControllerBase" />
+  <class name="wam_dmp_controller/OperationalSpaceImpedanceSplineController" type="wam_dmp_controller::OperationalSpaceImpedanceSplineController" base_class_type="controller_interface::ControllerBase" />
+  <class name="wam_dmp_controller/JointSpaceSplineController" type="wam_dmp_controller::JointSpaceSplineController" base_class_type="controller_interface::ControllerBase" />
 </library>

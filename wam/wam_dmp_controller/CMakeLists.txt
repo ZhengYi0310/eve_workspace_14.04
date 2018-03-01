@@ -60,6 +60,8 @@ add_message_files(DIRECTORY msg FILES
   SetJointPosMsg.msg
   SetJointGainsMsg.msg
   GoHomeMsg.msg
+  JointPosSplineMsg.msg
+  SetJointPosStampedMsg.msg
 )
 
 add_service_files(DIRECTORY srv FILES
@@ -70,6 +72,7 @@ add_service_files(DIRECTORY srv FILES
   SetJointPos.srv
   GetJointGains.srv
   SetJointGains.srv
+  JointPosSpline.srv
 )
 generate_messages(DEPENDENCIES
   geometry_msgs
@@ -118,6 +121,7 @@ add_library(${PROJECT_NAME}
   src/KinematicChainControllerBase.cpp
   src/joint_impedance_controller.cpp
   src/joint_space_controller.cpp
+  src/joint_space_spline_controller.cpp
   src/gravity_compensation.cpp
   src/arm_state_controller.cpp
   src/operational_space_controller.cpp

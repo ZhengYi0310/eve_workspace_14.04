@@ -49,7 +49,14 @@
 	<!-- robot simulation uses the full robot description -->
 	<group if="$(arg use_barrett_hw_sim)">
 		<!-- spawn the robot in gazebo -->
-		<node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param barrett_hw/robot_description_yi -urdf -model $(arg robot_name)"  respawn="false" output="screen" /> 
+		<node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param barrett_hw/robot_description_yi -urdf -model $(arg robot_name) 
+			-J left_wam/base_yaw_joint 1.574388859
+      			-J left_wam/shoulder_pitch_joint -1.629941524
+      			-J left_wam/shoulder_yaw_joint -0.06294470833
+      			-J left_wam/elbow_pitch_joint 0.3082449174
+      			-J left_wam/wrist_yaw_joint -0.04514964065
+      			-J left_wam/wrist_pitch_joint -0.2571394599
+      			-J lleft_wam/palm_yaw_joint -0.5003674773"  respawn="false" output="screen" /> 
                 
 
 		<!-- enable/disable gui at will, the rviz listens to the simulation -->

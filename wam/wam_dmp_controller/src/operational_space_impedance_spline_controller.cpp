@@ -61,7 +61,7 @@ namespace wam_dmp_controller
 
     void OperationalSpaceImpedanceSplineController::update(const ros::Time& time, const ros::Duration& period)
     {
-        Eigen::Vector3d x_des(6);
+        Eigen::VectorXd x_des(6);
         Eigen::VectorXd xdot_des(6);
         Eigen::VectorXd xdotdot_des(6);
         eval_current_point_to_point_traj(period, trans_des_, trans_dot_des_, trans_dotdot_des_, 

@@ -31,11 +31,11 @@
 	<param name="use_gui" value="$(arg gui)"/>
 	
 	<!-- joint and robot state publishers of the full robot description -->
-	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"> 
-                <param name="/use_gui" value="true"/>
+	<!-- <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"> -->
+        <!--        <param name="/use_gui" value="true"/> -->
 		<!-- <rosparam param="source_list">[/joint_states]</rosparam> --> 
-                <remap from="robot_description" to="barrett_hw/robot_description_yi" /> 
-	</node> 
+        <!--        <remap from="robot_description" to="barrett_hw/robot_description_yi" /> -->
+	<!-- </node> --> 
 	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"> 
      		<remap from="robot_description" to="barrett_hw/robot_description_yi" /> 
   	</node> 
