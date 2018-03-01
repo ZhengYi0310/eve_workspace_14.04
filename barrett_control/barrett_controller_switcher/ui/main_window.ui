@@ -105,7 +105,7 @@ QGroupBox::title {
             </spacer>
            </item>
            <item row="0" column="2">
-            <widget class="QComboBox" name="StopControllerCombo">
+            <widget class="QComboBox" name="StartControllerCombo">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -141,7 +141,7 @@ QGroupBox::title {
             </spacer>
            </item>
            <item row="1" column="2">
-            <widget class="QComboBox" name="StartControllerCombo">
+            <widget class="QComboBox" name="StopControllerCombo">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -172,9 +172,16 @@ QGroupBox::title {
               </spacer>
              </item>
              <item>
+              <widget class="QPushButton" name="button_LoadControllerList">
+               <property name="text">
+                <string>Load</string>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QPushButton" name="button_SwitchController">
                <property name="text">
-                <string>Switch</string>
+                <string>Switch/Start</string>
                </property>
               </widget>
              </item>
@@ -184,7 +191,7 @@ QGroupBox::title {
          </widget>
         </item>
         <item>
-         <widget class="QTabWidget" name="tabWidget">
+         <widget class="QTabWidget" name="ControllersTabWidget">
           <widget class="QWidget" name="JointSpaceControlTab">
            <attribute name="title">
             <string>Joint Space Control</string>
@@ -208,13 +215,6 @@ QGroupBox::title {
                <string>Position</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_5">
-               <item row="0" column="0">
-                <widget class="QLabel" name="JointPos1SetLabel">
-                 <property name="text">
-                  <string>joint 1</string>
-                 </property>
-                </widget>
-               </item>
                <item row="0" column="1">
                 <widget class="QLineEdit" name="Joint1PosText">
                  <property name="maximumSize">
@@ -222,6 +222,55 @@ QGroupBox::title {
                    <width>60</width>
                    <height>30</height>
                   </size>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QLabel" name="label_5">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>25</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>(-2.0, 2.0)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="5">
+                <spacer name="JointPosSpacer4">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>82</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLineEdit" name="Joint2PosText">
+                 <property name="maximumSize">
+                  <size>
+                   <width>60</width>
+                   <height>30</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="1">
+                <widget class="QLabel" name="label_4">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>25</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>(-2.8, 2.8)</string>
                  </property>
                 </widget>
                </item>
@@ -245,29 +294,6 @@ QGroupBox::title {
                  </property>
                 </widget>
                </item>
-               <item row="0" column="4">
-                <widget class="QLineEdit" name="Joint4PosText">
-                 <property name="maximumSize">
-                  <size>
-                   <width>60</width>
-                   <height>30</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="5">
-                <spacer name="JointPosSpacer4">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>82</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
                <item row="0" column="6">
                 <widget class="QLabel" name="JointPos7SetLabel">
                  <property name="text">
@@ -285,54 +311,14 @@ QGroupBox::title {
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="JointPos2SetLabel">
+               <item row="0" column="0">
+                <widget class="QLabel" name="JointPos1SetLabel">
                  <property name="text">
-                  <string>joint 2</string>
+                  <string>joint 1</string>
                  </property>
                 </widget>
                </item>
-               <item row="1" column="1">
-                <widget class="QLineEdit" name="Joint2PosText">
-                 <property name="maximumSize">
-                  <size>
-                   <width>60</width>
-                   <height>30</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="2">
-                <spacer name="JointPosSpacer2">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>82</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="1" column="3">
-                <widget class="QLabel" name="JointPos5SetLabel">
-                 <property name="text">
-                  <string>joint 5</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="4">
-                <widget class="QLineEdit" name="Joint5PosText">
-                 <property name="maximumSize">
-                  <size>
-                   <width>60</width>
-                   <height>30</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="5" colspan="2">
+               <item row="2" column="5" colspan="2">
                 <widget class="QPushButton" name="button_SendJointPos">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -345,14 +331,14 @@ QGroupBox::title {
                  </property>
                 </widget>
                </item>
-               <item row="2" column="0">
+               <item row="4" column="0">
                 <widget class="QLabel" name="JointPos3SetLabel">
                  <property name="text">
                   <string>joint 3</string>
                  </property>
                 </widget>
                </item>
-               <item row="2" column="1">
+               <item row="4" column="1">
                 <widget class="QLineEdit" name="Joint3PosText">
                  <property name="maximumSize">
                   <size>
@@ -362,7 +348,24 @@ QGroupBox::title {
                  </property>
                 </widget>
                </item>
-               <item row="2" column="2">
+               <item row="2" column="0">
+                <widget class="QLabel" name="JointPos2SetLabel">
+                 <property name="text">
+                  <string>joint 2</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="4">
+                <widget class="QLineEdit" name="Joint4PosText">
+                 <property name="maximumSize">
+                  <size>
+                   <width>60</width>
+                   <height>30</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="2">
                 <spacer name="JointPosSpacer3">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
@@ -375,14 +378,14 @@ QGroupBox::title {
                  </property>
                 </spacer>
                </item>
-               <item row="2" column="3">
+               <item row="4" column="3">
                 <widget class="QLabel" name="JointPos6SetLabel">
                  <property name="text">
                   <string>joint 6</string>
                  </property>
                 </widget>
                </item>
-               <item row="2" column="4">
+               <item row="4" column="4">
                 <widget class="QLineEdit" name="Joint6PosText">
                  <property name="maximumSize">
                   <size>
@@ -392,7 +395,7 @@ QGroupBox::title {
                  </property>
                 </widget>
                </item>
-               <item row="2" column="5">
+               <item row="4" column="5">
                 <widget class="QPushButton" name="button_GoHome">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -402,6 +405,151 @@ QGroupBox::title {
                  </property>
                  <property name="text">
                   <string>GoHome</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="2">
+                <spacer name="JointPosSpacer2">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>82</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="2" column="3">
+                <widget class="QLabel" name="JointPos5SetLabel">
+                 <property name="text">
+                  <string>joint 5</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="4">
+                <widget class="QLineEdit" name="Joint5PosText">
+                 <property name="maximumSize">
+                  <size>
+                   <width>60</width>
+                   <height>30</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLabel" name="label_6">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>25</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>(-2.6, 2.6)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="4">
+                <widget class="QLabel" name="label_7">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>25</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>(-0.9 3.1)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="4">
+                <widget class="QLabel" name="label_8">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>25</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>(-4.76 1.24)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="4">
+                <widget class="QLabel" name="label_9">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>25</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>(-1.6, 1.6)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="7">
+                <widget class="QLabel" name="label_10">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>25</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>(-3.0, 3.0)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="5">
+                <widget class="QLabel" name="JointPosSentLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>20</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>70</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="5">
+                <widget class="QLabel" name="GoHomeSentLabel">
+                 <property name="minimumSize">
+                  <size>
+                   <width>70</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="text">
+                  <string/>
                  </property>
                 </widget>
                </item>
@@ -426,15 +574,18 @@ QGroupBox::title {
                <string>Gains</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_6">
-               <item row="0" column="0">
-                <widget class="QLabel" name="Joint1KpGainLabel">
-                 <property name="text">
-                  <string>Kp_J1</string>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="Joint1KpGainText">
+                 <property name="maximumSize">
+                  <size>
+                   <width>60</width>
+                   <height>30</height>
+                  </size>
                  </property>
                 </widget>
                </item>
-               <item row="0" column="1">
-                <widget class="QLineEdit" name="Joint1KpGainText">
+               <item row="0" column="7">
+                <widget class="QLineEdit" name="Joint1KvGainText">
                  <property name="maximumSize">
                   <size>
                    <width>60</width>
@@ -456,100 +607,6 @@ QGroupBox::title {
                  </property>
                 </spacer>
                </item>
-               <item row="0" column="3">
-                <widget class="QLabel" name="Joint5KpGainLabel">
-                 <property name="text">
-                  <string>Kp_J5</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="4">
-                <widget class="QLineEdit" name="Joint5KpGainText">
-                 <property name="maximumSize">
-                  <size>
-                   <width>60</width>
-                   <height>30</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="5">
-                <spacer name="Joint4KpSpacer">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>21</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="0" column="6">
-                <widget class="QLabel" name="Joint1KvGainLabel">
-                 <property name="text">
-                  <string>Kv_J1</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="7">
-                <widget class="QLineEdit" name="Joint1KvGainText">
-                 <property name="maximumSize">
-                  <size>
-                   <width>60</width>
-                   <height>30</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="8">
-                <spacer name="Joint1KvSpacer">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="0" column="9">
-                <widget class="QLabel" name="Joint5KvGainLabel">
-                 <property name="text">
-                  <string>Kv_J5</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="10">
-                <widget class="QLineEdit" name="Joint5KvGainText">
-                 <property name="maximumSize">
-                  <size>
-                   <width>60</width>
-                   <height>30</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="Joint2KpGainLabel">
-                 <property name="text">
-                  <string>Kp_J2</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QLineEdit" name="Joint2KpGainText">
-                 <property name="maximumSize">
-                  <size>
-                   <width>60</width>
-                   <height>30</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
                <item row="1" column="2">
                 <spacer name="Joint2KpSpacer">
                  <property name="orientation">
@@ -570,13 +627,10 @@ QGroupBox::title {
                  </property>
                 </widget>
                </item>
-               <item row="1" column="4">
-                <widget class="QLineEdit" name="Joint6KpGainText">
-                 <property name="maximumSize">
-                  <size>
-                   <width>60</width>
-                   <height>30</height>
-                  </size>
+               <item row="0" column="3">
+                <widget class="QLabel" name="Joint5KpGainLabel">
+                 <property name="text">
+                  <string>Kp_J5</string>
                  </property>
                 </widget>
                </item>
@@ -610,6 +664,103 @@ QGroupBox::title {
                  </property>
                 </widget>
                </item>
+               <item row="0" column="4">
+                <widget class="QLineEdit" name="Joint5KpGainText">
+                 <property name="maximumSize">
+                  <size>
+                   <width>60</width>
+                   <height>30</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="7">
+                <widget class="QLineEdit" name="Joint4KvGainText">
+                 <property name="maximumSize">
+                  <size>
+                   <width>60</width>
+                   <height>30</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="9" colspan="2">
+                <widget class="QPushButton" name="button_SetGains">
+                 <property name="text">
+                  <string>SetGains</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="9">
+                <widget class="QLabel" name="Joint5KvGainLabel">
+                 <property name="text">
+                  <string>Kv_J5</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="10">
+                <widget class="QLineEdit" name="Joint5KvGainText">
+                 <property name="maximumSize">
+                  <size>
+                   <width>60</width>
+                   <height>30</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="4">
+                <widget class="QLineEdit" name="Joint7KpGainText">
+                 <property name="maximumSize">
+                  <size>
+                   <width>60</width>
+                   <height>30</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="5">
+                <spacer name="Joint6KpSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>21</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="2" column="6">
+                <widget class="QLabel" name="Joint3KvGainLabel">
+                 <property name="text">
+                  <string>Kv_J3</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="7">
+                <widget class="QLineEdit" name="Joint3KvGainText">
+                 <property name="maximumSize">
+                  <size>
+                   <width>60</width>
+                   <height>30</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="8">
+                <spacer name="Joint1KvSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
                <item row="1" column="8">
                 <spacer name="Joint2KvSpacer">
                  <property name="orientation">
@@ -629,6 +780,53 @@ QGroupBox::title {
                   <string>Kv_J6</string>
                  </property>
                 </widget>
+               </item>
+               <item row="2" column="9">
+                <widget class="QLabel" name="Joint7KvGainLabel">
+                 <property name="text">
+                  <string>Kv_J7</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="4">
+                <widget class="QLineEdit" name="Joint6KpGainText">
+                 <property name="maximumSize">
+                  <size>
+                   <width>60</width>
+                   <height>30</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="Joint2KpGainLabel">
+                 <property name="text">
+                  <string>Kp_J2</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="Joint2KpGainText">
+                 <property name="maximumSize">
+                  <size>
+                   <width>60</width>
+                   <height>30</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="5">
+                <spacer name="Joint4KpSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>21</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
                <item row="1" column="10">
                 <widget class="QLineEdit" name="Joint6KvGainText">
@@ -677,66 +875,6 @@ QGroupBox::title {
                  </property>
                 </widget>
                </item>
-               <item row="2" column="4">
-                <widget class="QLineEdit" name="Joint7KpGainText">
-                 <property name="maximumSize">
-                  <size>
-                   <width>60</width>
-                   <height>30</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="5">
-                <spacer name="Joint6KpSpacer">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>21</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="2" column="6">
-                <widget class="QLabel" name="Joint3KvGainLabel">
-                 <property name="text">
-                  <string>Kv_J3</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="7">
-                <widget class="QLineEdit" name="Joint3KvGainText">
-                 <property name="maximumSize">
-                  <size>
-                   <width>60</width>
-                   <height>30</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="8">
-                <spacer name="Joint3KvSpacer">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="2" column="9">
-                <widget class="QLabel" name="Joint7KvGainLabel">
-                 <property name="text">
-                  <string>Kv_J7</string>
-                 </property>
-                </widget>
-               </item>
                <item row="2" column="10">
                 <widget class="QLineEdit" name="Joint7KvGainText">
                  <property name="maximumSize">
@@ -771,20 +909,30 @@ QGroupBox::title {
                  </property>
                 </widget>
                </item>
-               <item row="3" column="7">
-                <widget class="QLineEdit" name="Joint4KvGainText">
-                 <property name="maximumSize">
-                  <size>
-                   <width>60</width>
-                   <height>30</height>
-                  </size>
+               <item row="0" column="0">
+                <widget class="QLabel" name="Joint1KpGainLabel">
+                 <property name="text">
+                  <string>Kp_J1</string>
                  </property>
                 </widget>
                </item>
-               <item row="3" column="9" colspan="2">
-                <widget class="QPushButton" name="button_SetGains">
+               <item row="2" column="8">
+                <spacer name="Joint3KvSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="0" column="6">
+                <widget class="QLabel" name="Joint1KvGainLabel">
                  <property name="text">
-                  <string>SetGains</string>
+                  <string>Kv_J1</string>
                  </property>
                 </widget>
                </item>

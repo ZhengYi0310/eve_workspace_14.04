@@ -673,6 +673,7 @@ namespace barrett_hw
             setControlStrategy(desired_strategy);
             std::cout << "The ControlStrategy changed to: " << getControlStrategy() << std::endl;
         }
+        ROS_INFO("Controller Switch is done !!!!!!!!!!!!!!!!!!!!!");
     }
 
 #if ROS_VERSION_MINIMUM(1,12,6)

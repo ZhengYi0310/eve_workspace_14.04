@@ -65,6 +65,7 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
 	ros::NodeHandle n;
 	// Add your ros communications here.
 	chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
+    set_robot_namespace("barrett_hw");
 	start();
 	return true;
 }
@@ -122,6 +123,58 @@ void QNode::log( const LogLevel &level, const std::string &msg) {
 	QVariant new_row(QString(logging_model_msg.str().c_str()));
 	logging_model.setData(logging_model.index(logging_model.rowCount()-1),new_row);
 	Q_EMIT loggingUpdated(); // used to readjust the scrollbar
+}
+
+bool QNode::get_controllers_list(std::vector<std::string>& running_list, std::vector<std::string>& stopped_list)
+{
+  ros::NodeHandle n;
+  ros::ServiceClient client;
+  controller_manager_msgs::ListControllers service;
+  std::vector<controller_manager_msgs::ControllerState> controller_list;
+
+  ros::service::waitForService("/controller_manager/list_controllers");
+
+  client = n.serviceClient<controller_manager_msgs::ListControllers>("/controller_manager/list_controllers");
+  if(!client.call(service))
+    return false;
+  controller_list = service.response.controller;
+
+  for (std::vector<controller_manager_msgs::ControllerState>::iterator it = controller_list.begin();
+   it != controller_list.end(); ++it)
+    {
+  if(it->state == "running")
+    running_list.push_back(it->name);
+  else if (it->state == "stopped")
+    stopped_list.push_back(it->name);
+    }
+
+  return true;
+}
+
+bool QNode::switch_controllers(const std::string start_controller, const std::string stop_controller, bool& switch_ok)
+{
+  ros::NodeHandle n;
+  ros::ServiceClient client = n.serviceClient<controller_manager_msgs::SwitchController>("/controller_manager/switch_controller");
+  controller_manager_msgs::SwitchController service;
+  std::vector<std::string> start_controllers;
+  std::vector<std::string> stop_controllers;
+  start_controllers.push_back(start_controller);
+  stop_controllers.push_back(stop_controller);
+  service.request.start_controllers = start_controllers;
+  service.request.stop_controllers = stop_controllers;
+  service.request.strictness = 2;
+
+  if(!client.call(service))
+    return false;
+
+  switch_ok = service.response.ok;
+
+  return true;
+}
+
+void QNode::set_robot_namespace(std::string name)
+{
+  robot_namespace_ = name;
 }
 
 }  // namespace barrett_controller_switcher

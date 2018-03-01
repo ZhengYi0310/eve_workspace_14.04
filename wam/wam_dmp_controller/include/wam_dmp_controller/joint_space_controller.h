@@ -13,6 +13,8 @@
 #include <std_msgs/Float64MultiArray.h>
 #include <wam_dmp_controller/SetJointPos.h>
 #include <wam_dmp_controller/SetJointGains.h>
+#include <wam_dmp_controller/GetJointPos.h>
+#include <wam_dmp_controller/GetJointGains.h>
 #include <wam_dmp_controller/GoHome.h>
 
 #include <boost/scoped_ptr.hpp>
@@ -42,14 +44,20 @@ namespace wam_dmp_controller
                          wam_dmp_controller::GoHome::Response &res);
 		    bool set_joint_pos(wam_dmp_controller::SetJointPos::Request &req,
                                wam_dmp_controller::SetJointPos::Response &res);
+            bool get_joint_pos(wam_dmp_controller::GetJointPos::Request &req,
+                               wam_dmp_controller::GetJointPos::Response &res);
 		    bool set_gains(wam_dmp_controller::SetJointGains::Request &req,
                            wam_dmp_controller::SetJointGains::Response &res);
+            bool get_gains(wam_dmp_controller::GetJointGains::Request &req,
+                           wam_dmp_controller::GetJointGains::Response &res);
 
             void command(const std_msgs::Float64MultiArray::ConstPtr &msg);
            
             ros::Subscriber sub_posture_;
 		    ros::ServiceServer set_posture_service_;
+            ros::ServiceServer get_posture_service_;
 		    ros::ServiceServer set_gains_service_;
+            ros::ServiceServer get_gains_service_;
             ros::ServiceServer go_home_service_;
         
 		    KDL::JntArray cmd_states_;

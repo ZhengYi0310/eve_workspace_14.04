@@ -178,7 +178,7 @@ namespace wam_dmp_controller
     	ROS_DEBUG("Number of joints in handle = %lu", joint_handles_.size() );
         for (uint32_t i = 0; i < joint_handles_.size(); i++)
         {
-            ROS_DEBUG("The name of for the handle %lu is: %s", i + 1, joint_handles_[i].getName().c_str());
+            ROS_INFO("The name of for the handle %lu is: %s", i + 1, joint_handles_[i].getName().c_str());
         }
 
         // Get joint handles for all of the joints in the chain

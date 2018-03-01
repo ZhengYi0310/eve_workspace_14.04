@@ -47,6 +47,7 @@ namespace barrett_hw
                         std::cout << "This robot has a joint named \"" << joint_names_[j]<< "\" which is not in the gazebo model." << std::endl;
                         return false;
                     }
+                    std::cout << "This robot has a joint named \"" << joint_names_[j]<< "\" in the gazebo model." << std::endl;
                     sim_joints_.push_back(joint);
                 }
 
@@ -62,12 +63,13 @@ namespace barrett_hw
                     joint_position_[j] += angles::shortest_angular_distance(joint_position_[j],
                                                                         sim_joints_[j]->GetAngle(0).Radian());
                     joint_position_kdl_(j) = joint_position_[j];
-                    // derivate velocity as in the real hardware instead of reading it from simulation
+                    //derivate velocity as in the real hardware instead of reading it from simulation
                     joint_velocity_[j] = filters::exponentialSmoothing((joint_position_[j] - joint_position_prev_[j])/period.toSec(), joint_velocity_[j], 0.2);
                     joint_acceleration_[j] = filters::exponentialSmoothing((joint_velocity_[j] - joint_velocity_prev_[j])/period.toSec(), joint_acceleration_[j], 0.2);
                     joint_effort_[j] = sim_joints_[j]->GetForce((int)(0));
                     joint_stiffness_[j] = joint_stiffness_command_[j];
                 }
+                //std::cout << "read!!!!!!!!!!!!!!!!!!!!!!!!!!11";
             }
 
             void write(ros::Time time, ros::Duration period)
@@ -78,6 +80,7 @@ namespace barrett_hw
                 {
 
                     case JOINT_POSITION:
+                        //ROS_INFO("use strategy JOINT_POSITION!");
                         for(int j=0; j < n_joints_; j++)
                         {
                             // according to the gazebo_ros_control plugin, this must *not* be called if SetForce is going to be called
@@ -93,6 +96,7 @@ namespace barrett_hw
                         break;
 
                     case CARTESIAN_IMPEDANCE:
+                        //ROS_INFO("use strategy CARTESIAN_IMPEDANCE!");                        
                         if(time-lastT_ < ts_)
                             break;
                         lastT_ = time;
@@ -115,6 +119,7 @@ namespace barrett_hw
 
                     case JOINT_IMPEDANCE:
                         // compute the gracity term
+                        //ROS_INFO("USE STRATEGY joint impedance!!");
                         f_dyn_solver_->JntToGravity(joint_position_kdl_, gravity_effort_);
         
                         for(int j=0; j < n_joints_; j++)
@@ -124,8 +129,11 @@ namespace barrett_hw
                             const double stiffness_effort = 0.0;//10.0*( joint_position_command_[j] - joint_position_[j] ); // joint_stiffness_command_[j]*( joint_position_command_[j] - joint_position_[j] );
           //double damping_effort = joint_damping_command_[j]*( joint_velocity_[j] );
                             const double effort = stiffness_effort + joint_effort_command_[j] + gravity_effort_(j);
+                            //std::cout << "write joint impedance!!!!";
                             sim_joints_[j]->SetForce(0, effort);
                         }
+                        
+                        //std::cout << "Commanded torque" << joint_effort_command_[0] << " " << joint_effort_command_[1] << " " << joint_effort_command_[2] << " " << joint_effort_command_[3] << " " << joint_effort_command_[4] << " " << joint_effort_command_[5] <<  " " << joint_effort_command_[6] << std::endl;
                         break;
 
                     case GRAVITY_COMPENSATION:

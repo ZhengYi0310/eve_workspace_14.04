@@ -47,10 +47,11 @@ public Q_SLOTS:
 	*******************************************/
 	void on_actionAbout_triggered();
 	void on_button_connect_clicked(bool check );
-    //void on_button_SwitchController_clicked(bool check);
+    void on_button_SwitchController_clicked(bool check);
+    void on_button_LoadControllerList_clicked(bool check);
     void on_button_SendJointPos_clicked(bool check);
-    //void on_button_GoHome_clicked(bool check);
-    //void on_button_SetGains_clicked(bool check);
+    void on_button_GoHome_clicked(bool check);
+    void on_button_SetGains_clicked(bool check);
 	void on_checkbox_use_environment_stateChanged(int state);
 
     /******************************************
@@ -64,7 +65,8 @@ private:
     void fill_joint_pos_fields();
     void fill_joint_gains_fields();
     void field_error_msg_box(std::string field_name);
-
+    void service_error_msg_box(std::string controller_name);
+    void set_send_jointpos_label(QLabel* label, bool state);
 	Ui::MainWindowDesign ui;
 	QNode qnode;
 };

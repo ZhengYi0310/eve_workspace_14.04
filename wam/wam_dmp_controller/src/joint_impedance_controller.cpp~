@@ -95,7 +95,7 @@ namespace wam_dmp_controller
             joint_set_point_handles_[i].setCommand(q_des_(i));
         }
         */
-        //ROS_INFO("Soley for functionality check!!!!!!!!!!!!");
+        ROS_INFO("Soley for functionality check!!!!!!!!!!!!");
 
     }
 

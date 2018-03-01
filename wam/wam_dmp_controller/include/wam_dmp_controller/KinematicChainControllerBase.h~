@@ -52,6 +52,7 @@ namespace wam_dmp_controller
 				} joint_limits_;
 
 				std::vector<typename JI::ResourceHandleType> joint_handles_;
+                        std::vector<typename JI::ResourceHandleType> joint_acceleration_handles_; // For acceleration reading
         		std::vector<typename JI::ResourceHandleType> joint_stiffness_handles_;
         		std::vector<typename JI::ResourceHandleType> joint_damping_handles_;
         		std::vector<typename JI::ResourceHandleType> joint_set_point_handles_;
@@ -177,7 +178,7 @@ namespace wam_dmp_controller
     	ROS_DEBUG("Number of joints in handle = %lu", joint_handles_.size() );
         for (uint32_t i = 0; i < joint_handles_.size(); i++)
         {
-            ROS_DEBUG("The name of for the handle %lu is: %s", i + 1, joint_handles_[i].getName().c_str());
+            ROS_INFO("The name of for the handle %lu is: %s", i + 1, joint_handles_[i].getName().c_str());
         }
 
         // Get joint handles for all of the joints in the chain

@@ -113,6 +113,7 @@ namespace barrett_hw
                 ros::Duration sim_period = sim_time_ros - last_update_sim_time_ros_;
 
                 // Check if we should update the controllers
+                
                 if(sim_period >= control_period_) 
                 {
                     // Store this simulation time
@@ -120,15 +121,19 @@ namespace barrett_hw
 
                     // Update the robot simulation with the state of the gazebo model
                     robot_hw_sim_->read(sim_time_ros, sim_period);
+                    //ROS_INFO("Controller readed!!!!!!!!!!!!!!!!11");
 
                     // Compute the controller commands
                     controller_manager_->update(sim_time_ros, sim_period);
+                    //ROS_INFO("controller manager updated!!");
                 }
 
                 // Update the gazebo model with the result of the controller
                 // computation
                 robot_hw_sim_->write(sim_time_ros, sim_time_ros - last_write_sim_time_ros_);
+                //ROS_INFO("HW Written!!!!!");
                 last_write_sim_time_ros_ = sim_time_ros;
+                
             }
 
             // Called on world reset

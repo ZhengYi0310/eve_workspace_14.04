@@ -1,0 +1,3 @@
+---
+SetJointPosMsg command
+bool state

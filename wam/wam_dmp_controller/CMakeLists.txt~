@@ -57,13 +57,19 @@ add_message_files(DIRECTORY msg FILES
   PoseRPY.msg
   PoseRPYCmd.msg
   ArmState.msg
+  SetJointPosMsg.msg
+  SetJointGainsMsg.msg
+  GoHomeMsg.msg
 )
 
 add_service_files(DIRECTORY srv FILES
   PoseRPYCommand.srv
   ImpedanceControllerGains.srv
   GoHome.srv
+  GetJointPos.srv
   SetJointPos.srv
+  GetJointGains.srv
+  SetJointGains.srv
 )
 generate_messages(DEPENDENCIES
   geometry_msgs
