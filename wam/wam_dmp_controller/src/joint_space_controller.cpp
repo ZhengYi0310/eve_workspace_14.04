@@ -25,9 +25,12 @@ namespace wam_dmp_controller
 		tau_cmd_.resize(kdl_chain_.getNrOfJoints());
 		Kp_.resize(kdl_chain_.getNrOfJoints());
 		Kv_.resize(kdl_chain_.getNrOfJoints());
+        Ki_.resize(kdl_chain_.getNrOfJoints());
 		M_.resize(kdl_chain_.getNrOfJoints());
 		C_.resize(kdl_chain_.getNrOfJoints());
 		G_.resize(kdl_chain_.getNrOfJoints());
+        pid_controllers_.resize(kdl_chain_.getNrOfJoints());
+        last_error_.resize(kdl_chain_.getNrOfJoints());
         home_.resize(kdl_chain_.getNrOfJoints());
         joint_initial_states_.resize(kdl_chain_.getNrOfJoints());
         current_cmd_.resize(kdl_chain_.getNrOfJoints());
@@ -35,6 +38,7 @@ namespace wam_dmp_controller
         // Read the Kq and Kv gains from the coniguration file
         ros::NodeHandle Kp_handle(n, "Kp_Gains");
         ros::NodeHandle Kv_handle(n, "Kv_Gains");
+        ros::NodeHandle Ki_handle(n, "Ki_Gains");
         ros::NodeHandle home_handle(n, "home_pos");
         
         for (size_t i = 0; i < joint_handles_.size(); i++)
@@ -59,6 +63,18 @@ namespace wam_dmp_controller
             {
                  ROS_WARN("Kv gain set for %s in yaml file, Using %f", joint_handles_[i].getName().c_str(), Kv_(i)); 
             }
+            
+            
+            if ( !Ki_handle.getParam(joint_handles_[i].getName().c_str(), Ki_(i) ) ) 
+            {
+                ROS_WARN("Ki gain not set for %s in yaml file, Using 0.7.", joint_handles_[i].getName().c_str());
+                Ki_(i) = 0.7;
+            }
+            else 
+            {
+                 ROS_WARN("Ki gain set for %s in yaml file, Using %f", joint_handles_[i].getName().c_str(), Ki_(i)); 
+            }
+            
 
             if ( !home_handle.getParam(joint_handles_[i].getName().c_str(), home_(i))) 
             {
@@ -68,7 +84,10 @@ namespace wam_dmp_controller
             else 
             {
                  ROS_WARN("home pos set for %s in yaml file, Using %f", joint_handles_[i].getName().c_str(), home_(i)); 
-            }            
+            }
+
+            pid_controllers_[i].initPid(Kp_(i), Ki_(i), Kv_(i), 0.0, 0.0);
+
         }
         sub_posture_ = nh_.subscribe("command", 1, &JointSpaceController::command, this);
 		set_posture_service_ = nh_.advertiseService("set_joint_pos", &JointSpaceController::set_joint_pos, this);
@@ -158,10 +177,14 @@ namespace wam_dmp_controller
         for(size_t i=0; i<joint_handles_.size(); i++)
         {
             // control law
-            pid_cmd_(i) = joint_des_states_.qdotdot(i) + Kv_(i)*(joint_des_states_.qdot(i) - joint_msr_states_.qdot(i)) + Kp_(i)*(joint_des_states_.q(i) - joint_msr_states_.q(i));
-            cg_cmd_(i) = C_(i)*joint_msr_states_.qdot(i) + G_(i);
+            last_error_(i) = joint_des_states_.qdot(i) - joint_msr_states_.qdot(i);
+            //pid_cmd_(i) = joint_des_states_.qdotdot(i) + Kv_(i)*(joint_des_states_.qdot(i) - joint_msr_states_.qdot(i)) + Kp_(i)*(joint_des_states_.q(i) - joint_msr_states_.q(i));
+            pid_cmd_(i) = pid_controllers_[i].computeCommand(joint_des_states_.q(i) - joint_msr_states_.q(i), joint_des_states_.qdot(i) - joint_msr_states_.qdot(i), period);
+            //cg_cmd_(i) = C_(i) + G_(i);
+            cg_cmd_(i) = G_(i);
+           
         }
-        tau_cmd_.data = M_.data * pid_cmd_.data;
+        tau_cmd_.data = pid_cmd_.data;
         KDL::Add(tau_cmd_,cg_cmd_,tau_cmd_);
         
         for(size_t i=0; i<joint_handles_.size(); i++)

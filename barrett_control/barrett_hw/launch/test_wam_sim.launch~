@@ -19,6 +19,8 @@
 	<arg name="use_rviz" default="false"/>
 	<arg name="gui" default="false" />
 
+        <arg name="rvizconfig" default="$(find barrett_model)/urdf.rviz" />
+
 	<!-- LAUNCH IMPLEMENTATION -->
 
 	<!-- the urdf/sdf parameter -->
@@ -29,9 +31,11 @@
 	<param name="use_gui" value="$(arg gui)"/>
 	
 	<!-- joint and robot state publishers of the full robot description -->
-	<!-- <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"> -->
-	<!--	<rosparam param="source_list">[/wam7_bhand/joint_states]</rosparam> -->
-	<!-- </node> -->
+	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"> 
+                <param name="/use_gui" value="true"/>
+		<!-- <rosparam param="source_list">[/joint_states]</rosparam> --> 
+                <remap from="robot_description" to="barrett_hw/robot_description_yi" /> 
+	</node> 
 	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"> 
      		<remap from="robot_description" to="barrett_hw/robot_description_yi" /> 
   	</node> 
@@ -69,7 +73,7 @@
 	<!-- real robot and controllers -->
         
 	<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"  args="barrett_hw/joint_state_controller barrett_hw/joint_space_controller --shutdown-timeout 2"/>
-	<node name="controller_stopper" pkg="controller_manager" type="spawner" args="--stopped barrett_hw/joint_impedance_controller barrett_hw/joint_impedance_controller --shutdown-timeout 2" />
+	<node name="controller_stopper" pkg="controller_manager" type="spawner" args="--stopped barrett_hw/joint_impedance_controller --shutdown-timeout 2" />
    
 
        

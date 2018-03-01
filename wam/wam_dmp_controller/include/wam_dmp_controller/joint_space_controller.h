@@ -16,6 +16,7 @@
 #include <wam_dmp_controller/GetJointPos.h>
 #include <wam_dmp_controller/GetJointGains.h>
 #include <wam_dmp_controller/GoHome.h>
+#include <control_toolbox/pid.h>
 
 #include <boost/scoped_ptr.hpp>
 /*
@@ -59,6 +60,8 @@ namespace wam_dmp_controller
 		    ros::ServiceServer set_gains_service_;
             ros::ServiceServer get_gains_service_;
             ros::ServiceServer go_home_service_;
+
+            std::vector<control_toolbox::Pid> pid_controllers_;
         
 		    KDL::JntArray cmd_states_;
 		    int cmd_flag_;	// discriminate if a user command arrived
@@ -70,8 +73,9 @@ namespace wam_dmp_controller
 		    KDL::JntArray tau_cmd_;
 		    KDL::JntSpaceInertiaMatrix M_; //Inertia matrix
 		    KDL::JntArray C_, G_;	//Coriolis and Gravitational matrices
-		    KDL::JntArray Kp_, Kv_;	//Position and Velocity gains
+		    KDL::JntArray Kp_, Kv_, Ki_;	//Position and Velocity gains
             KDL::JntArray home_;
+            KDL::JntArray last_error_;
 
 		    boost::scoped_ptr<KDL::ChainDynParam> id_solver_;
 
