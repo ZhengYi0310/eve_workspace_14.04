@@ -29,6 +29,7 @@ find_package(catkin REQUIRED COMPONENTS
   kdl_conversions
   eigen_conversions
   
+  
 )
 
 find_package(Boost REQUIRED COMPONENTS thread signals system filesystem)
@@ -108,6 +109,7 @@ catkin_package(
     roscpp
     kdl_conversions
     eigen_conversions
+   
     
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}

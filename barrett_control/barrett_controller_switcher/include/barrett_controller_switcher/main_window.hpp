@@ -66,7 +66,7 @@ private:
     void fill_joint_gains_fields();
     void field_error_msg_box(std::string field_name);
     void service_error_msg_box(std::string controller_name);
-    void set_send_jointpos_label(QLabel* label, bool state);
+    void set_send_jointpos_label(QLabel* label, bool accepted, double elapsed, double duration);
 	Ui::MainWindowDesign ui;
 	QNode qnode;
 };

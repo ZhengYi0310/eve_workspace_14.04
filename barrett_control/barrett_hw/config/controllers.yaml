@@ -6,6 +6,7 @@ barrett_hw:
     publish_rate: 100 
 
   joint_space_controller:
+    publish_rate: 100.0
     type: wam_dmp_controller/JointSpaceController
     root_link: left_wam/base_link
     tip_link: left_wam/wrist_palm_link
@@ -78,7 +79,7 @@ barrett_hw:
         left_wam/elbow_pitch_joint: 40
         left_wam/wrist_yaw_joint: 20
         left_wam/wrist_pitch_joint: 30
-        left_wam/palm_yaw_joint: 30
+        left_wam/palm_yaw_joint: 70
     Kv_Gains_copy:
         left_wam/base_yaw_joint: 10
         left_wam/shoulder_pitch_joint: 20

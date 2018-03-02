@@ -6,6 +6,7 @@ barrett_hw:
     publish_rate: 100 
 
   joint_space_controller:
+    publish_rate: 100.0
     type: wam_dmp_controller/JointSpaceController
     root_link: left_wam/base_link
     tip_link: left_wam/wrist_palm_link
@@ -59,6 +60,7 @@ barrett_hw:
         left_wam/palm_yaw_joint: -0.5003674773
 
   joint_space_spline_controller:
+    publish_rate: 100 
     type: wam_dmp_controller/JointSpaceSplineController
     root_link: left_wam/base_link
     tip_link: left_wam/wrist_palm_link

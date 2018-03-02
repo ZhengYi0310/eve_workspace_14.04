@@ -206,7 +206,7 @@ void MainWindow::on_button_SetGains_clicked(bool check)
         cmd.Kp_gains[i] = Kp_[i];
         cmd.Kv_gains[i] = Kv_[i];
     }
-    outcome = qnode.set_command<wam_dmp_controller::SetJointGains, wam_dmp_controller::SetJointGainsMsg>(cmd, res, state);
+    outcome = qnode.set_command<wam_dmp_controller::SetJointGains, wam_dmp_controller::SetJointGainsMsg>(cmd, res);
     if(!outcome)
       service_error_msg_box("joint_space_controller(SetJointGains)");
 }
@@ -214,70 +214,78 @@ void MainWindow::on_button_SetGains_clicked(bool check)
 void MainWindow::on_button_GoHome_clicked(bool check)
 {
     bool outcome;
-    bool state;
-    wam_dmp_controller::GoHomeMsg cmd, res;
-    outcome = qnode.set_command<wam_dmp_controller::GoHome, wam_dmp_controller::GoHomeMsg>(cmd, res, state);
+    wam_dmp_controller::JointPosSplineMsg cmd, res;
+    outcome = qnode.set_command<wam_dmp_controller::GoHomeSpline, wam_dmp_controller::JointPosSplineMsg>(cmd, res);
     if(!outcome)
-      service_error_msg_box("joint_space_controller(GoHome)");
+      service_error_msg_box("joint_spaces_pline_controller(GoHomeSpline)");
     else
-      set_send_jointpos_label(ui.GoHomeSentLabel, state);
+      set_send_jointpos_label(ui.GoHomeSentLabel, res.accepted, res.elapsed_time, res.p2p_traj_duration);
 }
 
 void MainWindow::on_button_SendJointPos_clicked(bool check)
 {
-    double j1, j2, j3, j4, j5, j6, j7;
+    double j1, j2, j3, j4, j5, j6, j7, D_t;
     bool outcome;
 
     j1 = ui.Joint1PosText->text().toDouble(&outcome);
-    if (!outcome)
+    if (!outcome || j1 <= -2.6 || j1 >= 2.6)
     {
         field_error_msg_box("Joint1PosText");
         return;
     }
 
     j2 = ui.Joint2PosText->text().toDouble(&outcome);
-    if (!outcome)
+    if (!outcome || j2 <= -2.0 || j2 >= 2.0)
     {
         field_error_msg_box("Joint2PosText");
         return;
     }
 
     j3 = ui.Joint3PosText->text().toDouble(&outcome);
-    if (!outcome)
+    if (!outcome || j3 <= -2.8 || j3 >= 2.8)
     {
         field_error_msg_box("Joint3PosText");
         return;
     }
 
     j4 = ui.Joint4PosText->text().toDouble(&outcome);
-    if (!outcome)
+    if (!outcome || j4 <= -0.9 || j4 >= 3.1)
     {
         field_error_msg_box("Joint4PosText");
         return;
     }
 
     j5 = ui.Joint5PosText->text().toDouble(&outcome);
-    if (!outcome)
+    if (!outcome || j5 <= -4.76 || j5 >= 1.24)
     {
         field_error_msg_box("Joint5PosText");
         return;
     }
 
     j6 = ui.Joint6PosText->text().toDouble(&outcome);
-    if (!outcome)
+    if (!outcome || j6 <= -1.6 || j6 >= 1.6)
     {
         field_error_msg_box("Joint6PosText");
         return;
     }
 
     j7 = ui.Joint7PosText->text().toDouble(&outcome);
-    if (!outcome)
+    if (!outcome || j7 <= -3.0 || j7 >= 3.0)
     {
         field_error_msg_box("Joint7PosText");
         return;
     }
 
-    wam_dmp_controller::SetJointPosMsg cmd, res;
+    D_t = ui.JointPosDurationText->text().toDouble(&outcome);
+    if (!outcome || D_t <= 5)
+    {
+        field_error_msg_box("JointPosDurationText");
+        return;
+    }
+
+    wam_dmp_controller::JointPosSplineMsg cmd, res;
+    cmd.joint_pos.resize(7);
+    res.joint_pos.resize(7);
     cmd.joint_pos[0] = j1;
     cmd.joint_pos[1] = j2;
     cmd.joint_pos[2] = j3;
@@ -285,14 +293,15 @@ void MainWindow::on_button_SendJointPos_clicked(bool check)
     cmd.joint_pos[4] = j5;
     cmd.joint_pos[5] = j6;
     cmd.joint_pos[6] = j7;
+    cmd.p2p_traj_duration = D_t;
 
     bool state;
-    outcome = qnode.set_command<wam_dmp_controller::SetJointPos, wam_dmp_controller::SetJointPosMsg>(cmd, res, state);
+    outcome = qnode.set_command<wam_dmp_controller::JointPosSpline, wam_dmp_controller::JointPosSplineMsg>(cmd, res);
 
     if(!outcome)
       service_error_msg_box("joint_space_controller(SetJointPos)");
     else
-      set_send_jointpos_label(ui.JointPosSentLabel, state);
+      set_send_jointpos_label(ui.JointPosSentLabel, res.accepted, res.elapsed_time, res.p2p_traj_duration);
 }
 
 void MainWindow::on_button_SwitchController_clicked(bool check)
@@ -312,7 +321,7 @@ void MainWindow::on_button_SwitchController_clicked(bool check)
         // so that it can signal when new errors are available on each topic callback
         //qnode.set_jointpos_controller_state(start_controller == "joint_space_controller");
         //qnode.set_hybrid_controller_state(start_controller == "hybrid_impedance_controller");
-        if(start_controller == "barrett_hw/joint_space_controller")
+        if(start_controller == "barrett_hw/joint_space_spline_controller")
         {
             fill_joint_pos_fields();
             fill_joint_gains_fields();
@@ -340,15 +349,20 @@ void MainWindow::updateLoggingView() {
         ui.view_logging->scrollToBottom();
 }
 
-void MainWindow::set_send_jointpos_label(QLabel* label, bool state)
+void MainWindow::set_send_jointpos_label(QLabel* label, bool accepted, double elapsed, double duration)
 {
   QString label_text;
 
-  if(state)
+  if(accepted)
     label_text = QString::fromStdString("Accepted");
   else
     {
-      label_text = QString::fromStdString("Wait");
+  if (elapsed >= duration)
+    label_text = QString::fromStdString("Completed ");
+  else
+    label_text = QString::fromStdString("Wait ") +\
+      QString::number(duration - elapsed, 'f', 0) +\
+      QString::fromStdString(" s");
     }
 
   label->setText(label_text);
@@ -411,12 +425,12 @@ void MainWindow::fill_joint_pos_fields()
   bool outcome;
 
   // Joint Space Controller
-  wam_dmp_controller::SetJointPosMsg joint_pos_curr_goal;
+  wam_dmp_controller::JointPosSplineMsg joint_pos_curr_goal;
 
-  outcome = qnode.get_current_cmd<wam_dmp_controller::GetJointPos,\
-                                  wam_dmp_controller::SetJointPosMsg>(joint_pos_curr_goal);
+  outcome = qnode.get_current_cmd<wam_dmp_controller::JointPosSpline,\
+                                  wam_dmp_controller::JointPosSplineMsg>(joint_pos_curr_goal);
   if(!outcome)
-    service_error_msg_box("joint_space_controller(GetJointPos)");
+    service_error_msg_box("joint_space_spline_controller(JointPosSpline)");
 
   ui.Joint1PosText->setText(QString::number(joint_pos_curr_goal.joint_pos[0],'f', 3));
   ui.Joint2PosText->setText(QString::number(joint_pos_curr_goal.joint_pos[1],'f', 3));
@@ -438,7 +452,7 @@ void MainWindow::fill_joint_gains_fields()
   outcome = qnode.get_current_cmd<wam_dmp_controller::GetJointGains,\
                                   wam_dmp_controller::SetJointGainsMsg>(joint_gains_curr_goal);
   if(!outcome)
-    service_error_msg_box("joint_space_controller(GetJointGains)");
+    service_error_msg_box("joint_space_spline_controller(GetJointGains)");
 
   ui.Joint1KpGainText->setText(QString::number(joint_gains_curr_goal.Kp_gains[0],'f', 3));
   ui.Joint2KpGainText->setText(QString::number(joint_gains_curr_goal.Kp_gains[1],'f', 3));

@@ -69,6 +69,7 @@ namespace wam_dmp_controller
 
             ros::Time last_publish_time_;
             double publish_rate_;
+            double publish_counter_;
            
             ros::Subscriber sub_posture_;
 		    ros::ServiceServer set_posture_service_;

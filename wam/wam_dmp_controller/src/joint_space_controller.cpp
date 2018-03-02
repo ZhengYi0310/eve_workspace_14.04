@@ -37,13 +37,16 @@ namespace wam_dmp_controller
         current_cmd_.resize(kdl_chain_.getNrOfJoints());
         command_struct_.positions_.resize(kdl_chain_.getNrOfJoints());
         command_struct_.velocities_.resize(kdl_chain_.getNrOfJoints());
-        command_struct_.positions_.resize(kdl_chain_.getNrOfJoints());
+        command_struct_.accelerations_.resize(kdl_chain_.getNrOfJoints());
+        publish_counter_ = 0;
         // Read the Kq and Kv gains from the coniguration file
         ros::NodeHandle Kp_handle(n, "Kp_Gains");
         ros::NodeHandle Kv_handle(n, "Kv_Gains");
         ros::NodeHandle Ki_handle(n, "Ki_Gains");
         ros::NodeHandle home_handle(n, "home_pos");
         
+        n.getParam("publish_rate", publish_rate_);
+        ROS_WARN("Publish rate set to %f.", publish_rate_);
         for (size_t i = 0; i < joint_handles_.size(); i++)
         {
             std::cout << joint_handles_[i].getName();
@@ -90,15 +93,14 @@ namespace wam_dmp_controller
             }
 
             pid_controllers_[i].initPid(Kp_(i), Ki_(i), Kv_(i), 0.0, 0.0);
-            n.getParam("publish_rate", publish_rate_);
 
         }
         sub_posture_ = nh_.subscribe("command", 1, &JointSpaceController::command, this);
-		set_posture_service_ = nh_.advertiseService("set_joint_pos", &JointSpaceController::set_joint_pos, this);
-		set_gains_service_ = nh_.advertiseService("set_gains", &JointSpaceController::set_gains, this);
-        get_posture_service_ = nh_.advertiseService("get_joint_pos", &JointSpaceController::get_joint_pos, this);
-		get_gains_service_ = nh_.advertiseService("get_gains", &JointSpaceController::get_gains, this);
-        go_home_service_ = nh_.advertiseService("go_home", &JointSpaceController::go_home, this);
+		//set_posture_service_ = nh_.advertiseService("set_joint_pos", &JointSpaceController::set_joint_pos, this);
+		//set_gains_service_ = nh_.advertiseService("set_gains", &JointSpaceController::set_gains, this);
+        //get_posture_service_ = nh_.advertiseService("get_joint_pos", &JointSpaceController::get_joint_pos, this);
+		//get_gains_service_ = nh_.advertiseService("get_gains", &JointSpaceController::get_gains, this);
+        //go_home_service_ = nh_.advertiseService("go_home", &JointSpaceController::go_home, this);
 
         pub_q_des_.reset(new realtime_tools::RealtimePublisher<wam_dmp_controller::SetJointPosStampedMsg>(nh_, "des_jt_pos", 10));
         pub_qdot_des_.reset(new realtime_tools::RealtimePublisher<wam_dmp_controller::SetJointPosStampedMsg>(nh_, "des_jt_vel", 10));
@@ -125,7 +127,8 @@ namespace wam_dmp_controller
     		joint_msr_states_.qdot(i) = joint_handles_[i].getVelocity();
     		joint_msr_states_.qdotdot(i) = 0.0;
     		joint_des_states_.q(i) = joint_msr_states_.q(i);
-            command_struct_.positions_[i] = joint_des_states_.q(i);
+            //command_struct_.positions_[i] = joint_des_states_.q(i);
+            command_struct_.positions_[i] = home_(i);
             //command_buffer_.initRT(command_struct_);
     	}
         command_buffer_.initRT(command_struct_);
@@ -181,9 +184,9 @@ namespace wam_dmp_controller
     	}
         */
         command_struct_ = *(command_buffer_.readFromRT());
-        joint_des_states_.q.data = Eigen::Map<Eigen::VectorXd>(&command_struct_.positions_[0], command_struct_.positions_.size());
-        joint_des_states_.qdot.data = Eigen::Map<Eigen::VectorXd>(&command_struct_.velocities_[0], command_struct_.velocities_.size());
-        joint_des_states_.qdotdot.data = Eigen::Map<Eigen::VectorXd>(&command_struct_.accelerations_[0], command_struct_.accelerations_.size());
+        //joint_des_states_.q.data = Eigen::Map<Eigen::VectorXd>(&command_struct_.positions_[0], command_struct_.positions_.size());
+        //joint_des_states_.qdot.data = Eigen::Map<Eigen::VectorXd>(&command_struct_.velocities_[0], command_struct_.velocities_.size());
+        //joint_des_states_.qdotdot.data = Eigen::Map<Eigen::VectorXd>(&command_struct_.accelerations_[0], command_struct_.accelerations_.size());
     	// computing Inertia, Coriolis and Gravity matrices
     	id_solver_->JntToMass(joint_msr_states_.q, M_);
     	id_solver_->JntToCoriolis(joint_msr_states_.q, joint_msr_states_.qdot, C_);
@@ -195,6 +198,9 @@ namespace wam_dmp_controller
         KDL::JntArray cg_cmd_(joint_handles_.size());
         for(size_t i=0; i<joint_handles_.size(); i++)
         {
+            joint_des_states_.q(i) = command_struct_.positions_[i];
+            joint_des_states_.qdot(i) = command_struct_.velocities_[i];
+            joint_des_states_.qdotdot(i) = command_struct_.accelerations_[i];
             // control law
             last_vel_error_(i) = joint_des_states_.qdot(i) - joint_msr_states_.qdot(i);
             last_pos_error_(i) = joint_des_states_.q(i) - joint_msr_states_.q(i);
@@ -212,11 +218,17 @@ namespace wam_dmp_controller
         {
             joint_handles_[i].setCommand(tau_cmd_(i));
         }
-
-        if (time > last_publish_time_ + ros::Duration(1.0 / publish_rate_))
+        //publish_counter_++;
+        
+        //std::cout << publish_rate_ << " " << (1.0/publish_rate_) << std::endl;
+        if (time > last_publish_time_ + ros::Duration(1.0/ publish_rate_))
         {
+            last_publish_time_ = time;
             publish_(time); 
         }
+        //{
+            //last_publish_time_ += ros::Duration(1.0 / publish_rate_);
+        //}
         /*
         if (step_ != 0)
         {
@@ -229,6 +241,7 @@ namespace wam_dmp_controller
     {
         if (pub_q_des_ && pub_q_des_->trylock())
         {
+            pub_q_des_->msg_.stamp = time;
             for (int i = 0; i < kdl_chain_.getNrOfJoints(); i++)
             {
                 pub_q_des_->msg_.joint_pos[i] = joint_des_states_.q(i); 
@@ -236,6 +249,7 @@ namespace wam_dmp_controller
         }
         if (pub_qdot_des_ && pub_qdot_des_->trylock())
         {
+            pub_qdot_des_->msg_.stamp = time;
             for (int i = 0; i < kdl_chain_.getNrOfJoints(); i++)
             {
                 pub_qdot_des_->msg_.joint_pos[i] = joint_des_states_.qdot(i); 
@@ -243,6 +257,7 @@ namespace wam_dmp_controller
         }
         if (pub_qdotdot_des_ && pub_qdotdot_des_->trylock())
         {
+            pub_qdotdot_des_->msg_.stamp = time;
             for (int i = 0; i < kdl_chain_.getNrOfJoints(); i++)
             {
                 pub_qdotdot_des_->msg_.joint_pos[i] = joint_des_states_.qdotdot(i); 
@@ -250,6 +265,7 @@ namespace wam_dmp_controller
         }
         if (pub_q_err_ && pub_q_err_->trylock())
         {
+             pub_q_err_->msg_.stamp = time;
             for (int i = 0; i < kdl_chain_.getNrOfJoints(); i++)
             {
                 pub_q_err_->msg_.joint_pos[i] = last_pos_error_(i); 
@@ -292,10 +308,17 @@ namespace wam_dmp_controller
 
     void JointSpaceController::setCommandRT(Eigen::VectorXd& q_des, Eigen::VectorXd& q_dot_des, Eigen::VectorXd& q_dotdot_des)
     {
+        /*
         command_struct_.positions_ = std::vector<double>(q_des.data(), q_des.data() + q_des.rows() * q_des.cols());
         command_struct_.velocities_ = std::vector<double>(q_dot_des.data(), q_dot_des.data() + q_dot_des.rows() * q_dot_des.cols());
         command_struct_.accelerations_ = std::vector<double>(q_dotdot_des.data(), q_dotdot_des.data() + q_dotdot_des.rows() * q_dotdot_des.cols());
-
+        */
+        for (int i = 0; i < kdl_chain_.getNrOfJoints(); i++)
+        {
+            command_struct_.positions_[i] = q_des[i];
+            command_struct_.velocities_[i] = q_dot_des[i];
+            command_struct_.accelerations_[i] = q_dotdot_des[i];
+        }
     }
 
     bool JointSpaceController::set_joint_pos(wam_dmp_controller::SetJointPos::Request &req,

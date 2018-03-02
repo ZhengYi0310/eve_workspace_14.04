@@ -128,7 +128,7 @@ namespace barrett_hw
           //double damping_effort = joint_damping_command_[j]*( joint_velocity_[j] );
                             const double effort = stiffness_effort + joint_effort_command_[j];
                             //std::cout << "write joint impedance!!!!";
-                            sim_joints_[j]->SetForce(0, 0);
+                            sim_joints_[j]->SetForce(0, effort);
                         }
                         
                         //std::cout << "Commanded torque" << joint_effort_command_[0] << " " << joint_effort_command_[1] << " " << joint_effort_command_[2] << " " << joint_effort_command_[3] << " " << joint_effort_command_[4] << " " << joint_effort_command_[5] <<  " " << joint_effort_command_[6] << std::endl;

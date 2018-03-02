@@ -1,0 +1,4 @@
+bool sent
+---
+# current command
+JointPosSplineMsg command

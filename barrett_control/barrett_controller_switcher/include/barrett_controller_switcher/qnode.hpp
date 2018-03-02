@@ -29,7 +29,10 @@
 #include <wam_dmp_controller/GetJointGains.h>
 #include <wam_dmp_controller/SetJointGainsMsg.h>
 #include <wam_dmp_controller/GoHome.h>
+#include <wam_dmp_controller/GoHomeSpline.h>
+#include <wam_dmp_controller/JointPosSpline.h>
 #include <wam_dmp_controller/GoHomeMsg.h>
+#include <wam_dmp_controller/JointPosSplineMsg.h>
 #include <controller_manager_msgs/ListControllers.h>
 #include <controller_manager_msgs/SwitchController.h>
 #include <controller_manager_msgs/ControllerState.h>
@@ -70,7 +73,7 @@ public:
 	void log( const LogLevel &level, const std::string &msg);
 
     template <class ServiceType, class ServiceMessageType>
-    bool set_command(ServiceMessageType command, ServiceMessageType& response, bool& state);
+    bool set_command(ServiceMessageType command, ServiceMessageType& response);
     template <class ServiceType, class ServiceMessageType>
     bool get_current_cmd(ServiceMessageType& current_command);
     bool get_controllers_list(std::vector<std::string>& running_list, std::vector<std::string>& stopped_list);
@@ -90,7 +93,7 @@ private:
 };
 
 template <class ServiceType, class ServiceMessageType>
-bool QNode::set_command(ServiceMessageType command, ServiceMessageType& response, bool& state)
+bool QNode::set_command(ServiceMessageType command, ServiceMessageType& response)
 {
   ros::NodeHandle n;
   ros::ServiceClient client;
@@ -100,11 +103,11 @@ bool QNode::set_command(ServiceMessageType command, ServiceMessageType& response
   // Choose the service name depending on the ServiceType type
 
   if(std::is_same<ServiceType, wam_dmp_controller::SetJointPos>::value)
-    service_name = "/" + robot_namespace_ + "/joint_space_controller/set_joint_pos";
+    service_name = "/" + robot_namespace_ + "/joint_space_spline_controller/set_traj_pos_spline";
   else if(std::is_same<ServiceType, wam_dmp_controller::SetJointGains>::value)
     service_name = "/" + robot_namespace_ + "/joint_space_controller/set_gains";
-  else if (std::is_same<ServiceType, wam_dmp_controller::GoHome>::value)
-    service_name = "/" + robot_namespace_ + "/joint_space_controller/go_home";
+  else if (std::is_same<ServiceType, wam_dmp_controller::GoHomeSpline>::value)
+    service_name = "/" + robot_namespace_ + "/joint_space_spline_controller/go_home_traj_spline";
   /*
   else if (std::is_same<ServiceType, lwr_force_position_controllers::HybridImpedanceCommandTrajForce>::value)
     service_name = "/" + robot_namespace_ + "/hybrid_impedance_controller/set_hybrid_traj_force_cmd";
@@ -119,8 +122,8 @@ bool QNode::set_command(ServiceMessageType command, ServiceMessageType& response
 
   if (client.call(service))
    {
-      //response = service.response.command;
-      state = service.response.state;
+      response = service.response.command;
+      //response;
       return true;
    }
   else
@@ -138,10 +141,10 @@ bool QNode::get_current_cmd(ServiceMessageType& current_command)
 
   // Choose the service name depending on the ServiceType type
 
-  if(std::is_same<ServiceType, wam_dmp_controller::GetJointPos>::value)
-    service_name = "/" + robot_namespace_ + "/joint_space_controller/get_joint_pos";
+  if(std::is_same<ServiceType, wam_dmp_controller::JointPosSpline>::value)
+    service_name = "/" + robot_namespace_ + "/joint_space_spline_controller/get_traj_pos_spline";
   else if(std::is_same<ServiceType, wam_dmp_controller::GetJointGains>::value)
-    service_name = "/" + robot_namespace_ + "/joint_space_controller/get_gains";
+    service_name = "/" + robot_namespace_ + "/joint_space_spline_controller/get_gains";
   /*
   else if (std::is_same<ServiceType, lwr_force_position_controllers::HybridImpedanceCommandTrajPos>::value)
     service_name = "/" + robot_namespace_ + "/hybrid_impedance_controller/get_hybrid_traj_pos_cmd";
