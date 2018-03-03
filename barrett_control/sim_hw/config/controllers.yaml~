@@ -1,0 +1,171 @@
+sim_hw:
+  # CONTROLLERS USED IN THE EXAMPLE
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 100 
+
+  joint_space_controller:
+    publish_rate: 100.0
+    type: wam_dmp_controller/JointSpaceController
+    root_link: left_wam/base_link
+    tip_link: left_wam/wrist_palm_link
+    Kp_Gains_copy:
+        left_wam/base_yaw_joint: 900
+        left_wam/shoulder_pitch_joint: 2500
+        left_wam/shoulder_yaw_joint: 600
+        left_wam/elbow_pitch_joint: 500
+        left_wam/wrist_yaw_joint: 50
+        left_wam/wrist_pitch_joint: 50
+        left_wam/palm_yaw_joint: 8
+    Kp_Gains:
+        left_wam/base_yaw_joint: 300
+        left_wam/shoulder_pitch_joint: 250
+        left_wam/shoulder_yaw_joint: 100
+        left_wam/elbow_pitch_joint: 40
+        left_wam/wrist_yaw_joint: 20
+        left_wam/wrist_pitch_joint: 30
+        left_wam/palm_yaw_joint: 30
+    Kv_Gains_copy:
+        left_wam/base_yaw_joint: 10
+        left_wam/shoulder_pitch_joint: 20
+        left_wam/shoulder_yaw_joint: 5
+        left_wam/elbow_pitch_joint: 1
+        left_wam/wrist_yaw_joint: 0.5
+        left_wam/wrist_pitch_joint: 0.5
+        left_wam/palm_yaw_joint: 0.05
+    Kv_Gains:
+        left_wam/base_yaw_joint: 2.5
+        left_wam/shoulder_pitch_joint: 5
+        left_wam/shoulder_yaw_joint: 2
+        left_wam/elbow_pitch_joint: 2
+        left_wam/wrist_yaw_joint: 2
+        left_wam/wrist_pitch_joint: 1
+        left_wam/palm_yaw_joint: 1
+    Ki_Gains:
+        left_wam/base_yaw_joint: 2.5
+        left_wam/shoulder_pitch_joint: 5
+        left_wam/shoulder_yaw_joint: 2
+        left_wam/elbow_pitch_joint: 0.5
+        left_wam/wrist_yaw_joint: 0.5
+        left_wam/wrist_pitch_joint: 0.5
+        left_wam/palm_yaw_joint: 1
+    home_pos:
+        left_wam/base_yaw_joint: 1.574388859
+        left_wam/shoulder_pitch_joint: -1.629941524
+        left_wam/shoulder_yaw_joint: -0.06294470833
+        left_wam/elbow_pitch_joint: 0.3082449174
+        left_wam/wrist_yaw_joint: -0.04514964065
+        left_wam/wrist_pitch_joint: -0.2571394599
+        left_wam/palm_yaw_joint: -0.5003674773
+
+  joint_space_spline_controller:
+    publish_rate: 100 
+    type: wam_dmp_controller/JointSpaceSplineController
+    root_link: left_wam/base_link
+    tip_link: left_wam/wrist_palm_link
+    Kp_Gains_copy:
+        left_wam/base_yaw_joint: 900
+        left_wam/shoulder_pitch_joint: 2500
+        left_wam/shoulder_yaw_joint: 600
+        left_wam/elbow_pitch_joint: 500
+        left_wam/wrist_yaw_joint: 50
+        left_wam/wrist_pitch_joint: 50
+        left_wam/palm_yaw_joint: 8
+    Kp_Gains:
+        left_wam/base_yaw_joint: 500
+        left_wam/shoulder_pitch_joint: 500
+        left_wam/shoulder_yaw_joint: 500
+        left_wam/elbow_pitch_joint: 500
+        left_wam/wrist_yaw_joint: 700
+        left_wam/wrist_pitch_joint: 700
+        left_wam/palm_yaw_joint: 700
+    Kv_Gains_copy:
+        left_wam/base_yaw_joint: 10
+        left_wam/shoulder_pitch_joint: 20
+        left_wam/shoulder_yaw_joint: 5
+        left_wam/elbow_pitch_joint: 1
+        left_wam/wrist_yaw_joint: 0.5
+        left_wam/wrist_pitch_joint: 0.5
+        left_wam/palm_yaw_joint: 0.05
+    Kv_Gains:
+        left_wam/base_yaw_joint: 10
+        left_wam/shoulder_pitch_joint: 10
+        left_wam/shoulder_yaw_joint: 10
+        left_wam/elbow_pitch_joint: 10
+        left_wam/wrist_yaw_joint: 10
+        left_wam/wrist_pitch_joint: 10
+        left_wam/palm_yaw_joint: 10
+    Ki_Gains:
+        left_wam/base_yaw_joint: 2.5
+        left_wam/shoulder_pitch_joint: 5
+        left_wam/shoulder_yaw_joint: 2
+        left_wam/elbow_pitch_joint: 0.5
+        left_wam/wrist_yaw_joint: 0.5
+        left_wam/wrist_pitch_joint: 0.5
+        left_wam/palm_yaw_joint: 1
+    home_pos:
+        left_wam/base_yaw_joint: 1.574388859
+        left_wam/shoulder_pitch_joint: -1.629941524
+        left_wam/shoulder_yaw_joint: -0.06294470833
+        left_wam/elbow_pitch_joint: 0.3082449174
+        left_wam/wrist_yaw_joint: -0.04514964065
+        left_wam/wrist_pitch_joint: -0.2571394599
+        left_wam/palm_yaw_joint: -0.5003674773
+
+  pid_spline_controller:
+    publish_rate: 100 
+    type: wam_dmp_controller/PIDSplineController
+    root_link: left_wam/base_link
+    tip_link: left_wam/wrist_palm_link
+    Kp_Gains:
+        left_wam/base_yaw_joint: 900
+        left_wam/shoulder_pitch_joint: 2500
+        left_wam/shoulder_yaw_joint: 600
+        left_wam/elbow_pitch_joint: 500
+        left_wam/wrist_yaw_joint: 50
+        left_wam/wrist_pitch_joint: 50
+        left_wam/palm_yaw_joint: 8
+    Kv_Gains:
+        left_wam/base_yaw_joint: 10
+        left_wam/shoulder_pitch_joint: 20
+        left_wam/shoulder_yaw_joint: 5
+        left_wam/elbow_pitch_joint: 1
+        left_wam/wrist_yaw_joint: 0.5
+        left_wam/wrist_pitch_joint: 0.5
+        left_wam/palm_yaw_joint: 0.05
+    Ki_Gains:
+        left_wam/base_yaw_joint: 2.5
+        left_wam/shoulder_pitch_joint: 5
+        left_wam/shoulder_yaw_joint: 2
+        left_wam/elbow_pitch_joint: 0.5
+        left_wam/wrist_yaw_joint: 0.5
+        left_wam/wrist_pitch_joint: 0.5
+        left_wam/palm_yaw_joint: 1
+    home_pos:
+        left_wam/base_yaw_joint: 1.574388859
+        left_wam/shoulder_pitch_joint: -1.629941524
+        left_wam/shoulder_yaw_joint: -0.06294470833
+        left_wam/elbow_pitch_joint: 0.3082449174
+        left_wam/wrist_yaw_joint: -0.04514964065
+        left_wam/wrist_pitch_joint: -0.2571394599
+        left_wam/palm_yaw_joint: -0.5003674773
+
+  joint_impedance_controller:
+    type: wam_dmp_controller/JointImpedanceController
+    root_link: left_wam/base_link
+    tip_link: left_wam/wrist_palm_link
+    stiffness_gains: 300
+    damping_gains: .7
+
+  gravity_compensation_controller:
+    type: wam_dmp_controller/GravityCompensation
+    root_link: left_wam/base_link
+    tip_link: left_wam/wrist_palm_link
+
+  arm_state_controller: 
+    type: wam_dmp_controller/ArmStateController
+    root_link: left_wam/base_link
+    tip_link: left_wam/wrist_palm_link
+    publish_rate: 100
+    
+     

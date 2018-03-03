@@ -352,11 +352,13 @@ void MainWindow::on_button_SwitchController_clicked(bool check)
         sleep(1);
         // if controller switch succeded reload controller list in combo boxes
         fill_controllers_list();
+        std::string robot_name_space;
+        qnode.get_robot_namespace(robot_name_space);
         // Let the ros node knows that cartesian position controller is started
         // so that it can signal when new errors are available on each topic callback
-        qnode.set_jointpos_controller_state(start_controller == "barrett_hw/joint_space_spline_controller");
+        qnode.set_jointpos_controller_state(start_controller == (robot_name_space + "/joint_space_spline_controller"));
         //qnode.set_hybrid_controller_state(start_controller == "hybrid_impedance_controller");
-        if(start_controller == "barrett_hw/joint_space_spline_controller")
+        if(start_controller == (robot_name_space + "/joint_space_spline_controller"))
         {
             fill_joint_pos_fields();
             fill_joint_gains_fields();

@@ -278,4 +278,9 @@ void QNode::set_robot_namespace(std::string name)
   robot_namespace_ = name;
 }
 
+void QNode::get_robot_namespace(std::string& name)
+{
+  name = robot_namespace_;
+}
+
 }  // namespace barrett_controller_switcher

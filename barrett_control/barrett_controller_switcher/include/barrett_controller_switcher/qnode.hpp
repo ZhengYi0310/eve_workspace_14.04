@@ -82,6 +82,7 @@ public:
     bool get_controllers_list(std::vector<std::string>& running_list, std::vector<std::string>& stopped_list);
     bool switch_controllers(const std::string start_controller, const std::string stop_controller, bool& switch_ok);
     void set_robot_namespace(std::string name);
+    void get_robot_namespace(std::string& name);
     void get_joints_state(std::vector<double>& positions);
     void get_joints_error(std::vector<double>& errors);
     void get_progress_jointpos(double& elapsed, double& duration);
