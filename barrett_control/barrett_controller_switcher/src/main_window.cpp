@@ -50,6 +50,40 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     if ( ui.checkbox_remember_settings->isChecked() ) {
         on_button_connect_clicked(true);
     }
+
+    qnode.set_robot_namespace(argv[1]);
+    qnode.init();
+
+
+    // move the window to the center
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight,
+                    Qt::AlignCenter,
+                    size(),
+                    qApp->desktop()->availableGeometry()));
+
+    // force size of the window
+    //setFixedSize(706, 681);
+
+    // fill controller lists from robot_namespace_/controller_manager/ListControllers
+    fill_controllers_list();
+
+    // fill controllers gains fields with default gains
+    fill_joint_gains_fields();
+    //fill_hybrid_gains_fields();
+
+    // connect joints state view update to joints state topic callback
+    QObject::connect(&qnode, SIGNAL(jointsStateArrived()), this, SLOT(update_joints_state()));
+
+    // connect joints error view update to joints error topic callback
+    QObject::connect(&qnode, SIGNAL(jointsErrorArrived()), this, SLOT(update_joints_error()));
+
+    // connect cartesian error view update to joints error topic callback
+    //QObject::connect(&qnode, SIGNAL(cartesianErrorArrived()), this, SLOT(update_cartesian_error()));
+
+    // connect progress bars and send state labels update to progress data service call
+    // service call is done in the run() method of qnode
+    QObject::connect(&qnode, SIGNAL(progressDataArrived()), this, SLOT(update_progress_data()));
+
 }
 
 MainWindow::~MainWindow() {}
@@ -109,7 +143,8 @@ void MainWindow::on_button_SetGains_clicked(bool check)
     bool state;
     std::vector<double> Kp_(7), Kv_(7);
     wam_dmp_controller::SetJointGainsMsg cmd, res;
-
+    cmd.Kp_gains.resize(7);
+    cmd.Kv_gains.resize(7);
     Kp_[0] = ui.Joint1KpGainText->text().toDouble(&outcome);
     if (!outcome || (Kp_[0] <= 0))
     {
@@ -319,7 +354,7 @@ void MainWindow::on_button_SwitchController_clicked(bool check)
         fill_controllers_list();
         // Let the ros node knows that cartesian position controller is started
         // so that it can signal when new errors are available on each topic callback
-        //qnode.set_jointpos_controller_state(start_controller == "joint_space_controller");
+        qnode.set_jointpos_controller_state(start_controller == "barrett_hw/joint_space_spline_controller");
         //qnode.set_hybrid_controller_state(start_controller == "hybrid_impedance_controller");
         if(start_controller == "barrett_hw/joint_space_spline_controller")
         {
@@ -348,6 +383,75 @@ void MainWindow::on_button_LoadControllerList_clicked(bool check)
 void MainWindow::updateLoggingView() {
         ui.view_logging->scrollToBottom();
 }
+
+void MainWindow::set_progress_bar(QProgressBar* bar, double elapsed_time, double total_time)
+{
+  bar->setValue(elapsed_time / total_time * 100.0);
+  //qnode.log(QNode::LogLevel::Info, std::string("progress bar updated"));
+  //std::stringstream ss;
+  //ss << (elapsed_time / total_time * 100.0);
+
+  //qnode.log(QNode::LogLevel::Info, std::string("progress set to") + ss.str());
+  //ss.str("");
+}
+
+void MainWindow::update_joints_state()
+{
+  std::vector<QLabel*> labels_list;
+  std::vector<double> joints_position;
+
+  // get new joints state
+  qnode.get_joints_state(joints_position);
+
+  labels_list.push_back(ui.Joint1Position_Val);
+  labels_list.push_back(ui.Joint4Position_Val);
+  labels_list.push_back(ui.Joint7Position_Val);
+  labels_list.push_back(ui.Joint2Position_Val);
+  labels_list.push_back(ui.Joint3Position_Val);
+  labels_list.push_back(ui.Joint6Position_Val);
+  labels_list.push_back(ui.Joint5Position_Val); // <-- ORDERING HERE IS IMPORTANT
+
+  for (int i=0; i<7; i++)
+    labels_list.at(i)->setText(QString::number(joints_position.at(i), 'f', 3));
+    //labels_list.at(i)->setText(QString::number(180.0/3.14 * joints_position.at(i), 'f', 3));
+}
+
+void MainWindow::update_joints_error()
+{
+  std::vector<QLabel*> labels_list;
+  std::vector<double> joints_error;
+
+  // get new joints error
+  qnode.get_joints_error(joints_error);
+
+  labels_list.push_back(ui.Joint1Error_Val);
+  labels_list.push_back(ui.Joint2Error_Val);
+  labels_list.push_back(ui.Joint3Error_Val);
+  labels_list.push_back(ui.Joint4Error_Val);
+  labels_list.push_back(ui.Joint5Error_Val);
+  labels_list.push_back(ui.Joint6Error_Val);
+  labels_list.push_back(ui.Joint7Error_Val); // <-- ORDERING HERE IS IMPORTANT
+
+  for (int i=0; i<7; i++)
+    labels_list.at(i)->setText(QString::number(joints_error.at(i), 'f', 3));
+}
+
+void MainWindow::update_progress_data()
+{
+  double jointpos_elapsed;
+  double jointpos_duration;
+
+  //void get_progress_jointpos(double& elapsed, double& duration);
+  if (qnode.get_jointpos_controller_state() == true)
+  {
+      qnode.get_progress_jointpos(jointpos_elapsed, jointpos_duration);
+      set_progress_bar(ui.progressBar_JointPos, jointpos_elapsed, jointpos_duration);
+      set_send_jointpos_label(ui.JointPosSentLabel, false, jointpos_elapsed, jointpos_duration);
+      set_send_jointpos_label(ui.GoHomeSentLabel, false, jointpos_elapsed, jointpos_duration);
+  }
+
+}
+
 
 void MainWindow::set_send_jointpos_label(QLabel* label, bool accepted, double elapsed, double duration)
 {
@@ -475,7 +579,7 @@ void MainWindow::fill_joint_gains_fields()
 
 void MainWindow::switch_tab(int index)
 {
-  //ui.ErrorsTabWidget->setCurrentIndex(index);
+  ui.ErrorsTabWidget->setCurrentIndex(index);
   ui.ControllersTabWidget->setCurrentIndex(index);
 }
 

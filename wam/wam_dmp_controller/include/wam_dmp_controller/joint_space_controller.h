@@ -74,8 +74,8 @@ namespace wam_dmp_controller
             ros::Subscriber sub_posture_;
 		    ros::ServiceServer set_posture_service_;
             ros::ServiceServer get_posture_service_;
-		    ros::ServiceServer set_gains_service_;
-            ros::ServiceServer get_gains_service_;
+		    //ros::ServiceServer set_gains_service_;
+            //ros::ServiceServer get_gains_service_;
             ros::ServiceServer go_home_service_;
 
             std::vector<control_toolbox::Pid> pid_controllers_;

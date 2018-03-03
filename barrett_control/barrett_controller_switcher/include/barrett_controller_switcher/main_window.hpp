@@ -58,6 +58,10 @@ public Q_SLOTS:
     ** Manual connections
     *******************************************/
     void updateLoggingView(); // no idea why this can't connect automatically
+    void update_joints_state();
+    void update_joints_error();
+    //void update_cartesian_error();
+    void update_progress_data();
 
 private:
     void switch_tab(int index);
@@ -67,6 +71,7 @@ private:
     void field_error_msg_box(std::string field_name);
     void service_error_msg_box(std::string controller_name);
     void set_send_jointpos_label(QLabel* label, bool accepted, double elapsed, double duration);
+    void set_progress_bar(QProgressBar* bar, double elapsed_time, double total_time);
 	Ui::MainWindowDesign ui;
 	QNode qnode;
 };

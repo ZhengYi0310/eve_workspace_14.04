@@ -73,7 +73,7 @@
       <origin xyz="0 0 0.346" rpy="${rpy}"/>
       <axis xyz="0 0 1"/>
       <limit effort="25" lower="-2.6" upper="2.6" velocity="2.0"/>
-      <dynamics damping="${1.8*b}" friction="10"/>
+      <dynamics damping="${1.8*b}" friction="0"/>
     </joint>
     <gazebo reference="${prefix}/base_yaw_joint">
       <xacro:gz_joint/>
@@ -112,8 +112,8 @@
       <child link="${prefix}/shoulder_pitch_link"/>
       <origin xyz="0 0 0" rpy="${-PI/2} 0 0"/>
       <axis xyz="0 0 1"/>
-      <limit effort="20" lower="-2.0" upper="2.0" velocity="2.0"/>
-      <dynamics damping="${0.5*b}" friction="10"/>
+      <limit effort="30" lower="-2.0" upper="2.0" velocity="2.0"/>
+      <dynamics damping="${0.5*b}" friction="0"/>
     </joint>
     <gazebo reference="${prefix}/shoulder_pitch_joint">
       <xacro:gz_joint/>
@@ -153,7 +153,7 @@
       <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
       <axis xyz="0 0 1"/>
       <limit effort="15" lower="-2.8" upper="2.8" velocity="2.0"/>
-      <dynamics damping="${1.5*b}" friction="10"/>
+      <dynamics damping="${1.5*b}" friction="0"/>
     </joint>
     <gazebo reference="${prefix}/shoulder_yaw_joint">
       <xacro:gz_joint/>
@@ -194,7 +194,7 @@
       <origin xyz="0.045 0 0.55" rpy="${-PI/2} 0 0"/>
       <axis xyz="0 0 1"/>
       <limit effort="15" lower="-0.9" upper="${PI}" velocity="2.00"/>
-      <dynamics damping="${0.8*b}" friction="10"/>
+      <dynamics damping="${0.8*b}" friction="0"/>
     </joint>
     <gazebo reference="${prefix}/elbow_pitch_joint">
       <xacro:gz_joint/>
@@ -250,7 +250,7 @@
       <origin xyz="-0.045 -0.3 0" rpy="${rpy}"/>
       <axis xyz="0 0 1"/>
       <limit effort="5" lower="-4.76" upper="1.24" velocity="2.0"/>
-      <dynamics damping="${0.5*b}" friction="10"/>
+      <dynamics damping="${0.5*b}" friction="0"/>
     </joint>
     <gazebo reference="${prefix}/wrist_yaw_joint">
       <xacro:gz_joint/>
@@ -290,7 +290,7 @@
       <origin xyz="0 0 0" rpy="${-PI/2} 0 0"/>
       <axis xyz="0 0 1"/>
       <limit effort="5" lower="-1.6" upper="1.6" velocity="2.00"/>
-      <dynamics damping="${0.1*b}" friction="10"/>
+      <dynamics damping="${0.1*b}" friction="0"/>
     </joint>
     <gazebo reference="${prefix}/wrist_pitch_joint">
       <xacro:gz_joint/>
@@ -330,7 +330,7 @@
       <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
       <axis xyz="0 0 1"/>
       <limit effort="5" lower="-3.0" upper="3.0" velocity="2.00"/><!-- 2.95 is a limit taken in from 3 due to saftey and differences between arms. -->
-      <dynamics damping="${0.1*b}" friction="10"/>
+      <dynamics damping="${0.1*b}" friction="0"/>
     </joint>
     <gazebo reference="${prefix}/palm_yaw_joint">
       <xacro:gz_joint/>

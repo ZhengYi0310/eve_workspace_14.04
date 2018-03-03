@@ -20,7 +20,6 @@
   <run_depend>kdl_urdf_tools</run_depend>
   <run_depend>barrett_hw</run_depend> 
   <run_depend>kdljacdot</run_depend> 
-  <run_depend>barrett_controller_switcher<run_depend>
 
 
   <export>

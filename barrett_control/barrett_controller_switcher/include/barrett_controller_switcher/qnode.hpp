@@ -20,8 +20,10 @@
 #include <ros/network.h>
 #include <string>
 #include <QThread>
+#include <QMutex>
 #include <QStringListModel>
 #include <std_msgs/Float64MultiArray.h>
+#include <sensor_msgs/JointState.h>
 #include <wam_dmp_controller/SetJointPos.h>
 #include <wam_dmp_controller/GetJointPos.h>
 #include <wam_dmp_controller/SetJointPosMsg.h>
@@ -33,6 +35,7 @@
 #include <wam_dmp_controller/JointPosSpline.h>
 #include <wam_dmp_controller/GoHomeMsg.h>
 #include <wam_dmp_controller/JointPosSplineMsg.h>
+#include <wam_dmp_controller/SetJointPosStampedMsg.h>
 #include <controller_manager_msgs/ListControllers.h>
 #include <controller_manager_msgs/SwitchController.h>
 #include <controller_manager_msgs/ControllerState.h>
@@ -79,17 +82,41 @@ public:
     bool get_controllers_list(std::vector<std::string>& running_list, std::vector<std::string>& stopped_list);
     bool switch_controllers(const std::string start_controller, const std::string stop_controller, bool& switch_ok);
     void set_robot_namespace(std::string name);
+    void get_joints_state(std::vector<double>& positions);
+    void get_joints_error(std::vector<double>& errors);
+    void get_progress_jointpos(double& elapsed, double& duration);
+    void set_jointpos_controller_state(bool state) {is_jointpos_controller_active_ = state;}
+    bool get_jointpos_controller_state() {return is_jointpos_controller_active_;}
 Q_SIGNALS:
 	void loggingUpdated();
     void rosShutdown();
+    void jointsStateArrived();
+    void jointsErrorArrived();
+    //void cartesianErrorArrived();
+    void progressDataArrived();
+
 
 private:
+    wam_dmp_controller::JointPosSplineMsg progress_joint_;
+
 	int init_argc;
 	char** init_argv;
 	ros::Publisher chatter_publisher;
     QStringListModel logging_model;
 
     std::string robot_namespace_;
+    ros::Subscriber sub_joints_state_;
+    ros::Subscriber sub_joints_error_;
+    bool is_jointpos_controller_active_;
+    sensor_msgs::JointState joints_state_;
+    wam_dmp_controller::SetJointPosStampedMsg joints_error_;
+
+    QMutex joints_state_mutex_;
+    QMutex joints_error_mutex_;
+
+    void joints_state_callback(const sensor_msgs::JointState::ConstPtr& msg);
+    void joints_error_callback(const wam_dmp_controller::SetJointPosStampedMsgConstPtr& msg);
+    void get_trajectories_progress();
 };
 
 template <class ServiceType, class ServiceMessageType>
@@ -102,10 +129,10 @@ bool QNode::set_command(ServiceMessageType command, ServiceMessageType& response
 
   // Choose the service name depending on the ServiceType type
 
-  if(std::is_same<ServiceType, wam_dmp_controller::SetJointPos>::value)
+  if(std::is_same<ServiceType, wam_dmp_controller::JointPosSpline>::value)
     service_name = "/" + robot_namespace_ + "/joint_space_spline_controller/set_traj_pos_spline";
   else if(std::is_same<ServiceType, wam_dmp_controller::SetJointGains>::value)
-    service_name = "/" + robot_namespace_ + "/joint_space_controller/set_gains";
+    service_name = "/" + robot_namespace_ + "/joint_space_spline_controller/set_gains";
   else if (std::is_same<ServiceType, wam_dmp_controller::GoHomeSpline>::value)
     service_name = "/" + robot_namespace_ + "/joint_space_spline_controller/go_home_traj_spline";
   /*
@@ -140,7 +167,6 @@ bool QNode::get_current_cmd(ServiceMessageType& current_command)
   double outcome;
 
   // Choose the service name depending on the ServiceType type
-
   if(std::is_same<ServiceType, wam_dmp_controller::JointPosSpline>::value)
     service_name = "/" + robot_namespace_ + "/joint_space_spline_controller/get_traj_pos_spline";
   else if(std::is_same<ServiceType, wam_dmp_controller::GetJointGains>::value)

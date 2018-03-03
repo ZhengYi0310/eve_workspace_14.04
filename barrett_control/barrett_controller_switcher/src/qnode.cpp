@@ -50,6 +50,17 @@ bool QNode::init() {
 	// Add your ros communications here.
 	chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
 	start();
+    sub_joints_state_ = n.subscribe("/joint_states", 1000,\
+                        &barrett_controller_switcher::QNode::joints_state_callback, this);
+
+    sub_joints_error_ = n.subscribe("/" + robot_namespace_ + "/joint_space_spline_controller/jt_err", 1000,\
+                    &barrett_controller_switcher::QNode::joints_error_callback, this);
+    /*
+    sub_cartesian_error_ = n.subscribe("/" + robot_namespace_ + "/hybrid_impedance_controller/error", 1000,\
+                       &barrett_controller_switcher::QNode::cartesian_error_callback, this);
+    */
+    ros::Duration(3).sleep();
+    is_jointpos_controller_active_ = false;
 	return true;
 }
 
@@ -64,25 +75,115 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
 	ros::start(); // explicitly needed since our nodehandle is going out of scope.
 	ros::NodeHandle n;
 	// Add your ros communications here.
-	chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
-    set_robot_namespace("barrett_hw");
+    //chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
+    //set_robot_namespace("barrett_hw");
 	start();
+    sub_joints_state_ = n.subscribe("/joint_states", 1000,\
+                        &barrett_controller_switcher::QNode::joints_state_callback, this);
+
+    sub_joints_error_ = n.subscribe("/" + robot_namespace_ + "/joint_space_spline_controller/jt_err", 1000,\
+                    &barrett_controller_switcher::QNode::joints_error_callback, this);
+    /*
+    sub_cartesian_error_ = n.subscribe("/" + robot_namespace_ + "/hybrid_impedance_controller/error", 1000,\
+                       &barrett_controller_switcher::QNode::cartesian_error_callback, this);
+    */
+    ros::Duration(3).sleep();
+    is_jointpos_controller_active_ = false;
 	return true;
 }
 
+void QNode::joints_state_callback(const sensor_msgs::JointState::ConstPtr& msg)
+{
+  joints_state_mutex_.lock();
+  joints_state_ = *msg;
+  joints_state_mutex_.unlock();
+
+  // Signal the UI that there is a new joints state message
+  Q_EMIT jointsStateArrived();
+}
+
+void QNode::joints_error_callback(const wam_dmp_controller::SetJointPosStampedMsgConstPtr& msg)
+{
+  //log(Info,std::string("joint_error arrived!" ));
+  joints_error_mutex_.lock();
+  joints_error_ = *msg;
+  joints_error_mutex_.unlock();
+
+  // Signal the UI that there is a joint position error message
+  // only if Cartesian Position Controller is active
+  //if (is_jointpos_controller_active_)
+  Q_EMIT jointsErrorArrived();
+}
+
+void QNode::get_joints_state(std::vector<double>& positions)
+{
+  joints_state_mutex_.lock();
+  positions = joints_state_.position;
+  joints_state_mutex_.unlock();
+}
+
+void QNode::get_joints_error(std::vector<double>& errors)
+{
+
+  joints_error_mutex_.lock();
+  errors = joints_error_.joint_pos;
+  joints_error_mutex_.unlock();
+}
+
+void QNode::get_trajectories_progress()
+{
+    get_current_cmd<wam_dmp_controller::JointPosSpline,\
+                          wam_dmp_controller::JointPosSplineMsg>(progress_joint_);
+  /*
+  get_current_cmd<lwr_force_position_controllers::HybridImpedanceCommandTrajPos,\
+          lwr_force_position_controllers::HybridImpedanceCommandTrajPosMsg>(progress_hybrid_pos_);
+  get_current_cmd<lwr_force_position_controllers::HybridImpedanceCommandTrajForce,\
+          lwr_force_position_controllers::HybridImpedanceCommandTrajForceMsg>(progress_hybrid_force_);
+  */
+}
+
+void QNode::get_progress_jointpos(double& elapsed, double& duration)
+{
+  elapsed = progress_joint_.elapsed_time;
+  duration = progress_joint_.p2p_traj_duration;
+}
+
 void QNode::run() {
-	ros::Rate loop_rate(1);
+    ros::Rate loop_rate(10);
+    double frequency = 10;
+    double step = 1.0 / 10;
+    double elapsed = 0;
 	int count = 0;
 	while ( ros::ok() ) {
 
 		std_msgs::String msg;
 		std::stringstream ss;
-		ss << "hello world " << count;
+        ss << "hello world " << count;
 		msg.data = ss.str();
-		chatter_publisher.publish(msg);
-		log(Info,std::string("I sent: ")+msg.data);
+        chatter_publisher.publish(msg);
+        log(Info,std::string("I sent: ")+msg.data);
 		ros::spinOnce();
 		loop_rate.sleep();
+        elapsed += step;
+        if (elapsed > 1)
+        {
+          /*
+          ss << progress_joint_.elapsed_time;
+          msg.data = ss.str();
+          log(Info,std::string("elapsed time: ")+msg.data);
+          ss.str("");
+          ss << progress_joint_.p2p_traj_duration;
+          msg.data = ss.str();
+          log(Info,std::string("segment duration: ")+msg.data);
+          ss.str("");
+          ss << (progress_joint_.elapsed_time / progress_joint_.p2p_traj_duration);
+          msg.data = ss.str();
+          log(Info,std::string("current progress: ")+msg.data);
+          */
+          //log(QNode::LogLevel::Info, std::string("progress bar updated"));
+          get_trajectories_progress();
+          Q_EMIT progressDataArrived();
+        }
 		++count;
 	}
 	std::cout << "Ros shutdown, proceeding to close the gui." << std::endl;

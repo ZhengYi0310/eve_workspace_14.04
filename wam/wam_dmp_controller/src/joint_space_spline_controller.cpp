@@ -126,6 +126,7 @@ namespace wam_dmp_controller
         // reset the time
         spline_seg_.reset(new QuinticSplineSegment<double>(0, *prev_setpoint_state_, p2p_traj_spline_duration_, *curr_setpoint_state_));
         time_ = p2p_traj_spline_duration_;
+        //ROS_WARN("DEFAULT TRAJ DURATION: %f, CURRENT ELAPSED TIME: %f", p2p_traj_spline_duration_, time_);
         
         // Let's use quinc spline segment 
 
@@ -140,7 +141,6 @@ namespace wam_dmp_controller
     {
         p2p_traj_mutex_.lock();
         time_ += period.toSec();
-
         if (time_ > p2p_traj_spline_duration_)
         {    
             time_ = p2p_traj_spline_duration_;
@@ -171,6 +171,7 @@ namespace wam_dmp_controller
 	        q_dotdot_des[i] = 3 * 2 *  p2p_traj_const_(1, i) * time_ + \
                              4 * 3 * p2p_traj_const_(2, i) * pow(time_, 2) + 5 * 4 * p2p_traj_const_(3, i) * pow(time_, 3);
         }
+        //ROS_INFO("time: %f, j1_pos: %f, j2_pos:%f, j3_pos:%f", time_, q_des_[0], q_des_[1], q_des_[2]);        
         p2p_traj_mutex_.unlock();
     }
 
@@ -198,6 +199,7 @@ namespace wam_dmp_controller
     bool JointSpaceSplineController::set_cmd_traj_spline_srv(wam_dmp_controller::JointPosSpline::Request &req, 
                                                              wam_dmp_controller::JointPosSpline::Response &res)
     {
+        ROS_WARN("attemt to set new goal!");
         if (command_struct_.positions_.size() != req.command.joint_pos.size())
         {
             ROS_ERROR("command struct has size %lu, request command has size %u, they are not equal", 
@@ -239,6 +241,7 @@ namespace wam_dmp_controller
         time_ = 0;
 
         p2p_traj_mutex_.unlock();
+        ROS_WARN("new traj goal set!");
 
         return true; 
     }
@@ -246,6 +249,7 @@ namespace wam_dmp_controller
      bool JointSpaceSplineController::go_home_traj_spline_srv(wam_dmp_controller::GoHomeSpline::Request &req, 
                                                               wam_dmp_controller::GoHomeSpline::Response &res)
     {
+        ROS_WARN("Attemp to move the arm to home position!");
         if (command_struct_.positions_.size() != kdl_chain_.getNrOfJoints())
         {
             ROS_ERROR("command struct has size %lu, home posture has size %u, they are not equal", 
@@ -286,7 +290,7 @@ namespace wam_dmp_controller
         time_ = 0;
 
         p2p_traj_mutex_.unlock();
-
+        ROS_WARN("Arm goal position set to home position!");
         return true; 
     }
 
@@ -294,6 +298,7 @@ namespace wam_dmp_controller
                                                              wam_dmp_controller::JointPosSpline::Response &res)
     {
         // get translation
+        res.command.joint_pos.resize(kdl_chain_.getNrOfJoints());
         res.command.p2p_traj_duration = p2p_traj_spline_duration_;
         // get elapsed time
         res.command.elapsed_time = time_;
@@ -310,6 +315,7 @@ namespace wam_dmp_controller
     bool JointSpaceSplineController::set_gains(wam_dmp_controller::SetJointGains::Request &req,
                                          wam_dmp_controller::SetJointGains::Response &res)
 	{
+        ROS_WARN("Attemp to set controller gains!");
         if(req.command.Kp_gains.size() == 0)
     	{
             ROS_ERROR("Desired Kp array must be of dimension %lu", joint_handles_.size());
@@ -331,13 +337,14 @@ namespace wam_dmp_controller
     		ROS_ERROR("Kv array had the wrong size: %u", (unsigned int)req.command.Kv_gains.size());
     		return res.state = false;
     	}
-
+        /*
         if (time_ != 0)
         {
             ROS_WARN("Set the gains after the current trajectory is done!!!!!!");
             res.state = true;
             return res.state;
         }
+        */
 		
 		for(unsigned int i = 0; i < joint_handles_.size(); i++)
 		{
@@ -348,6 +355,7 @@ namespace wam_dmp_controller
 		ROS_INFO("New gains Kp: %.1lf, %.1lf, %.1lf %.1lf, %.1lf, %.1lf, %.1lf", Kp_(0), Kp_(1), Kp_(2), Kp_(3), Kp_(4), Kp_(5), Kp_(6));
 		ROS_INFO("New gains Kv: %.1lf, %.1lf, %.1lf %.1lf, %.1lf, %.1lf, %.1lf", Kv_(0), Kv_(1), Kv_(2), Kv_(3), Kv_(4), Kv_(5), Kv_(6));
         res.state = true;
+        ROS_WARN("controller gains set to new value!");
         return res.state;
 	}
 
@@ -360,7 +368,7 @@ namespace wam_dmp_controller
         {
             res.command.Kp_gains[i] = Kp_(i);
             res.command.Kv_gains[i] = Kv_(i);
-            ROS_INFO("Gains Kp, Kv:%f, %f", res.command.Kp_gains[i], res.command.Kv_gains[i]);
+            //ROS_INFO("Gains Kp, Kv:%f, %f", res.command.Kp_gains[i], res.command.Kv_gains[i]);
         }
         res.state = true;
         return res.state;

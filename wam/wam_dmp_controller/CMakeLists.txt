@@ -125,6 +125,8 @@ add_library(${PROJECT_NAME}
   src/joint_impedance_controller.cpp
   src/joint_space_controller.cpp
   src/joint_space_spline_controller.cpp
+  src/pid_controller.cpp
+  src/pid_spline_controller.cpp
   src/gravity_compensation.cpp
   src/arm_state_controller.cpp
   src/operational_space_controller.cpp

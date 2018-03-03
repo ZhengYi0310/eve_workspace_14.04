@@ -204,7 +204,7 @@ namespace wam_dmp_controller
             // control law
             last_vel_error_(i) = joint_des_states_.qdot(i) - joint_msr_states_.qdot(i);
             last_pos_error_(i) = joint_des_states_.q(i) - joint_msr_states_.q(i);
-            pid_cmd_(i) = joint_des_states_.qdotdot(i) + Kv_(i)*(joint_des_states_.qdot(i) - joint_msr_states_.qdot(i)) + Kp_(i)*(joint_des_states_.q(i) - joint_msr_states_.q(i));
+            pid_cmd_(i) = Kv_(i)*(joint_des_states_.qdot(i) - joint_msr_states_.qdot(i)) + Kp_(i)*(joint_des_states_.q(i) - joint_msr_states_.q(i)) + joint_des_states_.qdotdot(i);
             //pid_cmd_(i) = pid_controllers_[i].computeCommand(joint_des_states_.q(i) - joint_msr_states_.q(i), joint_des_states_.qdot(i) - joint_msr_states_.qdot(i), period);
             cg_cmd_(i) = C_(i) + G_(i);
             //cg_cmd_(i) = G_(i);
@@ -319,6 +319,9 @@ namespace wam_dmp_controller
             command_struct_.velocities_[i] = q_dot_des[i];
             command_struct_.accelerations_[i] = q_dotdot_des[i];
         }
+        command_buffer_.initRT(command_struct_);
+
+        //std::cout << "current path point" << q_des[0] <<" "<< q_des[1]<< " " << q_des[2]<< " " << q_des[3]<< " " << q_des[4]<< " " << q_des[5] << " " << q_des[6] << std::endl;
     }
 
     bool JointSpaceController::set_joint_pos(wam_dmp_controller::SetJointPos::Request &req,
