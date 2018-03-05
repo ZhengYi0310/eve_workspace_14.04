@@ -83,6 +83,11 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
 
     sub_joints_error_ = n.subscribe("/" + robot_namespace_ + "/joint_space_spline_controller/jt_err", 1000,\
                     &barrett_controller_switcher::QNode::joints_error_callback, this);
+
+    sub_cart_pos_ = n.subscribe("/" + robot_namespace_ + "/operational_space_impedance_controller/curr_cart_pos", 1000,\
+                                  &barrett_controller_switcher::QNode::cart_pos_callback, this);
+    sub_cart_pos_ = n.subscribe("/" + robot_namespace_ + "/operational_space_impedance_controller/cart_err", 1000,\
+                                  &barrett_controller_switcher::QNode::cart_error_callback, this);
     /*
     sub_cartesian_error_ = n.subscribe("/" + robot_namespace_ + "/hybrid_impedance_controller/error", 1000,\
                        &barrett_controller_switcher::QNode::cartesian_error_callback, this);
@@ -115,6 +120,27 @@ void QNode::joints_error_callback(const wam_dmp_controller::SetJointPosStampedMs
   Q_EMIT jointsErrorArrived();
 }
 
+void QNode::cart_pos_callback(const wam_dmp_controller::PoseRPYConstPtr& msg)
+{
+  cart_pos_mutex_.lock();
+  cart_pos_ = *msg;
+  cart_pos_mutex_.unlock();
+
+  // Signal the UI that there is a new joints state message
+  Q_EMIT CartPosArrived();
+}
+
+void QNode::cart_error_callback(const wam_dmp_controller::PoseRPYConstPtr& msg)
+{
+  cart_error_mutex_.lock();
+  cart_err_ = *msg;
+  cart_error_mutex_.unlock();
+
+  // Signal the UI that there is a new joints state message
+  Q_EMIT CartErrorArrived();
+}
+
+
 void QNode::get_joints_state(std::vector<double>& positions)
 {
   joints_state_mutex_.lock();
@@ -130,13 +156,31 @@ void QNode::get_joints_error(std::vector<double>& errors)
   joints_error_mutex_.unlock();
 }
 
+void QNode::get_cart_pos(geometry_msgs::Vector3& trans, wam_dmp_controller::RPY& rot)
+{
+    cart_pos_mutex_.lock();
+    trans = cart_pos_.position;
+    rot = cart_pos_.orientation;
+    cart_pos_mutex_.unlock();
+}
+
+void QNode::get_cart_error(geometry_msgs::Vector3& trans_err, wam_dmp_controller::RPY& rot_err)
+{
+
+    cart_error_mutex_.lock();
+    trans_err = cart_err_.position;
+    rot_err = cart_err_.orientation;
+    cart_error_mutex_.unlock();
+}
+
 void QNode::get_trajectories_progress()
 {
-    get_current_cmd<wam_dmp_controller::JointPosSpline,\
-                          wam_dmp_controller::JointPosSplineMsg>(progress_joint_);
+   get_current_cmd<wam_dmp_controller::JointPosSpline,\
+                   wam_dmp_controller::JointPosSplineMsg>(progress_joint_);
+
+  get_current_cmd<wam_dmp_controller::PoseRPYCommand,\
+                  wam_dmp_controller::PoseRPYCmd>(progress_cart_);
   /*
-  get_current_cmd<lwr_force_position_controllers::HybridImpedanceCommandTrajPos,\
-          lwr_force_position_controllers::HybridImpedanceCommandTrajPosMsg>(progress_hybrid_pos_);
   get_current_cmd<lwr_force_position_controllers::HybridImpedanceCommandTrajForce,\
           lwr_force_position_controllers::HybridImpedanceCommandTrajForceMsg>(progress_hybrid_force_);
   */

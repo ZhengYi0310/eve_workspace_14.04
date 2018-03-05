@@ -39,6 +39,13 @@
 #include <controller_manager_msgs/ListControllers.h>
 #include <controller_manager_msgs/SwitchController.h>
 #include <controller_manager_msgs/ControllerState.h>
+#include <wam_dmp_controller/PoseRPY.h>
+#include <wam_dmp_controller/RPY.h>
+#include <wam_dmp_controller/PoseRPYCommand.h>
+#include <wam_dmp_controller/PoseRPYCmd.h>
+#include <wam_dmp_controller/ImpedanceControllerGains.h>
+#include <geometry_msgs/Vector3.h>
+
 
 
 
@@ -85,6 +92,8 @@ public:
     void get_robot_namespace(std::string& name);
     void get_joints_state(std::vector<double>& positions);
     void get_joints_error(std::vector<double>& errors);
+    void get_cart_pos(geometry_msgs::Vector3& trans, wam_dmp_controller::RPY& rot);
+    void get_cart_error(geometry_msgs::Vector3& trans_err, wam_dmp_controller::RPY& rot_err);
     void get_progress_jointpos(double& elapsed, double& duration);
     void set_jointpos_controller_state(bool state) {is_jointpos_controller_active_ = state;}
     bool get_jointpos_controller_state() {return is_jointpos_controller_active_;}
@@ -95,10 +104,15 @@ Q_SIGNALS:
     void jointsErrorArrived();
     //void cartesianErrorArrived();
     void progressDataArrived();
+    void CartPosArrived();
+    void CartErrorArrived();
+
 
 
 private:
     wam_dmp_controller::JointPosSplineMsg progress_joint_;
+    wam_dmp_controller::PoseRPYCmd progress_cart_;
+
 
 	int init_argc;
 	char** init_argv;
@@ -108,15 +122,24 @@ private:
     std::string robot_namespace_;
     ros::Subscriber sub_joints_state_;
     ros::Subscriber sub_joints_error_;
+    ros::Subscriber sub_cart_pos_;
+    ros::Subscriber sub_cart_error_;
     bool is_jointpos_controller_active_;
+    bool is_cartpos_controller_active_;
     sensor_msgs::JointState joints_state_;
     wam_dmp_controller::SetJointPosStampedMsg joints_error_;
+    wam_dmp_controller::PoseRPY cart_pos_;
+    wam_dmp_controller::PoseRPY cart_err_;
 
     QMutex joints_state_mutex_;
     QMutex joints_error_mutex_;
+    QMutex cart_pos_mutex_;
+    QMutex cart_error_mutex_;
 
     void joints_state_callback(const sensor_msgs::JointState::ConstPtr& msg);
     void joints_error_callback(const wam_dmp_controller::SetJointPosStampedMsgConstPtr& msg);
+    void cart_pos_callback(const wam_dmp_controller::PoseRPYConstPtr& msg);
+    void cart_error_callback(const wam_dmp_controller::PoseRPYConstPtr& msg);
     void get_trajectories_progress();
 };
 
@@ -172,9 +195,9 @@ bool QNode::get_current_cmd(ServiceMessageType& current_command)
     service_name = "/" + robot_namespace_ + "/joint_space_spline_controller/get_traj_pos_spline";
   else if(std::is_same<ServiceType, wam_dmp_controller::GetJointGains>::value)
     service_name = "/" + robot_namespace_ + "/joint_space_spline_controller/get_gains";
+  else if (std::is_same<ServiceType, wam_dmp_controller::PoseRPYCommand>::value)
+    service_name = "/" + robot_namespace_ + "/operational_space_spline_controller/get_traj_pos_cmd";
   /*
-  else if (std::is_same<ServiceType, lwr_force_position_controllers::HybridImpedanceCommandTrajPos>::value)
-    service_name = "/" + robot_namespace_ + "/hybrid_impedance_controller/get_hybrid_traj_pos_cmd";
   else if (std::is_same<ServiceType, lwr_force_position_controllers::HybridImpedanceCommandTrajForce>::value)
     service_name = "/" + robot_namespace_ + "/hybrid_impedance_controller/get_hybrid_traj_force_cmd";
   else if (std::is_same<ServiceType, lwr_force_position_controllers::HybridImpedanceCommandGains>::value)

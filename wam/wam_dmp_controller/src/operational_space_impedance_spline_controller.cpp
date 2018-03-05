@@ -27,7 +27,7 @@ namespace wam_dmp_controller
 
         set_cmd_traj_pos_service_ = n.advertiseService("set_traj_pos_cmd",
                                                        &OperationalSpaceImpedanceSplineController::set_cmd_traj_spline_srv, this);
-        get_cmd_traj_pos_service_ = n.advertiseService("set_traj_pos_cmd",
+        get_cmd_traj_pos_service_ = n.advertiseService("get_traj_pos_cmd",
                                                        &OperationalSpaceImpedanceSplineController::get_cmd_traj_spline_srv, this);
 
         // set trajectory duration
