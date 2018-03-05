@@ -66,11 +66,15 @@ namespace wam_dmp_controller
             void publish_info(const ros::Time& time);
 
             void set_p_sensor_cp(double x, double y, double z); // For hybrid force control
-            void get_gains_null(Eigen::Matrix<double, 6, 6>& null_Kp, Eigen::Matrix<double, 6, 6>& null_Kv);
-            void set_gains_null(Eigen::Matrix<double, 6, 6> null_Kp, Eigen::Matrix<double, 6, 6> null_Kv);
+            void get_gains_null(Eigen::MatrixXd& null_Kp, Eigen::MatrixXd& null_Kv);
+            void set_gains_null(Eigen::MatrixXd& null_Kp, Eigen::MatrixXd& null_Kv);
             void set_p_wrist_ee(double x, double y, double z);
             void set_p_base_ws(double x, double y, double z);
             void set_ws_base_angles(double alpha, double beta, double gamma);
+
+            //void publish_(const ros::Time& time);
+
+            //ros::Time last_publish_time_;
             
             KDL::JntSpaceInertiaMatrix M;
             KDL::JntArray C;
@@ -112,8 +116,8 @@ namespace wam_dmp_controller
     		Eigen::Matrix<double, 6, 6> Kp_;
     		Eigen::Matrix<double, 6, 6> Kv_;
             Eigen::Matrix<double, 6, 6> Ki_;
-            Eigen::Matrix<double, 6, 6> null_Kp_;
-            Eigen::Matrix<double, 6 ,6> null_Kv_;
+            Eigen::MatrixXd null_Kp_;
+            Eigen::MatrixXd null_Kv_;
             Eigen::Matrix<double, 6, 6> lamb_;
             
             // desired mass matrix, damping and gains of the modeled mechanical system 
@@ -161,7 +165,7 @@ namespace wam_dmp_controller
             /// For external force estimation////////////////////////////////////////////////////////////////
             
 
-            boost::scoped_ptr<realtime_tools::RealtimePublisher<wam_dmp_controller::PoseRPY> > pub_cart_des_, pub_cart_dot_des_, pub_cart_dotdot_des_, pub_cart_err_;
+            boost::scoped_ptr<realtime_tools::RealtimePublisher<wam_dmp_controller::PoseRPY> > pub_cart_curr_, pub_cart_des_, pub_cart_dot_des_, pub_cart_dotdot_des_, pub_cart_err_;
   	};
 } 
 #endif

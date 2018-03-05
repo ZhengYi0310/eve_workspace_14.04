@@ -108,8 +108,8 @@ namespace wam_dmp_controller
     	ws_E_.block<3,3>(0,0)   = Eigen::Matrix<double, 3, 3>::Identity();
     	ws_E_dot_               = Eigen::MatrixXd::Zero(6,6);
 
-    	null_Kp_                = Eigen::MatrixXd::Zero(6, 6);
-    	null_Kv_                = Eigen::MatrixXd::Zero(6, 6);
+    	null_Kp_                = Eigen::MatrixXd::Zero(kdl_chain_.getNrOfJoints(), kdl_chain_.getNrOfJoints());
+    	null_Kv_                = Eigen::MatrixXd::Zero(kdl_chain_.getNrOfJoints(), kdl_chain_.getNrOfJoints());
     	lamb_                   = Eigen::MatrixXd::Zero(6, 6);
         /*
         p2p_traj_duration_ = DEFAULT_P2P_TRAJ_DURATION;
@@ -128,7 +128,8 @@ namespace wam_dmp_controller
         get_cmd_gains_service_ = n.advertiseService("get_impedance_gains", 
                                                     &OperationalSpaceImpedanceController::get_cmd_gains, this);
         sub_command_ = n.subscribe("Cartesian_space_command", 10, &OperationalSpaceImpedanceController::set_cmd_traj_callback, this);
-  
+        
+        pub_cart_curr_.reset(new realtime_tools::RealtimePublisher<wam_dmp_controller::PoseRPY>(n , "curr_cart_pos", 100));
         pub_cart_des_.reset(new realtime_tools::RealtimePublisher<wam_dmp_controller::PoseRPY>(n, "des_cart_pos", 100));
         pub_cart_dot_des_.reset(new realtime_tools::RealtimePublisher<wam_dmp_controller::PoseRPY>(n, "des_cart_vel", 100));
         pub_cart_dotdot_des_.reset(new realtime_tools::RealtimePublisher<wam_dmp_controller::PoseRPY>(n, "des_cart_acc", 100));
@@ -583,7 +584,6 @@ namespace wam_dmp_controller
             pub_cart_dot_des_->msg_.orientation.yaw = rot_xyzdot_des_ws_[2];
         }
 
-        /* get the desired accel
         if (pub_cart_dotdot_des_ && pub_cart_dotdot_des_->trylock())
         {
             pub_cart_dotdot_des_->msg_.stamp = time;
@@ -594,7 +594,7 @@ namespace wam_dmp_controller
             pub_cart_dotdot_des_->msg_.orientation.pitch = rot_xyzdot_des_ws_[1];
             pub_cart_dotdot_des_->msg_.orientation.yaw = rot_xyzdot_des_ws_[2];
         }
-        */
+        
         if (pub_cart_err_ && pub_cart_err_->trylock())
         {
             pub_cart_err_->msg_.stamp = time;
@@ -606,12 +606,23 @@ namespace wam_dmp_controller
             pub_cart_err_->msg_.orientation.yaw = rot_xyz_error_[2];
         }
 
-        /* TODO publish the estimated external force 
-         */
+        if (pub_cart_curr_ && pub_cart_curr_->trylock())
+        {
+            pub_cart_err_->msg_.stamp = time;
+            pub_cart_err_->msg_.position.x = trans_xyz_ws_[0];
+            pub_cart_err_->msg_.position.y = trans_xyz_ws_[1];
+            pub_cart_err_->msg_.position.z = trans_xyz_ws_[2];
+            pub_cart_err_->msg_.orientation.roll = rot_xyz_ws_[0];
+            pub_cart_err_->msg_.orientation.pitch = rot_xyz_ws_[1];
+            pub_cart_err_->msg_.orientation.yaw = rot_xyz_ws_[2];
+            
+        }
+
         pub_cart_des_->unlockAndPublish();
         pub_cart_dot_des_->unlockAndPublish();
-        //pub_cart_dotdot_des_->unlockAndPublish();
+        pub_cart_dotdot_des_->unlockAndPublish();
         pub_cart_err_->unlockAndPublish();
+        pub_cart_curr_->unlockAndPublish();
 
         if (ext_f_est_)
         {
@@ -677,8 +688,22 @@ namespace wam_dmp_controller
             {
                 ROS_WARN("Ki gain set for %s in yaml file, Using %f", name[i].c_str(), Ki_.coeff(i, i)); 
             }
+ 
+        }
+        for (size_t i = 0; i < joint_handles_.size(); i++)
+        {
+            //TODO also need to load the rest joint postures from the parameter server.....
+            if ( !rest_postures_handle.getParam(joint_handles_[i].getName().c_str(), q_rest_[i])) 
+            {
+                ROS_WARN("rest posture not set for %s in yaml file, Using 0.", joint_handles_[i].getName().c_str());
+                q_rest_[i] = 0.0;
+            }
+            else
+            {
+                ROS_WARN("rest_posture set for %s in yaml file, Using %f",  joint_handles_[i].getName().c_str(), q_rest_[i]); 
+            }
 
-            if ( !null_Kp_handle.getParam(name[i].c_str(), null_Kp_.coeffRef(i, i))) 
+             if ( !null_Kp_handle.getParam(name[i].c_str(), null_Kp_.coeffRef(i, i))) 
             {
                 ROS_WARN("null_Kp gain not set for %s in yaml file, Using 0.", name[i].c_str());
                 null_Kp_.coeffRef(i, i) = 0;
@@ -696,19 +721,6 @@ namespace wam_dmp_controller
             else 
             {
                 ROS_WARN("null_Kv gain set for %s in yaml file, Using %f", name[i].c_str(), null_Kv_.coeff(i, i)); 
-            }
-        }
-        for (size_t i = 0; i < joint_handles_.size(); i++)
-        {
-            //TODO also need to load the rest joint postures from the parameter server.....
-            if ( !rest_postures_handle.getParam(joint_handles_[i].getName().c_str(), q_rest_[i])) 
-            {
-                ROS_WARN("rest posture not set for %s in yaml file, Using 0.", joint_handles_[i].getName().c_str());
-                q_rest_[i] = 0.0;
-            }
-            else
-            {
-                ROS_WARN("rest_posture set for %s in yaml file, Using %f",  joint_handles_[i].getName().c_str(), q_rest_[i]); 
             }
         }
 
@@ -925,15 +937,15 @@ namespace wam_dmp_controller
         p_sensor_cp_ = KDL::Vector(x, y, z);
     }
 
-    void OperationalSpaceImpedanceController::get_gains_null(Eigen::Matrix<double, 6, 6>& null_Kp, 
-                                                            Eigen::Matrix<double, 6, 6>& null_Kv)
+    void OperationalSpaceImpedanceController::get_gains_null(Eigen::MatrixXd& null_Kp, 
+                                                            Eigen::MatrixXd& null_Kv)
     {
         null_Kp = null_Kp_;
         null_Kv = null_Kv_;
     }
 
-    void OperationalSpaceImpedanceController::set_gains_null(Eigen::Matrix<double, 6, 6> null_Kp, 
-                                                            Eigen::Matrix<double, 6, 6> null_Kv)
+    void OperationalSpaceImpedanceController::set_gains_null(Eigen::MatrixXd& null_Kp, 
+                                                            Eigen::MatrixXd& null_Kv)
     {
         null_Kp_ = null_Kp;
         null_Kv_ = null_Kv;

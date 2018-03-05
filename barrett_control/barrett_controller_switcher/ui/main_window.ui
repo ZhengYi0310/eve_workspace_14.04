@@ -21,7 +21,7 @@
    <locale language="English" country="Australia"/>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_4">
+   <layout class="QVBoxLayout" name="verticalLayout_3">
     <item>
      <widget class="QTabWidget" name="tab_manager">
       <property name="minimumSize">
@@ -192,6 +192,21 @@ QGroupBox::title {
         </item>
         <item>
          <widget class="QTabWidget" name="ControllersTabWidget">
+          <property name="styleSheet">
+           <string notr="true">QGroupBox {
+    border: 1px solid lightgray;
+    margin-top: 0.5em;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 3px 0 3px;
+}</string>
+          </property>
+          <property name="currentIndex">
+           <number>1</number>
+          </property>
           <widget class="QWidget" name="JointSpaceControlTab">
            <attribute name="title">
             <string>Joint Space Control</string>
@@ -984,6 +999,456 @@ QGroupBox::title {
             </item>
            </layout>
           </widget>
+          <widget class="QWidget" name="CartesianSpaceControlTab">
+           <attribute name="title">
+            <string>Cartesian Space Control</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <widget class="QGroupBox" name="CartesianSpacePosGroupBox">
+              <property name="title">
+               <string>Position</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_7">
+               <item row="0" column="0">
+                <widget class="QLabel" name="CartPosXLabel">
+                 <property name="text">
+                  <string>X</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="CartPosXText"/>
+               </item>
+               <item row="0" column="2">
+                <spacer name="horizontalSpacer_5">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>11</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="0" column="3">
+                <widget class="QLabel" name="CartPosYLabel">
+                 <property name="text">
+                  <string>Y</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="4">
+                <widget class="QLineEdit" name="CartPosYText"/>
+               </item>
+               <item row="0" column="5">
+                <spacer name="horizontalSpacer_7">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>7</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="0" column="6">
+                <widget class="QLabel" name="CartPosZLabel">
+                 <property name="text">
+                  <string>Z</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="7">
+                <widget class="QLineEdit" name="CartPosZText"/>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="CartPosRollLabel">
+                 <property name="text">
+                  <string>Roll (X axis)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="CartPosRollText"/>
+               </item>
+               <item row="1" column="2">
+                <spacer name="horizontalSpacer_6">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>11</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="1" column="3">
+                <widget class="QLabel" name="CartPosPitchLabel">
+                 <property name="text">
+                  <string>Pitch (Y axis)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="4">
+                <widget class="QLineEdit" name="CartPosPitchText"/>
+               </item>
+               <item row="1" column="5">
+                <spacer name="horizontalSpacer_8">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>7</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="1" column="6">
+                <widget class="QLabel" name="CartPosYawLabel">
+                 <property name="text">
+                  <string>Yaw (Z axis)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="7">
+                <widget class="QLineEdit" name="CartPosYawText"/>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="CartPosDurationLabel">
+                 <property name="text">
+                  <string>D_T</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLineEdit" name="CartPosDurationText"/>
+               </item>
+               <item row="3" column="1">
+                <widget class="QPushButton" name="button_SendCartPos">
+                 <property name="text">
+                  <string>SendCartPos</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="3">
+                <widget class="QLabel" name="CartPosSentLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>20</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>70</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="4" colspan="3">
+                <widget class="QProgressBar" name="progressBar_CartPos">
+                 <property name="value">
+                  <number>0</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="CartesianSpaceGainGroupBox">
+              <property name="title">
+               <string>Gains</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_8">
+               <item row="0" column="0">
+                <widget class="QLabel" name="CartPosXGainLabel_Kp">
+                 <property name="text">
+                  <string>Kp_X</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="CartPosXGainText_Kp"/>
+               </item>
+               <item row="0" column="2">
+                <widget class="QLabel" name="CartPosYGainLabel_Kp">
+                 <property name="text">
+                  <string>Kp_Y</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="3">
+                <widget class="QLineEdit" name="CartPosYGainText_Kp"/>
+               </item>
+               <item row="0" column="4">
+                <widget class="QLabel" name="CartPosZGainLabel_Kp">
+                 <property name="text">
+                  <string>Kp_Z</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="5">
+                <widget class="QLineEdit" name="CartPosZGainText_Kp"/>
+               </item>
+               <item row="0" column="6">
+                <widget class="QLabel" name="CartPosRollGainLabel_Kp">
+                 <property name="text">
+                  <string>Kp_R</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="7">
+                <widget class="QLineEdit" name="CartPosRollGainText_Kp"/>
+               </item>
+               <item row="0" column="8">
+                <widget class="QLabel" name="CartPosPitchGainLabel_Kp">
+                 <property name="text">
+                  <string>Kp_P</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="9">
+                <widget class="QLineEdit" name="CartPosPitchGainText_Kp"/>
+               </item>
+               <item row="0" column="10">
+                <widget class="QLabel" name="CartPosYawGainLabel_Kp">
+                 <property name="text">
+                  <string>Kp_Y</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="11">
+                <widget class="QLineEdit" name="CartPosYawGainText_Kp"/>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="CartPosXGainLabel_Kv">
+                 <property name="text">
+                  <string>Kv_X</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="CartPosXGainText_Kv"/>
+               </item>
+               <item row="1" column="2">
+                <widget class="QLabel" name="CartPosYGainLabel_Kv">
+                 <property name="text">
+                  <string>Kv_Y</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="3">
+                <widget class="QLineEdit" name="CartPosYGainText_Kv"/>
+               </item>
+               <item row="1" column="4">
+                <widget class="QLabel" name="CartPosZGainLabel_Kv">
+                 <property name="text">
+                  <string>Kv_Z</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="5">
+                <widget class="QLineEdit" name="CartPosZGainText_Kv"/>
+               </item>
+               <item row="1" column="6">
+                <widget class="QLabel" name="CartPosRollGainLabel_Kv">
+                 <property name="text">
+                  <string>Kv_R</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="7">
+                <widget class="QLineEdit" name="CartPosRollGainText_Kv"/>
+               </item>
+               <item row="1" column="8">
+                <widget class="QLabel" name="CartPosPitchGainLabel_Kv">
+                 <property name="text">
+                  <string>Kv_P</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="9">
+                <widget class="QLineEdit" name="CartPosPitchGainText_Kv"/>
+               </item>
+               <item row="1" column="10">
+                <widget class="QLabel" name="CartPosYawGainLabel_Kv">
+                 <property name="text">
+                  <string>Kv_Y</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="11">
+                <widget class="QLineEdit" name="CartPosYawGainText_Kv"/>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="JointGainLabel_nullKp_1">
+                 <property name="text">
+                  <string>n_Kp1</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLineEdit" name="JointGainText_nullKp_1"/>
+               </item>
+               <item row="2" column="2">
+                <widget class="QLabel" name="JointGainLabel_nullKp_5">
+                 <property name="text">
+                  <string>n_Kp5</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="3">
+                <widget class="QLineEdit" name="JointGainText_nullKp_5"/>
+               </item>
+               <item row="2" column="6">
+                <widget class="QLabel" name="JointGainLabel_nullKv_1">
+                 <property name="text">
+                  <string>n_Kv1</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="7">
+                <widget class="QLineEdit" name="JointGainText_nullKv_1"/>
+               </item>
+               <item row="2" column="8">
+                <widget class="QLabel" name="JointGainLabel_nullKv_5">
+                 <property name="text">
+                  <string>n_Kv5</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="9">
+                <widget class="QLineEdit" name="JointGainText_nullKv_5"/>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="JointGainLabel_nullKp_2">
+                 <property name="text">
+                  <string>n_Kp2</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QLineEdit" name="JointGainText_nullKp_2"/>
+               </item>
+               <item row="3" column="2">
+                <widget class="QLabel" name="JointGainLabel_nullKp_6">
+                 <property name="text">
+                  <string>n_Kp6</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="3">
+                <widget class="QLineEdit" name="JointGainText_nullKp_6"/>
+               </item>
+               <item row="3" column="6">
+                <widget class="QLabel" name="JointGainLabel_nullKv_2">
+                 <property name="text">
+                  <string>n_Kv2</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="7">
+                <widget class="QLineEdit" name="JointGainText_nullKv_2"/>
+               </item>
+               <item row="3" column="8">
+                <widget class="QLabel" name="JointGainLabel_nullKv_6">
+                 <property name="text">
+                  <string>n_Kv6</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="9">
+                <widget class="QLineEdit" name="JointGainText_nullKv_6"/>
+               </item>
+               <item row="4" column="0">
+                <widget class="QLabel" name="JointGainLabel_nullKp_3">
+                 <property name="text">
+                  <string>n_Kp3</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QLineEdit" name="JointGainText_nullKp_3"/>
+               </item>
+               <item row="4" column="2">
+                <widget class="QLabel" name="JointGainLabel_nullKp_7">
+                 <property name="text">
+                  <string>n_Kp7</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="3">
+                <widget class="QLineEdit" name="JointGainText_nullKp_7"/>
+               </item>
+               <item row="4" column="6">
+                <widget class="QLabel" name="JointGainLabel_nullKv_3">
+                 <property name="text">
+                  <string>n_Kv3</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="7">
+                <widget class="QLineEdit" name="JointGainText_nullKv_3"/>
+               </item>
+               <item row="4" column="8">
+                <widget class="QLabel" name="JointGainLabel_nullKv_7">
+                 <property name="text">
+                  <string>n_Kv7</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="9">
+                <widget class="QLineEdit" name="JointGainText_nullKv_7"/>
+               </item>
+               <item row="5" column="0">
+                <widget class="QLabel" name="JointGainLabel_nullKp_4">
+                 <property name="text">
+                  <string>n_Kp4</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="1">
+                <widget class="QLineEdit" name="JointGainText_nullKp_4"/>
+               </item>
+               <item row="5" column="6">
+                <widget class="QLabel" name="JointGainLabel_nullKv_4">
+                 <property name="text">
+                  <string>n_Kv4</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="7">
+                <widget class="QLineEdit" name="JointGainText_nullKv_4"/>
+               </item>
+               <item row="5" column="10" colspan="2">
+                <widget class="QPushButton" name="button_SetGainsCart">
+                 <property name="text">
+                  <string>SetGains</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
        </layout>
@@ -1195,9 +1660,12 @@ QGroupBox::title {
           <height>281</height>
          </rect>
         </property>
+        <property name="currentIndex">
+         <number>1</number>
+        </property>
         <widget class="QWidget" name="JointSpaceControlState">
          <attribute name="title">
-          <string>Joint Space Control</string>
+          <string>Joint Space</string>
          </attribute>
          <layout class="QGridLayout" name="gridLayout_4">
           <item row="0" column="0">
@@ -1395,6 +1863,207 @@ QGroupBox::title {
           </item>
           <item row="7" column="2">
            <widget class="QLabel" name="Joint7Error_Val">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="CartesianSpaceControlStatetab">
+         <attribute name="title">
+          <string>Cartesian Space </string>
+         </attribute>
+         <layout class="QGridLayout" name="gridLayout_9">
+          <item row="0" column="0">
+           <widget class="QLabel" name="CartesianPositionLabel">
+            <property name="text">
+             <string>Position</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="CartesianErrorLabel">
+            <property name="text">
+             <string>Error</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="CartPosX_Val">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="CartPosXStateLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>X(m)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="CartErrorX_Val">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="CartPosY_Val">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="CartPosYStateLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Y(m)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLabel" name="CartErrorY_Val">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="CartPosZ_Val">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="CartPosZStateLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Z(m)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QLabel" name="CartErrorZ_Val">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="CartPosRoll_Val">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="CartPosRollStateLabel">
+            <property name="text">
+             <string>Roll(rad)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2">
+           <widget class="QLabel" name="CartErrorRoll_Val">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="CartPosYaw_Val">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLabel" name="CartPosPitchStateLabel">
+            <property name="text">
+             <string>Pitch(rad)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="2">
+           <widget class="QLabel" name="CartErrorYaw_Val">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="CartPosPitch_Val">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QLabel" name="CartPosYawStateLabel">
+            <property name="text">
+             <string>Yaw(rad)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="2">
+           <widget class="QLabel" name="CartErrorPitch_Val">
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
             </property>
