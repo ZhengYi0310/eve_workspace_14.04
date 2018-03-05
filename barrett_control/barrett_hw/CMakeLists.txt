@@ -2,17 +2,17 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(barrett_hw)
 
-include(CheckCXXCompilerFlag)
-check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
-check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0x)
-if(COMPILER_SUPPORTS_CXX11)
-  set(CMAKE_CXX_FLAGS "-std=c++11")
-elseif(COMPILER_SUPPORTS_CXX0X)
-  set(CMAKE_CXX_FLAGS "-std=c++0x")
-else()
-  message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-endif()
-message(STATUS "Compliter FLAG ${CMAKE_CXX_FLAGS}.")
+#include(CheckCXXCompilerFlag)
+#check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
+#check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0x)
+#if(COMPILER_SUPPORTS_CXX11)
+#  set(CMAKE_CXX_FLAGS "-std=c++11")
+#elseif(COMPILER_SUPPORTS_CXX0X)
+#  set(CMAKE_CXX_FLAGS "-std=c++0x")
+#else()
+#  message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+#endif()
+#message(STATUS "Compliter FLAG ${CMAKE_CXX_FLAGS}.")
 
 # Load catkin and all dependencies required for this package
 # TODO: remove all from COMPONENTS that are not catkin packages.
@@ -56,57 +56,61 @@ include_directories(${EIGEN_INCLUDE_DIRS})
 add_definitions(${EIGEN_DEFINITIONS})
 
 # Barrett
+find_package(barrett REQUIRED)
 include_directories(${BARRETT_INCLUDE_DIRS})
 link_directories(${BARRETT_LIBRARY_DIRS})
 add_definitions(${BARRETT_DEFINITIONS})
 
 # Add xenomai flags
-#add_xenomai_flags()
+add_xenomai_flags()
 
-#add_library(biotac_state_controller src/biotac_state_controller.cpp)
-#target_link_libraries(biotac_state_controller xenomai native rtdm ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
+add_library(biotac_state_controller src/biotac_state_controller.cpp)
+target_link_libraries(biotac_state_controller xenomai native rtdm ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
 
-#add_library(arm_cartesian_state_controller src/arm_cartesian_state_controller.cpp )
-#target_link_libraries(arm_cartesian_state_controller xenomai native rtdm ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
+add_library(arm_cartesian_state_controller src/arm_cartesian_state_controller.cpp )
+target_link_libraries(arm_cartesian_state_controller xenomai native rtdm ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
 
-#add_library(robot_states_publisher src/robot_states_publisher.cpp )
-#target_link_libraries(robot_states_publisher xenomai native rtdm ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
+add_library(robot_states_publisher src/robot_states_publisher.cpp )
+target_link_libraries(robot_states_publisher xenomai native rtdm ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
 
-#add_library(wam_server_lib src/wam_server_copy.cpp)
-#target_link_libraries(wam_server_lib xenomai native rtdm ${BARRETT_LIBRARIES} ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
+add_library(wam_server_lib src/wam_server_copy.cpp)
+target_link_libraries(wam_server_lib xenomai native rtdm ${BARRETT_LIBRARIES} ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
   
 add_library(base_robot_hw src/base_robot_hw.cpp)
 target_link_libraries(base_robot_hw ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
 
+add_library(barrett_hw_lib src/barrett_hw.cpp)
+target_link_libraries(barrett_hw_lib base_robot_hw xenomai native rtdm ${BARRETT_LIBRARIES} ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
 
-  #add_definitions(-D__XENO__)
-#add_executable(wam_server src/wam_server_copy.cpp)
-#target_link_libraries(wam_server xenomai native rtdm ${BARRETT_LIBRARIES} ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
-#add_dependencies(wam_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+#add_definitions(-D__XENO__)
+add_executable(barrett_hw src/barrett_hw.cpp)
+target_link_libraries(barrett_hw base_robot_hw xenomai native rtdm ${BARRETT_LIBRARIES} ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
+add_dependencies(barrett_hw ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 #add_executable(wam_server_ll src/wam_server_ll.cpp)
 #target_link_libraries(wam_server_ll xenomai native rtdm ${BARRETT_LIBRARIES} ${catkin_LIBRARIES})
 #add_dependencies(wam_server_ll ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-#add_executable(check_kdl_parser src/check_kdl_parser.cpp )
-#target_link_libraries(check_kdl_parser wam_server_lib xenomai native rtdm ${BARRETT_LIBRARIES} ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
-#add_dependencies(check_kdl_parser ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_executable(check_kdl_parser src/check_kdl_parser.cpp )
+target_link_libraries(check_kdl_parser wam_server_lib xenomai native rtdm ${BARRETT_LIBRARIES} ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
+add_dependencies(check_kdl_parser ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
   ## SIMULATION
   # lwr hw sim gazebo plugin 
-find_package(gazebo REQUIRED)
-include_directories(${GAZEBO_INCLUDE_DIRS})
-link_directories(${GAZEBO_LIBRARY_DIRS})
-add_library(base_robot_hw_gazebo_plugin  src/base_robot_hw_gazebo_plugin.cpp)
-add_dependencies(base_robot_hw_gazebo_plugin
-base_robot_hw
-)
-target_link_libraries(base_robot_hw_gazebo_plugin
-  base_robot_hw
-  ${catkin_LIBRARIES}
-  ${GAZEBO_LIBRARIES}
-  ${Boost_LIBRARIES}
-)
+#find_package(gazebo REQUIRED)
+#include_directories(${GAZEBO_INCLUDE_DIRS})
+#link_directories(${GAZEBO_LIBRARY_DIRS})
+#add_library(base_robot_hw_gazebo_plugin  src/base_robot_hw_gazebo_plugin.cpp)
+#add_dependencies(base_robot_hw_gazebo_plugin
+#base_robot_hw
+#)
+#target_link_libraries(base_robot_hw_gazebo_plugin
+#  base_robot_hw
+#  ${catkin_LIBRARIES}
+#  ${GAZEBO_LIBRARIES}
+#  ${Boost_LIBRARIES}
+#)
   ## Generate added messages and services with any dependencies listed here
   # TODO: fill in what other packages will need to use this package
   ## DEPENDS: system dependencies of this project that dependent projects also need

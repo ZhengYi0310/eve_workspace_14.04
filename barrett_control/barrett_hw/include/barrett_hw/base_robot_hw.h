@@ -19,6 +19,7 @@
 #include <joint_limits_interface/joint_limits_rosparam.h>
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <control_toolbox/filters.h>
+#include <angles/angles.h>
 
 // KDL
 #include <kdl/kdl.hpp>
