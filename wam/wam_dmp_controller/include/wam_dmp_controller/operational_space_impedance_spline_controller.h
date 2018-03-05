@@ -34,6 +34,10 @@ namespace wam_dmp_controller
                                          wam_dmp_controller::PoseRPYCommand::Response &res);
             bool get_cmd_traj_spline_srv(wam_dmp_controller::PoseRPYCommand::Request &req,
                                      wam_dmp_controller::PoseRPYCommand::Response &res);
+            bool set_cmd_gains(wam_dmp_controller::ImpedanceControllerGains::Request &req, 
+                               wam_dmp_controller::ImpedanceControllerGains::Response &res);     
+            bool get_cmd_gains(wam_dmp_controller::ImpedanceControllerGains::Request &req, 
+                               wam_dmp_controller::ImpedanceControllerGains::Response &res);
 
             //void get_parameters(ros::NodeHandle &n);
             void eval_current_point_to_point_traj(const ros::Duration& period,
@@ -50,6 +54,8 @@ namespace wam_dmp_controller
 
             ros::ServiceServer set_cmd_traj_pos_service_;     
             ros::ServiceServer get_cmd_traj_pos_service_;
+            ros::ServiceServer set_cmd_gains_service_;
+            ros::ServiceServer get_cmd_gains_service_;
 
             Eigen::Vector3d trans_des_;
             Eigen::Vector3d trans_dot_des_;

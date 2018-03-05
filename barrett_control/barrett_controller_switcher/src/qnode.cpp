@@ -84,9 +84,9 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
     sub_joints_error_ = n.subscribe("/" + robot_namespace_ + "/joint_space_spline_controller/jt_err", 1000,\
                     &barrett_controller_switcher::QNode::joints_error_callback, this);
 
-    sub_cart_pos_ = n.subscribe("/" + robot_namespace_ + "/operational_space_impedance_controller/curr_cart_pos", 1000,\
+    sub_cart_pos_ = n.subscribe("/" + robot_namespace_ + "/operational_space_impedance_spline_controller/curr_cart_pos", 1000,\
                                   &barrett_controller_switcher::QNode::cart_pos_callback, this);
-    sub_cart_pos_ = n.subscribe("/" + robot_namespace_ + "/operational_space_impedance_controller/cart_err", 1000,\
+    sub_cart_pos_ = n.subscribe("/" + robot_namespace_ + "/operational_space_impedance_spline_controller/cart_err", 1000,\
                                   &barrett_controller_switcher::QNode::cart_error_callback, this);
     /*
     sub_cartesian_error_ = n.subscribe("/" + robot_namespace_ + "/hybrid_impedance_controller/error", 1000,\
@@ -94,6 +94,7 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
     */
     ros::Duration(3).sleep();
     is_jointpos_controller_active_ = false;
+    is_cartpos_controller_active_ = false;
 	return true;
 }
 
@@ -190,6 +191,12 @@ void QNode::get_progress_jointpos(double& elapsed, double& duration)
 {
   elapsed = progress_joint_.elapsed_time;
   duration = progress_joint_.p2p_traj_duration;
+}
+
+void QNode::get_progress_cartpos(double& elapsed, double& duration)
+{
+  elapsed = progress_cart_.elapsed_time;
+  duration = progress_cart_.p2p_traj_duration;
 }
 
 void QNode::run() {

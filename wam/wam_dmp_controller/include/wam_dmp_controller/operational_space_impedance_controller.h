@@ -50,15 +50,18 @@ namespace wam_dmp_controller
 
 
     	private:
+            /*
             ros::ServiceServer set_cmd_gains_service_;
             ros::ServiceServer get_cmd_gains_service_;
-            
+            */
             void set_cmd_traj_point(geometry_msgs::Vector3 position, wam_dmp_controller::RPY orientation);
             void set_cmd_traj_callback(const wam_dmp_controller::PoseRPYConstPtr& msg);
+            /*
             bool set_cmd_gains(wam_dmp_controller::ImpedanceControllerGains::Request &req, 
                                wam_dmp_controller::ImpedanceControllerGains::Response &res);     
             bool get_cmd_gains(wam_dmp_controller::ImpedanceControllerGains::Request &req, 
-                               wam_dmp_controller::ImpedanceControllerGains::Response &res);   
+                               wam_dmp_controller::ImpedanceControllerGains::Response &res);
+            */
             void setCommandRT(Eigen::Vector3d trans_des, Eigen::Vector3d trans_dot_des, Eigen::Vector3d trans_dotdot_des, 
                               Eigen::Vector3d rot_des, Eigen::Vector3d rot_dot_des, Eigen::Vector3d rot_dotdot_des);
             void get_parameters(ros::NodeHandle &n);

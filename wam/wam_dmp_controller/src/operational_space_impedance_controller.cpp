@@ -123,10 +123,12 @@ namespace wam_dmp_controller
         //get_cmd_traj_pos_service_ = n.advertiseService("get_traj_pos_cmd", &OperationalSpaceImpedanceController::get_cmd_traj_spline_srv, this); 
       	// Start command subscriber 
         //
+        /*
         set_cmd_gains_service_ = n.advertiseService("set_impedance_gains", 
                                                     &OperationalSpaceImpedanceController::set_cmd_gains, this);
         get_cmd_gains_service_ = n.advertiseService("get_impedance_gains", 
                                                     &OperationalSpaceImpedanceController::get_cmd_gains, this);
+        */
         sub_command_ = n.subscribe("Cartesian_space_command", 10, &OperationalSpaceImpedanceController::set_cmd_traj_callback, this);
         
         pub_cart_curr_.reset(new realtime_tools::RealtimePublisher<wam_dmp_controller::PoseRPY>(n , "curr_cart_pos", 100));
@@ -864,7 +866,7 @@ namespace wam_dmp_controller
         set_cmd_traj_point(msg->position, msg->orientation);
 
     }
-
+    /*
     bool OperationalSpaceImpedanceController::set_cmd_gains(wam_dmp_controller::ImpedanceControllerGains::Request &req, wam_dmp_controller::ImpedanceControllerGains::Response &res)
     {
         // First check the size of the request 
@@ -906,16 +908,24 @@ namespace wam_dmp_controller
     bool OperationalSpaceImpedanceController::get_cmd_gains(wam_dmp_controller::ImpedanceControllerGains::Request &req, 
                                                             wam_dmp_controller::ImpedanceControllerGains::Response &res)
     {
+        res.Kp_gains.resize(6);
+        res.Kv_gains.resize(6);
+        res.null_Kp_gains.resize(kdl_chain_.getNrOfJoints());
+        res.null_Kv_gains.resize(kdl_chain_.getNrOfJoints());
         for (int i = 0; i < 6; i++)
         {
             res.Kp_gains.push_back(Kp_.coeff(i, i));
             res.Kv_gains.push_back(Kv_.coeff(i, i));
+        }
+        for (int i = 0; i < kdl_chain_.getNrOfJoints(); i++)
+        {
             res.null_Kp_gains.push_back(null_Kp_.coeff(i, i));
-            res.null_Kv_gains.push_back(null_Kv_.coeff(i, i));
+            res.null_Kv_gains.push_back(null_Kv_.coeff(i, i));            
         }
         res.accepted = true;
         return res.accepted;
     }
+    */
 
 
 

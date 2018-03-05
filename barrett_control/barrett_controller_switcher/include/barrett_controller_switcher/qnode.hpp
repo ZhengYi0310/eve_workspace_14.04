@@ -44,6 +44,7 @@
 #include <wam_dmp_controller/PoseRPYCommand.h>
 #include <wam_dmp_controller/PoseRPYCmd.h>
 #include <wam_dmp_controller/ImpedanceControllerGains.h>
+#include <wam_dmp_controller/ImpedanceControllerGainsMsg.h>
 #include <geometry_msgs/Vector3.h>
 
 
@@ -95,8 +96,11 @@ public:
     void get_cart_pos(geometry_msgs::Vector3& trans, wam_dmp_controller::RPY& rot);
     void get_cart_error(geometry_msgs::Vector3& trans_err, wam_dmp_controller::RPY& rot_err);
     void get_progress_jointpos(double& elapsed, double& duration);
+    void get_progress_cartpos(double& elapsed, double& duration);
     void set_jointpos_controller_state(bool state) {is_jointpos_controller_active_ = state;}
     bool get_jointpos_controller_state() {return is_jointpos_controller_active_;}
+    void set_cartpos_controller_state(bool state) {is_cartpos_controller_active_ = state;}
+    bool get_cartpos_controller_state() {return is_cartpos_controller_active_;}
 Q_SIGNALS:
 	void loggingUpdated();
     void rosShutdown();
@@ -159,11 +163,13 @@ bool QNode::set_command(ServiceMessageType command, ServiceMessageType& response
     service_name = "/" + robot_namespace_ + "/joint_space_spline_controller/set_gains";
   else if (std::is_same<ServiceType, wam_dmp_controller::GoHomeSpline>::value)
     service_name = "/" + robot_namespace_ + "/joint_space_spline_controller/go_home_traj_spline";
+
+  else if (std::is_same<ServiceType, wam_dmp_controller::PoseRPYCommand>::value)
+    service_name = "/" + robot_namespace_ + "/operational_space_impedance_spline_controller/set_traj_pos_cmd";
+
+  else if (std::is_same<ServiceType, wam_dmp_controller::ImpedanceControllerGains>::value)
+    service_name = "/" + robot_namespace_ + "/operational_space_impedance_spline_controller/get_impedance_gains";
   /*
-  else if (std::is_same<ServiceType, lwr_force_position_controllers::HybridImpedanceCommandTrajForce>::value)
-    service_name = "/" + robot_namespace_ + "/hybrid_impedance_controller/set_hybrid_traj_force_cmd";
-  else if (std::is_same<ServiceType, lwr_force_position_controllers::HybridImpedanceCommandGains>::value)
-    service_name = "/" + robot_namespace_ + "/hybrid_impedance_controller/set_hybrid_gains_cmd";
   else if (std::is_same<ServiceType, lwr_force_position_controllers::HybridImpedanceSwitchForcePos>::value)
     service_name = "/" + robot_namespace_ + "/hybrid_impedance_controller/switch_force_position_z";
    */
@@ -197,9 +203,9 @@ bool QNode::get_current_cmd(ServiceMessageType& current_command)
     service_name = "/" + robot_namespace_ + "/joint_space_spline_controller/get_gains";
   else if (std::is_same<ServiceType, wam_dmp_controller::PoseRPYCommand>::value)
     service_name = "/" + robot_namespace_ + "/operational_space_spline_controller/get_traj_pos_cmd";
+  else if (std::is_same<ServiceType, wam_dmp_controller::ImpedanceControllerGains>::value)
+    service_name = "/" + robot_namespace_ + "/operational_space_spline_controller/set_impedance_gains";
   /*
-  else if (std::is_same<ServiceType, lwr_force_position_controllers::HybridImpedanceCommandTrajForce>::value)
-    service_name = "/" + robot_namespace_ + "/hybrid_impedance_controller/get_hybrid_traj_force_cmd";
   else if (std::is_same<ServiceType, lwr_force_position_controllers::HybridImpedanceCommandGains>::value)
     service_name = "/" + robot_namespace_ + "/hybrid_impedance_controller/get_hybrid_gains_cmd";
   */

@@ -29,6 +29,10 @@ namespace wam_dmp_controller
                                                        &OperationalSpaceImpedanceSplineController::set_cmd_traj_spline_srv, this);
         get_cmd_traj_pos_service_ = n.advertiseService("get_traj_pos_cmd",
                                                        &OperationalSpaceImpedanceSplineController::get_cmd_traj_spline_srv, this);
+         set_cmd_gains_service_ = n.advertiseService("set_impedance_gains", 
+                                                    &OperationalSpaceImpedanceSplineController::set_cmd_gains, this);
+        get_cmd_gains_service_ = n.advertiseService("get_impedance_gains", 
+                                                    &OperationalSpaceImpedanceSplineController::get_cmd_gains, this);
 
         // set trajectory duration
         p2p_traj_spline_duration_ = DEFAULT_P2P_TRAJ_DURATION;
@@ -111,6 +115,69 @@ namespace wam_dmp_controller
         time_ = p2p_traj_spline_duration_;
 
         p2p_traj_mutex_.unlock();
+    }
+
+    bool OperationalSpaceImpedanceSplineController::set_cmd_gains(wam_dmp_controller::ImpedanceControllerGains::Request &req, wam_dmp_controller::ImpedanceControllerGains::Response &res)
+    {
+        // First check the size of the request 
+        if (req.command.Kp_gains.size() != 6)
+        {
+            ROS_WARN("Kp_gains size is not 6, but %lu instead.", req.command.Kp_gains.size());
+            res.accepted = false;
+        }
+        else if (req.command.Kv_gains.size() != kdl_chain_.getNrOfJoints())
+        {
+            ROS_WARN("Kv_gains size is not 6, but %lu instead.", req.command.Kv_gains.size());
+            res.accepted = false;
+        }
+        else if (req.command.null_Kp_gains.size() != kdl_chain_.getNrOfJoints())
+        {
+            ROS_WARN("null_Kp_gains size is not %lu, but %lu instead.", kdl_chain_.getNrOfJoints(), req.command.null_Kp_gains.size());
+            res.accepted = false; 
+        }
+        else if (req.command.null_Kv_gains.size() != kdl_chain_.getNrOfJoints())
+        {
+            ROS_WARN("null_Kv_gains size is not %lu, but %lu instead.", kdl_chain_.getNrOfJoints(), req.command.null_Kv_gains.size());
+            res.accepted = false; 
+        }
+        else
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                Kp_.coeffRef(i, i) = req.command.Kp_gains[i];
+                Kv_.coeffRef(i, i) = req.command.Kv_gains[i];
+            }
+            for (int i = 0; i < kdl_chain_.getNrOfJoints(); i++)
+            {
+                null_Kp_.coeffRef(i, i) = req.command.null_Kp_gains[i];
+                null_Kv_.coeffRef(i, i) = req.command.null_Kv_gains[i];
+            }
+
+            res.accepted = true;
+        }
+
+        return res.accepted;   
+    }    
+
+    bool OperationalSpaceImpedanceSplineController::get_cmd_gains(wam_dmp_controller::ImpedanceControllerGains::Request &req, 
+                                                            wam_dmp_controller::ImpedanceControllerGains::Response &res)
+    {
+        res.command.Kp_gains.resize(6);
+        res.command.Kv_gains.resize(6);
+        res.command.null_Kp_gains.resize(kdl_chain_.getNrOfJoints());
+        res.command.null_Kv_gains.resize(kdl_chain_.getNrOfJoints());
+        for (int i = 0; i < 6; i++)
+        {
+            res.command.Kp_gains.push_back(Kp_.coeff(i, i));
+            res.command.Kv_gains.push_back(Kv_.coeff(i, i));
+        }
+        for (int i = 0; i < kdl_chain_.getNrOfJoints(); i++)
+        {
+            res.command.null_Kp_gains.push_back(null_Kp_.coeff(i, i));
+            res.command.null_Kv_gains.push_back(null_Kv_.coeff(i, i));            
+        }
+        res.accepted = true;
+        return res.accepted;
     }
 
     bool OperationalSpaceImpedanceSplineController::set_cmd_traj_spline_srv(wam_dmp_controller::PoseRPYCommand::Request &req, 

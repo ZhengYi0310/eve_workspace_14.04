@@ -63,6 +63,7 @@ add_message_files(DIRECTORY msg FILES
   GoHomeMsg.msg
   JointPosSplineMsg.msg
   SetJointPosStampedMsg.msg
+  ImpedanceControllerGainsMsg.msg
 )
 
 add_service_files(DIRECTORY srv FILES

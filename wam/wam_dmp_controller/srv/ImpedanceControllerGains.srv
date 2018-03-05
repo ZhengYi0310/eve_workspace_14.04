@@ -1,14 +1,5 @@
 # controller gains (position)
-float64[] Kp_gains
-float64[] Kv_gains
-# nullspace motion gains 
-float64[] null_Kp_gains
-float64[] null_Kv_gains
+ImpedanceControllerGainsMsg command
 ---
-# controller gains (position)
-float64[] Kp_gains
-float64[] Kv_gains
-# nullspace motion gains 
-float64[] null_Kp_gains
-float64[] null_Kv_gains
+ImpedanceControllerGainsMsg command
 bool accepted

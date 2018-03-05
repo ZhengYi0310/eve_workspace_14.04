@@ -21,8 +21,8 @@
    <locale language="English" country="Australia"/>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_3">
-    <item>
+   <layout class="QGridLayout" name="gridLayout_10">
+    <item row="0" column="0">
      <widget class="QTabWidget" name="tab_manager">
       <property name="minimumSize">
        <size>
@@ -1003,9 +1003,15 @@ QGroupBox::title {
            <attribute name="title">
             <string>Cartesian Space Control</string>
            </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_4">
+           <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
              <widget class="QGroupBox" name="CartesianSpacePosGroupBox">
+              <property name="minimumSize">
+               <size>
+                <width>570</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="title">
                <string>Position</string>
               </property>
@@ -1173,70 +1179,28 @@ QGroupBox::title {
             </item>
             <item>
              <widget class="QGroupBox" name="CartesianSpaceGainGroupBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>570</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>900</width>
+                <height>16777215</height>
+               </size>
+              </property>
               <property name="title">
                <string>Gains</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_8">
-               <item row="0" column="0">
-                <widget class="QLabel" name="CartPosXGainLabel_Kp">
-                 <property name="text">
-                  <string>Kp_X</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QLineEdit" name="CartPosXGainText_Kp"/>
-               </item>
-               <item row="0" column="2">
-                <widget class="QLabel" name="CartPosYGainLabel_Kp">
-                 <property name="text">
-                  <string>Kp_Y</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="3">
-                <widget class="QLineEdit" name="CartPosYGainText_Kp"/>
-               </item>
-               <item row="0" column="4">
-                <widget class="QLabel" name="CartPosZGainLabel_Kp">
-                 <property name="text">
-                  <string>Kp_Z</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="5">
-                <widget class="QLineEdit" name="CartPosZGainText_Kp"/>
-               </item>
-               <item row="0" column="6">
-                <widget class="QLabel" name="CartPosRollGainLabel_Kp">
-                 <property name="text">
-                  <string>Kp_R</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="7">
-                <widget class="QLineEdit" name="CartPosRollGainText_Kp"/>
-               </item>
-               <item row="0" column="8">
-                <widget class="QLabel" name="CartPosPitchGainLabel_Kp">
-                 <property name="text">
-                  <string>Kp_P</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="9">
-                <widget class="QLineEdit" name="CartPosPitchGainText_Kp"/>
-               </item>
-               <item row="0" column="10">
-                <widget class="QLabel" name="CartPosYawGainLabel_Kp">
-                 <property name="text">
-                  <string>Kp_Y</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="11">
-                <widget class="QLineEdit" name="CartPosYawGainText_Kp"/>
-               </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="CartPosXGainLabel_Kv">
                  <property name="text">
@@ -1254,18 +1218,56 @@ QGroupBox::title {
                  </property>
                 </widget>
                </item>
-               <item row="1" column="3">
-                <widget class="QLineEdit" name="CartPosYGainText_Kv"/>
-               </item>
-               <item row="1" column="4">
-                <widget class="QLabel" name="CartPosZGainLabel_Kv">
+               <item row="0" column="2">
+                <widget class="QLabel" name="CartPosYGainLabel_Kp">
                  <property name="text">
-                  <string>Kv_Z</string>
+                  <string>Kp_Y</string>
                  </property>
                 </widget>
                </item>
-               <item row="1" column="5">
-                <widget class="QLineEdit" name="CartPosZGainText_Kv"/>
+               <item row="0" column="0">
+                <widget class="QLabel" name="CartPosXGainLabel_Kp">
+                 <property name="text">
+                  <string>Kp_X</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="CartPosXGainText_Kp"/>
+               </item>
+               <item row="3" column="9">
+                <widget class="QLineEdit" name="JointGainText_nullKv_6"/>
+               </item>
+               <item row="4" column="0">
+                <widget class="QLabel" name="JointGainLabel_nullKp_3">
+                 <property name="text">
+                  <string>n_Kp3</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="2">
+                <widget class="QLabel" name="JointGainLabel_nullKp_7">
+                 <property name="text">
+                  <string>n_Kp7</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="3">
+                <widget class="QLineEdit" name="JointGainText_nullKp_7"/>
+               </item>
+               <item row="4" column="6">
+                <widget class="QLabel" name="JointGainLabel_nullKv_3">
+                 <property name="text">
+                  <string>n_Kv3</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="4">
+                <widget class="QLabel" name="CartPosZGainLabel_Kp">
+                 <property name="text">
+                  <string>Kp_Z</string>
+                 </property>
+                </widget>
                </item>
                <item row="1" column="6">
                 <widget class="QLabel" name="CartPosRollGainLabel_Kv">
@@ -1294,18 +1296,31 @@ QGroupBox::title {
                  </property>
                 </widget>
                </item>
-               <item row="1" column="11">
-                <widget class="QLineEdit" name="CartPosYawGainText_Kv"/>
+               <item row="2" column="9">
+                <widget class="QLineEdit" name="JointGainText_nullKv_5"/>
                </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="JointGainLabel_nullKp_1">
+               <item row="1" column="4">
+                <widget class="QLabel" name="CartPosZGainLabel_Kv">
                  <property name="text">
-                  <string>n_Kp1</string>
+                  <string>Kv_Z</string>
                  </property>
                 </widget>
                </item>
-               <item row="2" column="1">
-                <widget class="QLineEdit" name="JointGainText_nullKp_1"/>
+               <item row="1" column="5">
+                <widget class="QLineEdit" name="CartPosZGainText_Kv"/>
+               </item>
+               <item row="1" column="3">
+                <widget class="QLineEdit" name="CartPosYGainText_Kv"/>
+               </item>
+               <item row="0" column="7">
+                <widget class="QLineEdit" name="CartPosRollGainText_Kp"/>
+               </item>
+               <item row="0" column="8">
+                <widget class="QLabel" name="CartPosPitchGainLabel_Kp">
+                 <property name="text">
+                  <string>Kp_P</string>
+                 </property>
+                </widget>
                </item>
                <item row="2" column="2">
                 <widget class="QLabel" name="JointGainLabel_nullKp_5">
@@ -1334,9 +1349,6 @@ QGroupBox::title {
                  </property>
                 </widget>
                </item>
-               <item row="2" column="9">
-                <widget class="QLineEdit" name="JointGainText_nullKv_5"/>
-               </item>
                <item row="3" column="0">
                 <widget class="QLabel" name="JointGainLabel_nullKp_2">
                  <property name="text">
@@ -1347,62 +1359,8 @@ QGroupBox::title {
                <item row="3" column="1">
                 <widget class="QLineEdit" name="JointGainText_nullKp_2"/>
                </item>
-               <item row="3" column="2">
-                <widget class="QLabel" name="JointGainLabel_nullKp_6">
-                 <property name="text">
-                  <string>n_Kp6</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="3">
-                <widget class="QLineEdit" name="JointGainText_nullKp_6"/>
-               </item>
-               <item row="3" column="6">
-                <widget class="QLabel" name="JointGainLabel_nullKv_2">
-                 <property name="text">
-                  <string>n_Kv2</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="7">
-                <widget class="QLineEdit" name="JointGainText_nullKv_2"/>
-               </item>
-               <item row="3" column="8">
-                <widget class="QLabel" name="JointGainLabel_nullKv_6">
-                 <property name="text">
-                  <string>n_Kv6</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="9">
-                <widget class="QLineEdit" name="JointGainText_nullKv_6"/>
-               </item>
-               <item row="4" column="0">
-                <widget class="QLabel" name="JointGainLabel_nullKp_3">
-                 <property name="text">
-                  <string>n_Kp3</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="1">
-                <widget class="QLineEdit" name="JointGainText_nullKp_3"/>
-               </item>
-               <item row="4" column="2">
-                <widget class="QLabel" name="JointGainLabel_nullKp_7">
-                 <property name="text">
-                  <string>n_Kp7</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="3">
-                <widget class="QLineEdit" name="JointGainText_nullKp_7"/>
-               </item>
-               <item row="4" column="6">
-                <widget class="QLabel" name="JointGainLabel_nullKv_3">
-                 <property name="text">
-                  <string>n_Kv3</string>
-                 </property>
-                </widget>
+               <item row="0" column="3">
+                <widget class="QLineEdit" name="CartPosYGainText_Kp"/>
                </item>
                <item row="4" column="7">
                 <widget class="QLineEdit" name="JointGainText_nullKv_3"/>
@@ -1443,6 +1401,72 @@ QGroupBox::title {
                   <string>SetGains</string>
                  </property>
                 </widget>
+               </item>
+               <item row="0" column="10">
+                <widget class="QLabel" name="CartPosYawGainLabel_Kp">
+                 <property name="text">
+                  <string>Kp_Y</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="11">
+                <widget class="QLineEdit" name="CartPosYawGainText_Kp"/>
+               </item>
+               <item row="3" column="2">
+                <widget class="QLabel" name="JointGainLabel_nullKp_6">
+                 <property name="text">
+                  <string>n_Kp6</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="3">
+                <widget class="QLineEdit" name="JointGainText_nullKp_6"/>
+               </item>
+               <item row="3" column="6">
+                <widget class="QLabel" name="JointGainLabel_nullKv_2">
+                 <property name="text">
+                  <string>n_Kv2</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="7">
+                <widget class="QLineEdit" name="JointGainText_nullKv_2"/>
+               </item>
+               <item row="3" column="8">
+                <widget class="QLabel" name="JointGainLabel_nullKv_6">
+                 <property name="text">
+                  <string>n_Kv6</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="5">
+                <widget class="QLineEdit" name="CartPosZGainText_Kp"/>
+               </item>
+               <item row="0" column="6">
+                <widget class="QLabel" name="CartPosRollGainLabel_Kp">
+                 <property name="text">
+                  <string>Kp_R</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="11">
+                <widget class="QLineEdit" name="CartPosYawGainText_Kv"/>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="JointGainLabel_nullKp_1">
+                 <property name="text">
+                  <string>n_Kp1</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QLineEdit" name="JointGainText_nullKp_3"/>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLineEdit" name="JointGainText_nullKp_1"/>
+               </item>
+               <item row="0" column="9">
+                <widget class="QLineEdit" name="CartPosPitchGainText_Kp"/>
                </item>
               </layout>
              </widget>
@@ -1661,7 +1685,7 @@ QGroupBox::title {
          </rect>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="JointSpaceControlState">
          <attribute name="title">
@@ -2019,7 +2043,7 @@ QGroupBox::title {
            </widget>
           </item>
           <item row="5" column="0">
-           <widget class="QLabel" name="CartPosYaw_Val">
+           <widget class="QLabel" name="CartPosPitch_Val">
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
             </property>
@@ -2036,7 +2060,7 @@ QGroupBox::title {
            </widget>
           </item>
           <item row="5" column="2">
-           <widget class="QLabel" name="CartErrorYaw_Val">
+           <widget class="QLabel" name="CartErrorPitch_Val">
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
             </property>
@@ -2046,7 +2070,7 @@ QGroupBox::title {
            </widget>
           </item>
           <item row="6" column="0">
-           <widget class="QLabel" name="CartPosPitch_Val">
+           <widget class="QLabel" name="CartPosYaw_Val">
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
             </property>
@@ -2063,7 +2087,7 @@ QGroupBox::title {
            </widget>
           </item>
           <item row="6" column="2">
-           <widget class="QLabel" name="CartErrorPitch_Val">
+           <widget class="QLabel" name="CartErrorYaw_Val">
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
             </property>

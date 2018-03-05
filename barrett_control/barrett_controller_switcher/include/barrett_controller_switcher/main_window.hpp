@@ -50,8 +50,10 @@ public Q_SLOTS:
     void on_button_SwitchController_clicked(bool check);
     void on_button_LoadControllerList_clicked(bool check);
     void on_button_SendJointPos_clicked(bool check);
+    void on_button_SendCartPos_clicked(bool check);
     void on_button_GoHome_clicked(bool check);
     void on_button_SetGains_clicked(bool check);
+    void on_button_SetGainsCart_clicked(bool check);
 	void on_checkbox_use_environment_stateChanged(int state);
 
     /******************************************
@@ -60,7 +62,8 @@ public Q_SLOTS:
     void updateLoggingView(); // no idea why this can't connect automatically
     void update_joints_state();
     void update_joints_error();
-    //void update_cartesian_error();
+    void update_cart_error();
+    void update_cart_pos();
     void update_progress_data();
 
 private:
@@ -68,9 +71,12 @@ private:
     void fill_controllers_list();
     void fill_joint_pos_fields();
     void fill_joint_gains_fields();
+    void fill_cart_pos_fields();
+    void fill_cart_gains_fields();
     void field_error_msg_box(std::string field_name);
     void service_error_msg_box(std::string controller_name);
     void set_send_jointpos_label(QLabel* label, bool accepted, double elapsed, double duration);
+    void set_send_cartpos_label(QLabel* label, bool accepted, double elapsed, double duration);
     void set_progress_bar(QProgressBar* bar, double elapsed_time, double total_time);
 	Ui::MainWindowDesign ui;
 	QNode qnode;
