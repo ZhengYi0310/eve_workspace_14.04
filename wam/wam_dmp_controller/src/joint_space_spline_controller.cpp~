@@ -62,7 +62,6 @@ namespace wam_dmp_controller
 
     void JointSpaceSplineController::starting(const ros::Time& time)
     {
-        ROS_INFO("JointSpaceSplineController IS RUNNING!!!!!!");
         JointSpaceController::starting(time);
         /*
             Important!!!!!!!!!!!!!!!!!!!

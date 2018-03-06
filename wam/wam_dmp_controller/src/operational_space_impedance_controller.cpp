@@ -47,6 +47,7 @@ namespace wam_dmp_controller
         M.resize(kdl_chain_.getNrOfJoints());
         C.resize(kdl_chain_.getNrOfJoints());
         G.resize(kdl_chain_.getNrOfJoints());
+        q_zero_.resize(kdl_chain_.getNrOfJoints());
         command_struct_.trans_xyz_command_ = Eigen::Vector3d::Zero();
         command_struct_.rot_xyz_command_ = Eigen::Vector3d::Zero();
         command_struct_.trans_xyzdot_command_ = Eigen::Vector3d::Zero();
@@ -85,6 +86,7 @@ namespace wam_dmp_controller
         ws_x_                   = Eigen::VectorXd(6);
         ws_xdot_                = Eigen::VectorXd(6);
         tau_                    = Eigen::VectorXd(kdl_chain_.getNrOfJoints());
+        tau_null_               = Eigen::VectorXd(kdl_chain_.getNrOfJoints());
         q_rest_                 = Eigen::VectorXd(kdl_chain_.getNrOfJoints());
         command_filter_         = Eigen::MatrixXd::Zero(kdl_chain_.getNrOfJoints(), 6);
         F_unit_                 = Eigen::VectorXd(6);
@@ -160,6 +162,10 @@ namespace wam_dmp_controller
             // Initialize the SISE Kalman Filter 
             SISE_KalmanFilterPtr->InitializeLinearModel(A_, B_, C_, W_, V_);
             SISE_KalmanFilterPtr->InitializeEstimator(x0_, P_xx_0_);
+
+            // use the joint space to conpute the M_gain
+            dyn_param_solver_->JntToMass(q_zero_, M_gain_);
+            M_star_.block(0, 0, state_dim_, state_dim_) = M_gain_.data;
             SISE_KalmanFilterPtr->updateCtrlMatrix(M_star_);
             KDL::Jacobian base_J_ee;
     	    base_J_ee.resize(kdl_chain_.getNrOfJoints());
@@ -205,7 +211,7 @@ namespace wam_dmp_controller
         //
         // set default trajectory (force and position)
         //set_default_traj();
-
+        //ROS_INFO("OperationalSpaceImpedanceController IS RUNNING!!!!!");
    		return;
   	}
 
@@ -236,7 +242,7 @@ namespace wam_dmp_controller
     	//
     	//////////////////////////////////////////////////////////////////////////////////
     	//
-
+        //ROS_INFO("Receive new command !!!!!!");
     	// get current robot configuration (q and q dot)
     	for(size_t i=0; i<kdl_chain_.getNrOfJoints(); i++)
       	{
@@ -279,6 +285,7 @@ namespace wam_dmp_controller
             input_est_ = M_star_ * input_est_;
             input_est_ += J_last_.data.transpose() * ext_f_last_; 
         }
+       // ROS_INFO("DYNAMIC PARAMS COMPUTED!!!!!!!");
         ////////////////////////////////////////////////////////////
 
     	//////////////////////////////////////////////////////////////////////////////////
@@ -292,6 +299,7 @@ namespace wam_dmp_controller
     	KDL::Jacobian base_J_ee;
     	base_J_ee.resize(kdl_chain_.getNrOfJoints());
     	ee_jacobian_solver_->JntToJac(joint_msr_states_.q, base_J_ee);
+       // ROS_INFO("EE JACOBIAN COMPUTED!!!!");
 
     	/*
     	// evaluate the current geometric jacobian base_J_wrist
@@ -312,6 +320,7 @@ namespace wam_dmp_controller
     	// end effector
     	KDL::Frame ee_fk_frame;
     	ee_fk_solver_->JntToCart(joint_msr_states_.q, ee_fk_frame);
+        //ROS_INFO("forward kinematics COMPUTED!!!!");
     	//
     	//////////////////////////////////////////////////////////////////////////////////
 
@@ -328,6 +337,7 @@ namespace wam_dmp_controller
     	p_ws_ee_ = R_ws_base_ * (ee_fk_frame.p - p_base_ws_);;
 
     	R_ws_ee_.GetEulerZYX(alpha, beta, gamma);
+        //ROS_INFO("R_WS_EE_ COMPUTED!!!!");
 
     	// evaluate the transformation matrix between 
     	// the geometric and analytical jacobian TA
@@ -340,7 +350,7 @@ namespace wam_dmp_controller
         E = Eigen::Matrix3d::Identity();
     	eul_kin_RPY(beta, alpha, E);
     	ws_E_.block<3,3>(3,3) = E.inverse();
-
+        //ROS_INFO("E_ COMPUTED!!!!");
     	// evaluate ws_J_ee
     	KDL::Jacobian ws_J_ee;
     	ws_J_ee.resize(kdl_chain_.getNrOfJoints());
@@ -348,12 +358,18 @@ namespace wam_dmp_controller
 
     	Eigen::MatrixXd ws_JA_ee;
     	ws_JA_ee = ws_E_ * ws_J_ee.data;
+        //ROS_INFO("WS_JA_EE_ COMPUTED!!!!");
     	/////////////////////////////////////////////////////
         trans_xyz_ws_ << p_ws_ee_.x(), p_ws_ee_.y(), p_ws_ee_.z();
         rot_xyz_ws_ << gamma, beta, alpha;
+        //ROS_INFO("position COMPUTED!!!!");
     	trans_xyzdot_ws_ = (ws_JA_ee * joint_msr_states_.qdot.data).block(0, 0, 3, 1);
-        //rot_xyzdot_ws_ = (ws_JA_ee * joint_msr_states_.qdot.data).block(3, 0, 3, 1); 
-        rot_xyzdot_ws_ << (ws_JA_ee * joint_msr_states_.qdot.data)(5),  (ws_JA_ee * joint_msr_states_.qdot.data)[4],  (ws_JA_ee * joint_msr_states_.qdot.data)(3);
+        //ROS_INFO("transvelocity COMPUTED!!!!");
+        //rot_xyzdot_ws_ = (ws_JA_ee * joint_msr_states_.qdot.data).block(3, 0, 3, 1);
+        ws_xdot_ = ws_JA_ee * joint_msr_states_.qdot.data;
+        rot_xyzdot_ws_ << ws_xdot_.coeff(0, 5),  ws_xdot_.coeff(0, 4),  ws_xdot_.coeff(0, 3);
+
+        //ROS_INFO("Analytical jACOBIAN COMPUTED!!!!!!!");
     	//////////////////////////////////////////////////////
 
     	 //////////////////////////////////////////////////////////////////////////////////
@@ -370,13 +386,19 @@ namespace wam_dmp_controller
       		// use kdl matrix for simulation
       		//Lambda_inv = ws_JA_ee * M.data.inverse() * ws_JA_ee.transpose();
             // use the Geometric Jacobian here 
-            Lambda_inv = ws_JA_ee * M.data.inverse() * base_J_ee.data.transpose();
+            {
+                Lambda_inv = ws_JA_ee * M.data.inverse() * base_J_ee.data.transpose();
+                //ROS_INFO("SIMULATION!!!!");
+            }
     	else
       		// use kdl matrix for real scenario
       		//Lambda_inv = ws_JA_ee * M.data.inverse() * ws_JA_ee.transpose();
-            Lambda_inv = ws_JA_ee * M.data.inverse() * base_J_ee.data.transpose();
-
+            {
+                Lambda_inv = ws_JA_ee * M.data.inverse() * base_J_ee.data.transpose();
+                //ROS_INFO("NO SIMULATION!!!!");
+            }
     	ComputeMassMatrix(Lambda_inv, Lambda);
+        //ROS_INFO("PSEDU INVERSE OF JACOBIAN AND CARTESIAN SPACE INERTIAL MATRIX COMPUTED!!!!");
 
         // Always consider null-space control, otherwise might cause unstable behavior for redundant Manipulator 
         // in joint Space
@@ -394,7 +416,7 @@ namespace wam_dmp_controller
     	ComputeMassMatrix(J_dyn_, J_dyn_inv_);
         
         J_dyn_inv_ = M.data.inverse() * base_J_ee.data.transpose() * J_dyn_inv_;
-
+        //ROS_INFO("PSEDU INVERSE OF JACOBIAN AND CARTESIAN SPACE INERTIAL MATRIX COMPUTED!!!!");
         /////////////////////////////
         if (ext_f_est_)
         {
@@ -440,7 +462,7 @@ namespace wam_dmp_controller
     	ws_J_ee_dot.changeBase(R_ws_base_);
     	Eigen::MatrixXd ws_JA_ee_dot;
         ws_JA_ee_dot = ws_E_dot_ * ws_J_ee.data + ws_E_ * ws_J_ee_dot.data;
-
+        //ROS_INFO("ws_ja_ee computed!!!!!");
     	//////////////////////////////////////////////////////////////////////////////////
     	//
     	// evaluate dynamics inversion command TAU
@@ -455,8 +477,10 @@ namespace wam_dmp_controller
         command_filter_ = base_J_ee.data.transpose() * Lambda;
     	if(use_simulation_)
       		tau_ = C.data + G.data - command_filter_ * ws_JA_ee_dot * joint_msr_states_.qdot.data;
+
     	else  // gravity handled by the hardware interface itself when not using simulation 
       		tau_ = C.data - command_filter_ * ws_JA_ee_dot * joint_msr_states_.qdot.data;
+        //ROS_INFO("COMPUTING TAU!!!!!!");
         /////////////////////////////////////////////
         if (ext_f_est_)
         {
@@ -471,20 +495,21 @@ namespace wam_dmp_controller
     	// for details on the definition of a dynamically consistent generalized inverse)
     	//
     	//////////////////////////////////////////////////////////////////////////////////
-        /* An easier approch based on RPY angles and no clipping 
-         * 
-         * tau_trans_ = trans_xyzdotdot_des_ws_ + Kp_.block(0, 0, 3, 3) * (trans_xyz_des_ws_ - trans_xyz_ws_) + Kv_.block(0, 0, 3, 3) * (trans_xyzdot_des_ws_ - trans_xyzdot_ws_);
-         * rot_xyz_error_ = rot_xyz_des_ws_ - rot_xyz_ws_;
-         * for (int i = 0; i < 3; i++)
-         * {
-         *      rot_xyz_error_(i) = angles::normalize_angle(rot_xyz_error_(i)); 
-         * }
-         * tau_rot_ = rot_xyzdotdot_des_ws_ + Kp_.block(3, 3, 3, 3) * rot_xyz_error_ + Kv_.block(3, 3, 3, 3) * (rot_xyzdot_des_ws_ - rot_xyzdot_ws_);
-         *  F_unit_.block(0, 0, 3, 1) = tau_trans_;
-            F_unit_.block(3, 0, 3, 1) = tau_rot_;
-         * 
-         *
-         */
+        //An easier approch based on RPY angles and no clipping 
+          
+        tau_trans_ = trans_xyzdotdot_des_ws_ + Kp_.block(0, 0, 3, 3) * (trans_xyz_des_ws_ - trans_xyz_ws_) + Kv_.block(0, 0, 3, 3) * (trans_xyzdot_des_ws_ - trans_xyzdot_ws_);
+        rot_xyz_error_ = rot_xyz_des_ws_ - rot_xyz_ws_;
+        trans_xyz_error_ = trans_xyz_des_ws_ - trans_xyz_ws_;
+        for (int i = 0; i < 3; i++)
+        {
+            rot_xyz_error_(i) = angles::normalize_angle(rot_xyz_error_(i)); 
+        }
+        tau_rot_ = rot_xyzdotdot_des_ws_ + Kp_.block(3, 3, 3, 3) * rot_xyz_error_ + Kv_.block(3, 3, 3, 3) * (rot_xyzdot_des_ws_ - rot_xyzdot_ws_);
+        F_unit_.block(0, 0, 3, 1) = tau_trans_;
+        F_unit_.block(3, 0, 3, 1) = tau_rot_;
+        //ROS_INFO("COMPUTING F_UNIT!!!!!!!!");
+        ///////////////////////////////////////////////// 
+        /*
         trans_xyz_error_ = Kp_.block(0, 0, 3, 3) * (trans_xyz_des_ws_ - trans_xyz_ws_);
         if(trans_xyz_error_.norm() > trans_vmax_)
         {
@@ -504,7 +529,7 @@ namespace wam_dmp_controller
         rot_xyz_ws_qua_ = rot_xyz_ws_mat_ = Z_ * Y_ * X_;
         rot_xyz_des_ws_qua_ = rot_xyz_des_ws_mat_ = Z_des_ * Y_des_ * X_des_;
         rot_xyz_error_qua_ = rot_xyz_ws_mat_ * rot_xyz_des_ws_mat_.inverse();
-        
+        */
         /* 
         // Opeational Space Control: A Theoretic and Empirical Comparison 
         KDL::Vector temp = KDL::Vector(rot_xyz_des_ws_qua_.x(), rot_xyz_des_ws_qua_.y(), rot_xyz_des_ws_qua_.z());
@@ -512,6 +537,7 @@ namespace wam_dmp_controller
         rot_xyz_error_ = rot_xyz_des_ws_qua_.w() * rot_xyz_ws_qua_.vec() - rot_xyz_ws_qua_.w() * rot_xyz_des_ws_qua_.vec() + rot_xyz_des_ws_skew_ *  rot_xyz_ws_qua_.vec();
         tau_rot_ =  Kv_.block(3, 3, 3, 3) * (rot_xyzdot_ws_ - Kp_.block(3, 3, 3, 3) * rot_xyz_error_); 
         */
+        /*
         double norm = sqrt(rot_xyz_error_qua_.x() * rot_xyz_error_qua_.x() + rot_xyz_error_qua_.y() * rot_xyz_error_qua_.y() + rot_xyz_error_qua_.z() * rot_xyz_error_qua_.z());
         double c = 0.0;
         if(norm != 0.0)
@@ -527,11 +553,13 @@ namespace wam_dmp_controller
         tau_rot_ = Kv_.block(3, 3, 3, 3) * (rot_xyzdot_ws_ + Kp_.block(3, 3, 3, 3) * rot_xyz_error_);
         F_unit_.block(0, 0, 3, 1) = tau_trans_;
         F_unit_.block(3, 0, 3, 1) = tau_rot_;
+        */
         tau_ += command_filter_ * F_unit_;
-
+        // ROS_INFO("TAU_NULL WITH F_UNIT COMPUTED!!!!!");
         // Consider the nullspace controller here 
         tau_null_ = (Eigen::MatrixXd::Identity(kdl_chain_.getNrOfJoints(), kdl_chain_.getNrOfJoints()) - base_J_ee.data.transpose() * J_dyn_inv_.transpose()) * M.data * (null_Kp_ * (q_rest_ - joint_msr_states_.q.data) - null_Kv_ * joint_msr_states_.qdot.data);
         tau_ += tau_null_;
+        //ROS_INFO("TAU_NULL COMPUTED!!!!!");
 
         //
         // evaluate position vector between the origin of the workspace frame and the end-effector
@@ -614,13 +642,13 @@ namespace wam_dmp_controller
 
         if (pub_cart_curr_ && pub_cart_curr_->trylock())
         {
-            pub_cart_err_->msg_.stamp = time;
-            pub_cart_err_->msg_.position.x = trans_xyz_ws_[0];
-            pub_cart_err_->msg_.position.y = trans_xyz_ws_[1];
-            pub_cart_err_->msg_.position.z = trans_xyz_ws_[2];
-            pub_cart_err_->msg_.orientation.roll = rot_xyz_ws_[0];
-            pub_cart_err_->msg_.orientation.pitch = rot_xyz_ws_[1];
-            pub_cart_err_->msg_.orientation.yaw = rot_xyz_ws_[2];
+            pub_cart_curr_->msg_.stamp = time;
+            pub_cart_curr_->msg_.position.x = trans_xyz_ws_[0];
+            pub_cart_curr_->msg_.position.y = trans_xyz_ws_[1];
+            pub_cart_curr_->msg_.position.z = trans_xyz_ws_[2];
+            pub_cart_curr_->msg_.orientation.roll = rot_xyz_ws_[0];
+            pub_cart_curr_->msg_.orientation.pitch = rot_xyz_ws_[1];
+            pub_cart_curr_->msg_.orientation.yaw = rot_xyz_ws_[2];
             
         }
 
@@ -659,9 +687,10 @@ namespace wam_dmp_controller
         ros::NodeHandle Kp_handle(n, "Kp_Gains");
         ros::NodeHandle Kv_handle(n, "Kv_Gains");
         ros::NodeHandle Ki_handle(n, "Ki_Gains");
-        ros::NodeHandle null_Kp_handle(n, "null_Kp_gains");
-        ros::NodeHandle null_Kv_handle(n, "null_Kv_gains");
+        ros::NodeHandle null_Kp_handle(n, "null_Kp_Gains");
+        ros::NodeHandle null_Kv_handle(n, "null_Kv_Gains");
         ros::NodeHandle rest_postures_handle(n, "rest_posture");
+        ros::NodeHandle zero_postures_handle(n, "zero_posture");
          
         for (size_t i = 0; i < 6; i++)
         {
@@ -709,24 +738,34 @@ namespace wam_dmp_controller
                 ROS_WARN("rest_posture set for %s in yaml file, Using %f",  joint_handles_[i].getName().c_str(), q_rest_[i]); 
             }
 
-             if ( !null_Kp_handle.getParam(name[i].c_str(), null_Kp_.coeffRef(i, i))) 
+             if ( !zero_postures_handle.getParam(joint_handles_[i].getName().c_str(), q_zero_(i))) 
             {
-                ROS_WARN("null_Kp gain not set for %s in yaml file, Using 0.", name[i].c_str());
+                ROS_WARN("zero posture not set for %s in yaml file, Using 0.", joint_handles_[i].getName().c_str());
+                q_zero_(i) = 0.0;
+            }
+            else
+            {
+                ROS_WARN("zero_posture set for %s in yaml file, Using %f",  joint_handles_[i].getName().c_str(), q_zero_(i)); 
+            }
+
+            if ( !null_Kp_handle.getParam(joint_handles_[i].getName().c_str(), null_Kp_.coeffRef(i, i))) 
+            {
+                ROS_WARN("null_Kp gain not set for %s in yaml file, Using 0.", joint_handles_[i].getName().c_str());
                 null_Kp_.coeffRef(i, i) = 0;
             }
             else 
             {
-                ROS_WARN("null_Kp gain set for %s in yaml file, Using %f", name[i].c_str(), null_Kp_.coeff(i, i)); 
+                ROS_WARN("null_Kp gain set for %s in yaml file, Using %f", joint_handles_[i].getName().c_str(), null_Kp_.coeff(i, i)); 
             }
             
-            if ( !null_Kv_handle.getParam(name[i].c_str(), null_Kv_.coeffRef(i, i))) 
+            if ( !null_Kv_handle.getParam(joint_handles_[i].getName().c_str(), null_Kv_.coeffRef(i, i))) 
             {
-                ROS_WARN("null_Kv gain not set for %s in yaml file, Using 0.", name[i].c_str());
+                ROS_WARN("null_Kv gain not set for %s in yaml file, Using 0.",joint_handles_[i].getName().c_str());
                 null_Kv_.coeffRef(i, i) = 0;
             }
             else 
             {
-                ROS_WARN("null_Kv gain set for %s in yaml file, Using %f", name[i].c_str(), null_Kv_.coeff(i, i)); 
+                ROS_WARN("null_Kv gain set for %s in yaml file, Using %f",joint_handles_[i].getName().c_str(), null_Kv_.coeff(i, i)); 
             }
         }
 
@@ -804,7 +843,7 @@ namespace wam_dmp_controller
         V_      = Eigen::MatrixXd::Zero(measurement_dim_, measurement_dim_);
         P_xx_0_ = Eigen::MatrixXd::Zero(state_dim_, state_dim_);
         x0_     = Eigen::MatrixXd::Zero(state_dim_, 1);
-        M_gain_ = Eigen::MatrixXd::Identity(state_dim_, state_dim_);
+        //M_gain_ = Eigen::MatrixXd::Identity(state_dim_, state_dim_);
 
         std::vector<double> W_vec;
         std::vector<double> V_vec;
@@ -827,9 +866,9 @@ namespace wam_dmp_controller
         W_      = Eigen::Map<Eigen::VectorXd>(&W_vec[0], W_vec.size()).asDiagonal();
         V_      = Eigen::Map<Eigen::VectorXd>(&V_vec[0], V_vec.size()).asDiagonal();
         P_xx_0_ = Eigen::Map<Eigen::VectorXd>(&Pxx0_vec[0], Pxx0_vec.size()).asDiagonal();
-        M_gain_ = Eigen::Map<Eigen::VectorXd>(&M_gain_vec[0], M_gain_vec.size()).asDiagonal();
+        M_gain_.resize(kdl_chain_.getNrOfJoints()); 
 
-        M_star_ << M_gain_, Eigen::MatrixXd::Ones(state_dim_, state_dim_);
+        M_star_ = Eigen::MatrixXd::Ones(state_dim_, measurement_dim_);
     }
     
     

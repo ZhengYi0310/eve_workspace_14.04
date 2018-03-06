@@ -129,10 +129,12 @@ namespace wam_dmp_controller
             Eigen::Matrix<double, 6, 6> Pd_;
             Eigen::MatrixXd J_dyn_inv_;
             Eigen::MatrixXd J_dyn_;
-            Eigen::Vector3d tau_trans_, tau_rot_, tau_null_;
+            Eigen::Vector3d tau_trans_, tau_rot_;
+            Eigen::VectorXd tau_null_;
     		Eigen::VectorXd tau_, F_unit_;
     		Eigen::MatrixXd command_filter_;
             Eigen::VectorXd q_rest_;
+            KDL::JntArray q_zero_;
             //bool null_control_;
     		//double gamma_im_link5_initial_;
 
@@ -150,7 +152,8 @@ namespace wam_dmp_controller
             double publish_rate_;
 
             /// For external force estimation/////////////////////////////////////////////////////////////////
-            Eigen::MatrixXd A_, B_, C_, W_, V_, P_xx_0_, x0_, M_gain_, M_star_;
+            Eigen::MatrixXd A_, B_, C_, W_, V_, P_xx_0_, x0_, M_star_;
+            KDL::JntSpaceInertiaMatrix  M_gain_;
             Eigen::MatrixXd input_est_;
             KDL::Jacobian J_curr_, J_last_;
             double state_dim_;

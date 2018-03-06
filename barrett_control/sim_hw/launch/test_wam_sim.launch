@@ -79,8 +79,8 @@
 
 	<!-- real robot and controllers -->
         
-	<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"  args="sim_hw/joint_state_controller sim_hw/joint_space_spline_controller --shutdown-timeout 2"/>
-	<node name="controller_stopper" pkg="controller_manager" type="spawner" args="--stopped sim_hw/joint_impedance_controller --shutdown-timeout 2" />
+	<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"  args="sim_hw/joint_space_spline_controller sim_hw/joint_state_controller  --shutdown-timeout 2"/>
+	<node name="controller_stopper" pkg="controller_manager" type="spawner" args="--stopped sim_hw/joint_impedance_controller sim_hw/operational_space_impedance_spline_controller  --shutdown-timeout 2" />
    
 
        

@@ -12,11 +12,11 @@ namespace wam_dmp_controller
   inline void ComputeMassMatrix(const Eigen::MatrixXd& lambda_inv, Eigen::MatrixXd& lambda, double thresh = 0.001, bool damped=true)
   {
     double lambda_ = damped ? 0.2:0.0;
-    Eigen::JacobiSVD<Eigen::Matrix3d> svd(lambda_inv, Eigen::ComputeFullU | Eigen::ComputeFullV);
-
+    Eigen::JacobiSVD<Eigen::MatrixXd> svd(lambda_inv, Eigen::ComputeFullU | Eigen::ComputeFullV);
     Eigen::JacobiSVD<Eigen::MatrixXd>::SingularValuesType sing_vals_ = svd.singularValues();
     Eigen::MatrixXd S = lambda_inv;
     S.setZero();
+
     for(int i = 0; i < sing_vals_.size(); ++i)
     {
       if(sing_vals_(i) < thresh)

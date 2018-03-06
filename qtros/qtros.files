@@ -1,5 +1,0 @@
-include/qtros/main_window.hpp
-include/qtros/qnode.hpp
-src/main.cpp
-src/main_window.cpp
-src/qnode.cpp

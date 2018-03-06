@@ -51,6 +51,7 @@ namespace wam_dmp_controller
 
     void OperationalSpaceImpedanceSplineController::starting(const ros::Time& time)
     {
+        //ROS_INFO("OperationalSpaceImpedanceSplineController IS RUNNING!!!!!!");
         OperationalSpaceImpedanceController::starting(time);
         /*
             Important!!!!!!!!!!!!!!!!!!!
@@ -60,7 +61,8 @@ namespace wam_dmp_controller
         */
 
         // set default trajectory 
-        set_default_pos_traj(); 
+        set_default_pos_traj();
+        //ROS_INFO("default traj set!!!!");
     }
 
     void OperationalSpaceImpedanceSplineController::update(const ros::Time& time, const ros::Duration& period)
@@ -70,9 +72,12 @@ namespace wam_dmp_controller
         Eigen::VectorXd xdotdot_des(6);
         eval_current_point_to_point_traj(period, trans_des_, trans_dot_des_, trans_dotdot_des_, 
                                          rot_des_, rot_dot_des_, rot_dotdot_des_);
+        //ROS_INFO("OperationalSpaceImpedanceSplineController EVAL CURRENT POINT IS DONE!!!!!");
         OperationalSpaceImpedanceController::setCommandRT(trans_des_, trans_dot_des_, trans_dotdot_des_, 
                                                           rot_des_, rot_dot_des_, rot_dotdot_des_);
+        //ROS_INFO("current cmd set!!!!");
         OperationalSpaceImpedanceController::update(time, period);
+        //ROS_INFO("OperationalSpaceImpedanceSplineController UPDATE IS DONE!!!");
     }
 
     void OperationalSpaceImpedanceSplineController::set_default_pos_traj()
@@ -168,13 +173,15 @@ namespace wam_dmp_controller
         res.command.null_Kv_gains.resize(kdl_chain_.getNrOfJoints());
         for (int i = 0; i < 6; i++)
         {
-            res.command.Kp_gains.push_back(Kp_.coeff(i, i));
-            res.command.Kv_gains.push_back(Kv_.coeff(i, i));
+            res.command.Kp_gains[i] = Kp_.coeff(i, i);
+            res.command.Kv_gains[i] = Kv_.coeff(i, i);
+            //ROS_INFO("Kp(i ,i): %f, Kv(i, i): %f", res.command.Kp_gains[i], res.command.Kv_gains[i]);
         }
         for (int i = 0; i < kdl_chain_.getNrOfJoints(); i++)
         {
-            res.command.null_Kp_gains.push_back(null_Kp_.coeff(i, i));
-            res.command.null_Kv_gains.push_back(null_Kv_.coeff(i, i));            
+            res.command.null_Kp_gains[i] = null_Kp_.coeff(i, i);
+            res.command.null_Kv_gains[i] = null_Kv_.coeff(i, i);    
+              //ROS_INFO("null_Kp(i ,i): %f, null_Kv(i, i): %f",res.command.null_Kp_gains[i], res.command.null_Kv_gains[i]);
         }
         res.accepted = true;
         return res.accepted;
@@ -249,7 +256,7 @@ namespace wam_dmp_controller
             time_ = p2p_traj_spline_duration_;
             //run_spline_ = false;
         }
-
+        //ROS_INFO("TIME SET!!!!!!!!!!!!!!11");
         for (int i=0; i<3; i++)
         {
 	        trans_des[i] = p2p_traj_const_(0, i) + p2p_traj_const_(1, i) * pow(time_, 3) + \
@@ -261,16 +268,16 @@ namespace wam_dmp_controller
 	        trans_dotdot_des[i] = 3 * 2 *  p2p_traj_const_(1, i) * time_ + \
                              4 * 3 * p2p_traj_const_(2, i) * pow(time_, 2) + 5 * 4 * p2p_traj_const_(3, i) * pow(time_, 3);
         }
-        for (int i = 3; i < 6; i++)
+        for (int i = 0; i < 3; i++)
         {
-            rot_des[i] = p2p_traj_const_(0, i) + p2p_traj_const_(1, i) * pow(time_, 3) + \
-                       p2p_traj_const_(2, i) * pow(time_, 4) + p2p_traj_const_(3, i) * pow(time_, 5);
+            rot_des[i] = p2p_traj_const_(0, i + 3) + p2p_traj_const_(1, i + 3) * pow(time_, 3) + \
+                       p2p_traj_const_(2, i + 3) * pow(time_, 4) + p2p_traj_const_(3, i + 3) * pow(time_, 5);
 
-	        rot_dot_des[i] = 3 * p2p_traj_const_(1, i) * pow(time_, 2) + \
-                          4 * p2p_traj_const_(2, i) * pow(time_, 3) + 5 * p2p_traj_const_(3, i) * pow(time_, 4);
+	        rot_dot_des[i] = 3 * p2p_traj_const_(1, i + 3) * pow(time_, 2) + \
+                          4 * p2p_traj_const_(2, i + 3) * pow(time_, 3) + 5 * p2p_traj_const_(3, i + 3) * pow(time_, 4);
 
-	        rot_dotdot_des[i] = 3 * 2 *  p2p_traj_const_(1, i) * time_ + \
-                             4 * 3 * p2p_traj_const_(2, i) * pow(time_, 2) + 5 * 4 * p2p_traj_const_(3, i) * pow(time_, 3);
+	        rot_dotdot_des[i] = 3 * 2 *  p2p_traj_const_(1, i + 3) * time_ + \
+                             4 * 3 * p2p_traj_const_(2, i + 3) * pow(time_, 2) + 5 * 4 * p2p_traj_const_(3, i + 3) * pow(time_, 3);
         }
         p2p_traj_mutex_.unlock();
     }
