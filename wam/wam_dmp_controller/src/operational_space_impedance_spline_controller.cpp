@@ -109,7 +109,7 @@ namespace wam_dmp_controller
         p2p_traj_const_(0, 4) = beta;
         p2p_traj_const_(0, 5) = alpha;
         prev_trans_setpoint_ << p_ws_ee.x(), p_ws_ee.y(), p_ws_ee.z();
-        prev_rot_setpoint_ << alpha, beta, gamma;
+        prev_rot_setpoint_ << gamma, beta, alpha;
 
         // reset the time
         time_ = p2p_traj_spline_duration_;

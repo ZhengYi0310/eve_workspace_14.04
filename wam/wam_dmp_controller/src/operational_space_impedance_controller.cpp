@@ -55,10 +55,13 @@ namespace wam_dmp_controller
         command_struct_.rot_xyzdotdot_command_ = Eigen::Vector3d::Zero();
     	// instantiate solvers
     	dyn_param_solver_.reset(new KDL::ChainDynParam(kdl_chain_, gravity_));
-    	ee_jacobian_solver_.reset(new KDL::ChainJntToJacSolver(extended_chain_));
+    	//ee_jacobian_solver_.reset(new KDL::ChainJntToJacSolver(extended_chain_));
+        ee_jacobian_solver_.reset(new KDL::ChainJntToJacSolver(kdl_chain_)); //consider only up to the wrist for now.
     	wrist_jacobian_solver_.reset(new KDL::ChainJntToJacSolver(kdl_chain_));
-    	ee_fk_solver_.reset(new KDL::ChainFkSolverPos_recursive(extended_chain_));
-    	ee_jacobian_dot_solver_.reset(new KDL::ChainJntToJacDotSolver(extended_chain_));
+    	//ee_fk_solver_.reset(new KDL::ChainFkSolverPos_recursive(extended_chain_));
+        ee_fk_solver_.reset(new KDL::ChainFkSolverPos_recursive(kdl_chain_));  //consider only up to the wrist for now.
+    	//ee_jacobian_dot_solver_.reset(new KDL::ChainJntToJacDotSolver(extended_chain_));
+        ee_jacobian_dot_solver_.reset(new KDL::ChainJntToJacDotSolver(kdl_chain_)); // consider only up to the wrist for now.
 
     	// instantiate wrenches
         wrench_wrist_ = KDL::Wrench();
@@ -168,7 +171,7 @@ namespace wam_dmp_controller
     	    // get the current ZYX representation PHI from R_ws_base * ee_fk_frame.M
     	    double alpha, beta, gamma;
     	    R_ws_ee_ = R_ws_base_ * ee_fk_frame.M;
-    	    p_ws_ee_ = p_ws_base_ + ee_fk_frame.p;
+    	    p_ws_ee_ = R_ws_base_ * (ee_fk_frame.p - p_base_ws_);
 
     	    R_ws_ee_.GetEulerZYX(alpha, beta, gamma);
 
@@ -196,8 +199,8 @@ namespace wam_dmp_controller
                 joint_acc_curr_(i) = joint_acceleration_handles_[i].getPosition();
                 joint_acc_last_(i) = joint_acceleration_handles_[i].getPosition();
       	    }
-            J_curr_.data = ws_J_ee.data;
-            J_last_.data = ws_J_ee.data;
+            J_curr_.data = base_J_ee.data;
+            J_last_.data = base_J_ee.data;
         }
         //
         // set default trajectory (force and position)
@@ -322,7 +325,7 @@ namespace wam_dmp_controller
     	// get the current ZYX representation PHI from R_ws_base * ee_fk_frame.M
     	double alpha, beta, gamma;
     	R_ws_ee_ = R_ws_base_ * ee_fk_frame.M;
-    	p_ws_ee_ = p_ws_base_ + ee_fk_frame.p;
+    	p_ws_ee_ = R_ws_base_ * (ee_fk_frame.p - p_base_ws_);;
 
     	R_ws_ee_.GetEulerZYX(alpha, beta, gamma);
 
@@ -349,7 +352,8 @@ namespace wam_dmp_controller
         trans_xyz_ws_ << p_ws_ee_.x(), p_ws_ee_.y(), p_ws_ee_.z();
         rot_xyz_ws_ << gamma, beta, alpha;
     	trans_xyzdot_ws_ = (ws_JA_ee * joint_msr_states_.qdot.data).block(0, 0, 3, 1);
-        rot_xyzdot_ws_ = (ws_JA_ee * joint_msr_states_.qdot.data).block(3, 0, 3, 1); 
+        //rot_xyzdot_ws_ = (ws_JA_ee * joint_msr_states_.qdot.data).block(3, 0, 3, 1); 
+        rot_xyzdot_ws_ << (ws_JA_ee * joint_msr_states_.qdot.data)(5),  (ws_JA_ee * joint_msr_states_.qdot.data)[4],  (ws_JA_ee * joint_msr_states_.qdot.data)(3);
     	//////////////////////////////////////////////////////
 
     	 //////////////////////////////////////////////////////////////////////////////////
@@ -366,11 +370,11 @@ namespace wam_dmp_controller
       		// use kdl matrix for simulation
       		//Lambda_inv = ws_JA_ee * M.data.inverse() * ws_JA_ee.transpose();
             // use the Geometric Jacobian here 
-            Lambda_inv = ws_JA_ee * M.data.inverse() * ws_J_ee.data.transpose();
+            Lambda_inv = ws_JA_ee * M.data.inverse() * base_J_ee.data.transpose();
     	else
       		// use kdl matrix for real scenario
       		//Lambda_inv = ws_JA_ee * M.data.inverse() * ws_JA_ee.transpose();
-            Lambda_inv = ws_JA_ee * M.data.inverse() * ws_J_ee.data.transpose();
+            Lambda_inv = ws_JA_ee * M.data.inverse() * base_J_ee.data.transpose();
 
     	ComputeMassMatrix(Lambda_inv, Lambda);
 
@@ -381,21 +385,21 @@ namespace wam_dmp_controller
       		// use kdl matrix for simulation
       		//Lambda_inv = ws_JA_ee * M.data.inverse() * ws_JA_ee.transpose();
             // use the Geometric Jacobian here 
-            J_dyn_ = ws_J_ee.data * M.data.inverse() * ws_J_ee.data.transpose();
+            J_dyn_ = base_J_ee.data * M.data.inverse() * base_J_ee.data.transpose();
     	else
       		// use kdl matrix for real scenario
       		//Lambda_inv = ws_JA_ee * M.data.inverse() * ws_JA_ee.transpose();
-            J_dyn_ = ws_J_ee.data * M.data.inverse() * ws_J_ee.data.transpose();
+            J_dyn_ = base_J_ee.data * M.data.inverse() * base_J_ee.data.transpose();
 
     	ComputeMassMatrix(J_dyn_, J_dyn_inv_);
         
-        J_dyn_inv_ = M.data.inverse() * ws_J_ee.data.transpose() * J_dyn_inv_;
+        J_dyn_inv_ = M.data.inverse() * base_J_ee.data.transpose() * J_dyn_inv_;
 
         /////////////////////////////
         if (ext_f_est_)
         {
             ext_f_curr_ = J_dyn_inv_.transpose() * input_est_;
-            J_last_.data = ws_J_ee.data;
+            J_last_.data = base_J_ee.data;
         } 
         /////////////////////////////
     	//////////////////////////////////////////////////////////////////////////////////
@@ -448,7 +452,7 @@ namespace wam_dmp_controller
     	//////////////////////////////////////////////////////////////////////////////////
     	// use Geometric Jaocbian here 
       	//command_filter_ = ws_JA_ee.transpose() * Lambda;
-        command_filter_ = ws_J_ee.data.transpose() * Lambda;
+        command_filter_ = base_J_ee.data.transpose() * Lambda;
     	if(use_simulation_)
       		tau_ = C.data + G.data - command_filter_ * ws_JA_ee_dot * joint_msr_states_.qdot.data;
     	else  // gravity handled by the hardware interface itself when not using simulation 
@@ -526,7 +530,7 @@ namespace wam_dmp_controller
         tau_ += command_filter_ * F_unit_;
 
         // Consider the nullspace controller here 
-        tau_null_ = M.data * (null_Kp_ * (q_rest_ - joint_msr_states_.q.data) - null_Kv_ * joint_msr_states_.qdot.data);
+        tau_null_ = (Eigen::MatrixXd::Identity(kdl_chain_.getNrOfJoints(), kdl_chain_.getNrOfJoints()) - base_J_ee.data.transpose() * J_dyn_inv_.transpose()) * M.data * (null_Kp_ * (q_rest_ - joint_msr_states_.q.data) - null_Kv_ * joint_msr_states_.qdot.data);
         tau_ += tau_null_;
 
         //
@@ -784,50 +788,36 @@ namespace wam_dmp_controller
             ROS_ERROR("measurement dimension not specified!");
             return;             
         }
+
+        if (input_dim_ != measurement_dim_)
+        {
+            ROS_ERROR("For this psecific problem, input dim should be equal to measurement dim.");
+        }
         else 
         {
             ROS_INFO("measurement dimension is set to %f", measurement_dim_);
         }
-        A_      = Eigen::MatrixXd::Zero(state_dim_, state_dim_);
+        A_      = Eigen::MatrixXd::Identity(state_dim_, state_dim_);
         B_      = Eigen::MatrixXd::Zero(state_dim_, input_dim_);
-        C_      = Eigen::MatrixXd::Zero(measurement_dim_, state_dim_);
+        C_      = Eigen::MatrixXd::Identity(measurement_dim_, state_dim_);
         W_      = Eigen::MatrixXd::Zero(state_dim_, state_dim_);
         V_      = Eigen::MatrixXd::Zero(measurement_dim_, measurement_dim_);
         P_xx_0_ = Eigen::MatrixXd::Zero(state_dim_, state_dim_);
         x0_     = Eigen::MatrixXd::Zero(state_dim_, 1);
-        M_gain_ = Eigen::MatrixXd::Zero(state_dim_, state_dim_);
+        M_gain_ = Eigen::MatrixXd::Identity(state_dim_, state_dim_);
 
-        std::vector<double> A_vec;
-        std::vector<double> B_vec;
-        std::vector<double> C_vec;
         std::vector<double> W_vec;
         std::vector<double> V_vec;
         std::vector<double> Pxx0_vec;
         std::vector<double> x0_vec;
         std::vector<double> M_gain_vec;
 
-        n_estimators.getParam("A", A_vec);
-        n_estimators.getParam("B", B_vec);
-        n_estimators.getParam("C", C_vec);
         n_estimators.getParam("W", W_vec);
         n_estimators.getParam("V", V_vec);
         n_estimators.getParam("P_xx_0", Pxx0_vec);
         n_estimators.getParam("x0", x0_vec);
         n_estimators.getParam("M_gain_", M_gain_vec);
         
-        for (int i = 0; i < A_vec.size(); i++)
-        {
-            A_ << A_vec[i];
-        }
-        
-        for (int i = 0; i < B_vec.size(); i++)
-        {
-            B_ << B_vec[i];
-        }
-        for (int i = 0; i < C_vec.size(); i++)
-        {
-            C_ << C_vec[i];
-        }
         for (int i = 0; i < x0_vec.size(); i++)
         {
             x0_ << x0_vec[i];

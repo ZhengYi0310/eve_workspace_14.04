@@ -55,6 +55,11 @@ bool QNode::init() {
 
     sub_joints_error_ = n.subscribe("/" + robot_namespace_ + "/joint_space_spline_controller/jt_err", 1000,\
                     &barrett_controller_switcher::QNode::joints_error_callback, this);
+
+    sub_cart_pos_ = n.subscribe("/" + robot_namespace_ + "/operational_space_impedance_spline_controller/curr_cart_pos", 1000,\
+                                  &barrett_controller_switcher::QNode::cart_pos_callback, this);
+    sub_cart_pos_ = n.subscribe("/" + robot_namespace_ + "/operational_space_impedance_spline_controller/cart_err", 1000,\
+                                  &barrett_controller_switcher::QNode::cart_error_callback, this);
     /*
     sub_cartesian_error_ = n.subscribe("/" + robot_namespace_ + "/hybrid_impedance_controller/error", 1000,\
                        &barrett_controller_switcher::QNode::cartesian_error_callback, this);
