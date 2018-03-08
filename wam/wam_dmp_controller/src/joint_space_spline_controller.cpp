@@ -11,7 +11,7 @@
 #include <math.h>
 #include <angles/angles.h>
 #include <geometry_msgs/WrenchStamped.h>
-#define DEFAULT_P2P_TRAJ_DURATION 10.0
+#define DEFAULT_P2P_TRAJ_DURATION 6.0
 #define P2P_COEFF_3 10.0
 #define P2P_COEFF_4 -15.0 
 #define P2P_COEFF_5 6.0
@@ -53,6 +53,7 @@ namespace wam_dmp_controller
 
         prev_setpoint_state_.reset(new PosVelAccState<double>(kdl_chain_.getNrOfJoints()));
         curr_setpoint_state_.reset(new PosVelAccState<double>(kdl_chain_.getNrOfJoints()));
+        spline_count_ = 0;
         //prev_setpoint_state_ = PosVelAccState<double>(kdl_chain_.getNrOfJoints());
         //curr_setpoint_state_ = PosVelAccState<double>(kdl_chain_.getNrOfJoints());
 
@@ -100,16 +101,6 @@ namespace wam_dmp_controller
             curr_setpoint_state_->position[i]     = q(i);
             curr_setpoint_state_->velocity[i]     = 0.0;
             curr_setpoint_state_->acceleration[i] = 0.0;
-            
-            /*
-            prev_setpoint_state_.position[i]     = q(i);
-            prev_setpoint_state_.velocity[i]     = 0.0;
-            prev_setpoint_state_.acceleration[i] = 0.0;
-            curr_setpoint_state_.position[i]     = q(i);
-            curr_setpoint_state_.velocity[i]     = 0.0;
-            curr_setpoint_state_.acceleration[i] = 0.0;
-            */
-            
         }
         // set position and attitude tajectory constants
         for(int i=0; i<p2p_traj_const_.cols(); i++)
@@ -148,19 +139,34 @@ namespace wam_dmp_controller
             //run_spline_ = false;
         }
 
-        //use the spline segment here 
+        //use the spline segment herehas_velocity
+        
         PosVelAccState<double> des_state; 
         spline_seg_->sample(time_, des_state);
-        /* 
+       
+        /*
+        if (time_ < p2p_traj_spline_duration_ && spline_count_ <= 10)
+        {
+            std::cout << "Desired position: " << des_state.position[0] << " " << des_state.position[1] << " " << des_state.position[2] << " " << des_state.position[3] << " " << des_state.position[4] << " " << des_state.position[5] << " " << des_state.position[6] << std::endl; 
+            spline_count_++;
+        }
+        */
+        /*
+        if (spline_count_ > 10)
+        {
+            spline_count_ = 0;
+        }
+        */
         for (int i = 0; i < kdl_chain_.getNrOfJoints(); i++)
         {
             q_des[i] = des_state.position[i];
             q_dot_des[i] = des_state.velocity[i];
             q_dotdot_des_[i] = des_state.acceleration[i];
         }
-        */
+        
+        
     
-
+        /*     
         for (int i=0; i<kdl_chain_.getNrOfJoints(); i++)
         {
 	        q_des[i] = p2p_traj_const_(0, i) + p2p_traj_const_(1, i) * pow(time_, 3) + \
@@ -172,6 +178,7 @@ namespace wam_dmp_controller
 	        q_dotdot_des[i] = 3 * 2 *  p2p_traj_const_(1, i) * time_ + \
                              4 * 3 * p2p_traj_const_(2, i) * pow(time_, 2) + 5 * 4 * p2p_traj_const_(3, i) * pow(time_, 3);
         }
+        */
         //ROS_INFO("time: %f, j1_pos: %f, j2_pos:%f, j3_pos:%f", time_, q_des_[0], q_des_[1], q_des_[2]);        
         p2p_traj_mutex_.unlock();
     }
@@ -220,11 +227,11 @@ namespace wam_dmp_controller
         for (int i = 0; i < kdl_chain_.getNrOfJoints(); i++)
         {
             command_struct_.positions_[i] = req.command.joint_pos[i];
-            /* use the spling segment
+        //use the spling segment 
             curr_setpoint_state_->position[i] = command_struct_.positions_[i];
-            prev_setpoint_state_->position[i] = curr_setpoint_state_->position[i];
-            prev_setpoint_state_->velocity[i] = curr_setpoint_state_->velocity[i];
-            prev_setpoint_state_->acceleration[i] = curr_setpoint_state_->acceleration[i];
+            /*
+            std::cout << "current_setpoint: " << curr_setpoint_state_->position[i] << std::endl;
+            std::cout << "prev_setpoint: " << prev_setpoint_state_->position[i] << std::endl;
             */
         }
         curr_command_ = Eigen::Map<Eigen::VectorXd>(&command_struct_.positions_[0], command_struct_.positions_.size());
@@ -233,17 +240,27 @@ namespace wam_dmp_controller
         p2p_traj_spline_duration_ = req.command.p2p_traj_duration;
 
         //command_buffer_.writeFromNonRT(command_struct_); Don't do this when set a spline!!!!!! 
-        eval_point_to_point_traj_constants(curr_command_, p2p_traj_spline_duration_);
-        //curr_setpoint_state_->velocity = std::vector<double>(kdl_chain_.getNrOfJoints(), 0.0);
-        //curr_setpoint_state_->acceleration = std::vector<double>(kdl_chain_.getNrOfJoints(), 0.0);
-        // when use the segspline class just refit the spline segment 
-        //  spline_seg_.reset(new QuinticSplineSegment<double>(0, *prev_setpoint_state_, p2p_traj_spline_duration_, *curr_setpoint_state_));
-
+        //eval_point_to_point_traj_constants(curr_command_, p2p_traj_spline_duration_);
+        curr_setpoint_state_->velocity = std::vector<double>(kdl_chain_.getNrOfJoints(), 0.0);
+        curr_setpoint_state_->acceleration = std::vector<double>(kdl_chain_.getNrOfJoints(), 0.0);
+        // when use the segspline class just refit the spline segment
+        //
+        // 
+        spline_seg_.reset(new QuinticSplineSegment<double>(0, *prev_setpoint_state_, p2p_traj_spline_duration_, *curr_setpoint_state_));
+        
+        for (int i = 0; i < kdl_chain_.getNrOfJoints(); i++)
+        { 
+            prev_setpoint_state_->position[i] = curr_setpoint_state_->position[i];
+            prev_setpoint_state_->velocity[i] = curr_setpoint_state_->velocity[i];
+            prev_setpoint_state_->acceleration[i] = curr_setpoint_state_->acceleration[i];
+            
+        } 
+        
         time_ = 0;
 
         p2p_traj_mutex_.unlock();
         ROS_WARN("new traj goal set!");
-
+        spline_count_ = 0;
         return true; 
     }
 
@@ -266,28 +283,44 @@ namespace wam_dmp_controller
             return true;
         }
         res.command.accepted = true;
-
+        
         for (int i = 0; i < kdl_chain_.getNrOfJoints(); i++)
         {
             command_struct_.positions_[i] = home_(i);
-            /*
             curr_setpoint_state_->position[i] = home_(i);
-            prev_setpoint_state_->position[i] = curr_setpoint_state_->position[i];
-            prev_setpoint_state_->velocity[i] = curr_setpoint_state_->velocity[i];
-            prev_setpoint_state_->acceleration[i] = curr_setpoint_state_->acceleration[i];
+            /*
+            std::cout << "current_setpoint: " << curr_setpoint_state_->position[i] << std::endl;
+            std::cout << "prev_setpoint: " << prev_setpoint_state_->position[i] << std::endl;
             */
         }
-        //curr_setpoint_state_->velocity = std::vector<double>(kdl_chain_.getNrOfJoints(), 0.0);
-        //curr_setpoint_state_->acceleration = std::vector<double>(kdl_chain_.getNrOfJoints(), 0.0);
+        curr_setpoint_state_->velocity = std::vector<double>(kdl_chain_.getNrOfJoints(), 0.0);
+        curr_setpoint_state_->acceleration = std::vector<double>(kdl_chain_.getNrOfJoints(), 0.0);
+     
         curr_command_ = Eigen::Map<Eigen::VectorXd>(&command_struct_.positions_[0], command_struct_.positions_.size());
         p2p_traj_mutex_.lock();
 
         p2p_traj_spline_duration_ = DEFAULT_P2P_TRAJ_DURATION;
 
         //command_buffer_.writeFromNonRT(command_struct_); Don't do this when set a spline!!!!!! 
-        eval_point_to_point_traj_constants(curr_command_, p2p_traj_spline_duration_);
-        // when use the segspline class just refit the spline segment 
-        //  spline_seg_.reset(new QuinticSplineSegment<double>(0, *prev_setpoint_state_, p2p_traj_spline_duration_, *curr_setpoint_state_));
+        //eval_point_to_point_traj_constants(curr_command_, p2p_traj_spline_duration_);
+
+        // when use the segspline class just refit the spline segment
+      
+
+
+        spline_seg_.reset(new QuinticSplineSegment<double>(0, *prev_setpoint_state_, p2p_traj_spline_duration_, *curr_setpoint_state_));
+        
+        for (int i = 0; i < kdl_chain_.getNrOfJoints(); i++)
+        { 
+            prev_setpoint_state_->position[i] = curr_setpoint_state_->position[i];
+            prev_setpoint_state_->velocity[i] = curr_setpoint_state_->velocity[i];
+            prev_setpoint_state_->acceleration[i] = curr_setpoint_state_->acceleration[i];
+            
+        } 
+        
+        
+        
+        spline_count_ = 0;   
         time_ = 0;
 
         p2p_traj_mutex_.unlock();

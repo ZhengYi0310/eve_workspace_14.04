@@ -63,6 +63,7 @@ namespace wam_dmp_controller
         ee_fk_solver_.reset(new KDL::ChainFkSolverPos_recursive(kdl_chain_));  //consider only up to the wrist for now.
     	//ee_jacobian_dot_solver_.reset(new KDL::ChainJntToJacDotSolver(extended_chain_));
         ee_jacobian_dot_solver_.reset(new KDL::ChainJntToJacDotSolver(kdl_chain_)); // consider only up to the wrist for now.
+        print_fmt_.reset(new Eigen::IOFormat(4, 0, ", ", "\n", "[", "]"));
 
     	// instantiate wrenches
         wrench_wrist_ = KDL::Wrench();
@@ -333,10 +334,11 @@ namespace wam_dmp_controller
     	//
     	// get the current ZYX representation PHI from R_ws_base * ee_fk_frame.M
     	double alpha, beta, gamma;
+       
     	R_ws_ee_ = R_ws_base_ * ee_fk_frame.M;
-    	p_ws_ee_ = R_ws_base_ * (ee_fk_frame.p - p_base_ws_);;
-
-    	R_ws_ee_.GetEulerZYX(alpha, beta, gamma);
+    	p_ws_ee_ = R_ws_base_ * (ee_fk_frame.p - p_base_ws_);
+    	R_ws_ee_.GetEulerZYX(alpha, beta, gamma); 
+       
         //ROS_INFO("R_WS_EE_ COMPUTED!!!!");
 
     	// evaluate the transformation matrix between 
@@ -350,6 +352,7 @@ namespace wam_dmp_controller
         E = Eigen::Matrix3d::Identity();
     	eul_kin_RPY(beta, alpha, E);
     	ws_E_.block<3,3>(3,3) = E.inverse();
+        //std::cout << E.inverse().format(*print_fmt_) << std::endl;
         //ROS_INFO("E_ COMPUTED!!!!");
     	// evaluate ws_J_ee
     	KDL::Jacobian ws_J_ee;
@@ -358,16 +361,25 @@ namespace wam_dmp_controller
 
     	Eigen::MatrixXd ws_JA_ee;
     	ws_JA_ee = ws_E_ * ws_J_ee.data;
+        
+        /*
+        std::cout << "base Jaocbian" << std::endl;
+        std::cout << base_J_ee.data.format(*print_fmt_) << std::endl;
+        std::cout << "ee Jacobian" << std::endl;
+        std::cout << ws_J_ee.data.format(*print_fmt_) << std::endl;
+        */
         //ROS_INFO("WS_JA_EE_ COMPUTED!!!!");
     	/////////////////////////////////////////////////////
         trans_xyz_ws_ << p_ws_ee_.x(), p_ws_ee_.y(), p_ws_ee_.z();
-        rot_xyz_ws_ << gamma, beta, alpha;
+        rot_xyz_ws_ << alpha, beta, gamma;
         //ROS_INFO("position COMPUTED!!!!");
-    	trans_xyzdot_ws_ = (ws_JA_ee * joint_msr_states_.qdot.data).block(0, 0, 3, 1);
+    	//trans_xyzdot_ws_ = (ws_J_ee.data * joint_msr_states_.qdot.data).block(0, 0, 3, 1);
+        trans_xyzdot_ws_ = (ws_JA_ee * joint_msr_states_.qdot.data).block(0, 0, 3, 1);
         //ROS_INFO("transvelocity COMPUTED!!!!");
         //rot_xyzdot_ws_ = (ws_JA_ee * joint_msr_states_.qdot.data).block(3, 0, 3, 1);
+        //ws_xdot_ = ws_J_ee.data * joint_msr_states_.qdot.data;
         ws_xdot_ = ws_JA_ee * joint_msr_states_.qdot.data;
-        rot_xyzdot_ws_ << ws_xdot_.coeff(0, 5),  ws_xdot_.coeff(0, 4),  ws_xdot_.coeff(0, 3);
+        rot_xyzdot_ws_ << ws_xdot_.coeff(0, 3),  ws_xdot_.coeff(0, 4),  ws_xdot_.coeff(0, 5);
 
         //ROS_INFO("Analytical jACOBIAN COMPUTED!!!!!!!");
     	//////////////////////////////////////////////////////
@@ -387,34 +399,42 @@ namespace wam_dmp_controller
       		//Lambda_inv = ws_JA_ee * M.data.inverse() * ws_JA_ee.transpose();
             // use the Geometric Jacobian here 
             {
-                Lambda_inv = ws_JA_ee * M.data.inverse() * base_J_ee.data.transpose();
+                //Lambda_inv = ws_J_ee.data * M.data.inverse() * base_J_ee.data.transpose();
+                 Lambda_inv = ws_JA_ee * M.data.inverse() * base_J_ee.data.transpose();
                 //ROS_INFO("SIMULATION!!!!");
             }
     	else
       		// use kdl matrix for real scenario
       		//Lambda_inv = ws_JA_ee * M.data.inverse() * ws_JA_ee.transpose();
             {
+                //Lambda_inv = ws_J_ee.data * M.data.inverse() * base_J_ee.data.transpose();
                 Lambda_inv = ws_JA_ee * M.data.inverse() * base_J_ee.data.transpose();
                 //ROS_INFO("NO SIMULATION!!!!");
             }
-    	ComputeMassMatrix(Lambda_inv, Lambda);
+    	//ComputeMassMatrix(Lambda_inv, Lambda);
+        Lambda = Lambda_inv.inverse();
+       
         //ROS_INFO("PSEDU INVERSE OF JACOBIAN AND CARTESIAN SPACE INERTIAL MATRIX COMPUTED!!!!");
 
         // Always consider null-space control, otherwise might cause unstable behavior for redundant Manipulator 
         // in joint Space
         // use the Geometric Jacobian here 
     	if(use_simulation_)
-      		// use kdl matrix for simulation
-      		//Lambda_inv = ws_JA_ee * M.data.inverse() * ws_JA_ee.transpose();
-            // use the Geometric Jacobian here 
-            J_dyn_ = base_J_ee.data * M.data.inverse() * base_J_ee.data.transpose();
+            {
+      		    // use kdl matrix for simulation
+      		    //Lambda_inv = ws_JA_ee * M.data.inverse() * ws_JA_ee.transpose();
+                // use the Geometric Jacobian here 
+                J_dyn_ = base_J_ee.data * M.data.inverse() * base_J_ee.data.transpose();
+            }
     	else
-      		// use kdl matrix for real scenario
-      		//Lambda_inv = ws_JA_ee * M.data.inverse() * ws_JA_ee.transpose();
-            J_dyn_ = base_J_ee.data * M.data.inverse() * base_J_ee.data.transpose();
+            {
+      		    // use kdl matrix for real scenario
+      		    //Lambda_inv = ws_JA_ee * M.data.inverse() * ws_JA_ee.transpose();
+                J_dyn_ = base_J_ee.data * M.data.inverse() * base_J_ee.data.transpose();
+            }
 
-    	ComputeMassMatrix(J_dyn_, J_dyn_inv_);
-        
+    	//ComputeMassMatrix(J_dyn_, J_dyn_inv_);
+        J_dyn_inv_ = J_dyn_.inverse(); 
         J_dyn_inv_ = M.data.inverse() * base_J_ee.data.transpose() * J_dyn_inv_;
         //ROS_INFO("PSEDU INVERSE OF JACOBIAN AND CARTESIAN SPACE INERTIAL MATRIX COMPUTED!!!!");
         /////////////////////////////
@@ -470,16 +490,24 @@ namespace wam_dmp_controller
     	// inheriting controllers augment TAU by calling 
     	// set_command(desired_acceleration)
     	// so that TAU += command_filter * desired_accelration
-    	//
+    	//www.orocos.org › KDL › Documentat
     	//////////////////////////////////////////////////////////////////////////////////
     	// use Geometric Jaocbian here 
       	//command_filter_ = ws_JA_ee.transpose() * Lambda;
+         
+        //std::cout << Lambda.format(*print_fmt_) << std::endl;
         command_filter_ = base_J_ee.data.transpose() * Lambda;
     	if(use_simulation_)
-      		tau_ = C.data + G.data - command_filter_ * ws_JA_ee_dot * joint_msr_states_.qdot.data;
-
-    	else  // gravity handled by the hardware interface itself when not using simulation 
-      		tau_ = C.data - command_filter_ * ws_JA_ee_dot * joint_msr_states_.qdot.data;
+      	    {
+                //tau_ = C.data - command_filter_ * ws_J_ee_dot.data * joint_msr_states_.qdot.data; //+ G.data;
+                tau_ = C.data - command_filter_ * ws_JA_ee_dot * joint_msr_states_.qdot.data; //+ G.data;
+            }
+    	else  // gravity handled by the hardware interface itself when not using simulation
+            {
+                //tau_ = C.data - command_filter_ * ws_J_ee_dot.data * joint_msr_states_.qdot.data;
+                tau_ = C.data - command_filter_ * ws_JA_ee_dot * joint_msr_states_.qdot.data; //+ G.data;
+            }
+        
         //ROS_INFO("COMPUTING TAU!!!!!!");
         /////////////////////////////////////////////
         if (ext_f_est_)
@@ -502,11 +530,20 @@ namespace wam_dmp_controller
         trans_xyz_error_ = trans_xyz_des_ws_ - trans_xyz_ws_;
         for (int i = 0; i < 3; i++)
         {
-            rot_xyz_error_(i) = angles::normalize_angle(rot_xyz_error_(i)); 
+            rot_xyz_error_(i) = angles::normalize_angle(rot_xyz_error_(i));
         }
         tau_rot_ = rot_xyzdotdot_des_ws_ + Kp_.block(3, 3, 3, 3) * rot_xyz_error_ + Kv_.block(3, 3, 3, 3) * (rot_xyzdot_des_ws_ - rot_xyzdot_ws_);
         F_unit_.block(0, 0, 3, 1) = tau_trans_;
         F_unit_.block(3, 0, 3, 1) = tau_rot_;
+        //F_unit_.block(3, 0, 3, 1) = Eigen::Vector3d::Zero();
+        /* 
+        for (int i = 0; i < 6; i++)
+        {
+            std::cout << "Froce: x: " << F_unit_[0] << " y: " << F_unit_[1] << " z: " << F_unit_[2] << " rot_x: " << F_unit_[3] << " rot_y: " << F_unit_[4] << " rot_z: " << F_unit_[5] << std::endl;
+            //std::cout << "Cart err: x: " << trans_xyz_error_[0] << " y: " << trans_xyz_error_[1] << " z: " << trans_xyz_error_[2] << " rot_x: " << rot_xyz_error_[0] << " rot_y: " << rot_xyz_error_[1] << " rot_z: " << rot_xyz_error_[2] << std::endl; 
+        }
+        */
+        
         //ROS_INFO("COMPUTING F_UNIT!!!!!!!!");
         ///////////////////////////////////////////////// 
         /*
@@ -554,7 +591,14 @@ namespace wam_dmp_controller
         F_unit_.block(0, 0, 3, 1) = tau_trans_;
         F_unit_.block(3, 0, 3, 1) = tau_rot_;
         */
+       
         tau_ += command_filter_ * F_unit_;
+        /*
+        for (int i = 0; i < 7; i++)
+        {
+            std::cout << "torque: j1: " << tau_[0] << " j2: " << tau_[1] << " j3: " << tau_[2] << " j4: " << tau_[3] << " j5: " << tau_[4] << " j6: " << tau_[5] << " j7: " << tau_[6] << std::endl; 
+        }
+        */
         // ROS_INFO("TAU_NULL WITH F_UNIT COMPUTED!!!!!");
         // Consider the nullspace controller here 
         tau_null_ = (Eigen::MatrixXd::Identity(kdl_chain_.getNrOfJoints(), kdl_chain_.getNrOfJoints()) - base_J_ee.data.transpose() * J_dyn_inv_.transpose()) * M.data * (null_Kp_ * (q_rest_ - joint_msr_states_.q.data) - null_Kv_ * joint_msr_states_.qdot.data);
@@ -568,7 +612,7 @@ namespace wam_dmp_controller
     
 
         // evaluate the state
-        ws_x_ << p_ws_ee(0), p_ws_ee(1), p_ws_ee(2), gamma, beta, alpha;
+        ws_x_ << p_ws_ee(0), p_ws_ee(1), p_ws_ee(2), alpha, beta, gamma;
     	// set joint efforts
     	for(int i=0; i<kdl_chain_.getNrOfJoints(); i++)
       	{
@@ -621,12 +665,12 @@ namespace wam_dmp_controller
         if (pub_cart_dotdot_des_ && pub_cart_dotdot_des_->trylock())
         {
             pub_cart_dotdot_des_->msg_.stamp = time;
-            pub_cart_dotdot_des_->msg_.position.x = trans_xyzdot_des_ws_[0];
-            pub_cart_dotdot_des_->msg_.position.y = trans_xyzdot_des_ws_[1];
-            pub_cart_dotdot_des_->msg_.position.z = trans_xyzdot_des_ws_[2];
-            pub_cart_dotdot_des_->msg_.orientation.roll = rot_xyzdot_des_ws_[0];
-            pub_cart_dotdot_des_->msg_.orientation.pitch = rot_xyzdot_des_ws_[1];
-            pub_cart_dotdot_des_->msg_.orientation.yaw = rot_xyzdot_des_ws_[2];
+            pub_cart_dotdot_des_->msg_.position.x = trans_xyzdotdot_des_ws_[0];
+            pub_cart_dotdot_des_->msg_.position.y = trans_xyzdotdot_des_ws_[1];
+            pub_cart_dotdot_des_->msg_.position.z = trans_xyzdotdot_des_ws_[2];
+            pub_cart_dotdot_des_->msg_.orientation.roll = rot_xyzdotdot_des_ws_[0];
+            pub_cart_dotdot_des_->msg_.orientation.pitch = rot_xyzdotdot_des_ws_[1];
+            pub_cart_dotdot_des_->msg_.orientation.yaw = rot_xyzdotdot_des_ws_[2];
         }
         
         if (pub_cart_err_ && pub_cart_err_->trylock())

@@ -109,19 +109,19 @@ sim_hw:
     p_sensor_cp: [0, 0, 0]
     ws_base_angles: [0, 0, 0]
     Kp_Gains:
-        trans_x: 2000
-        trans_y: 2000
-        trans_z: 2000
-        rot_x: 2000
-        rot_y: 2000
-        rot_z: 2000
+        trans_x: 200
+        trans_y: 200
+        trans_z: 200
+        rot_x: 200
+        rot_y: 200
+        rot_z: 200
     Kv_Gains:
-        trans_x: 50
-        trans_y: 50
-        trans_z: 50
-        rot_x: 50
-        rot_y: 50
-        rot_z: 50
+        trans_x: 200
+        trans_y: 200
+        trans_z: 200
+        rot_x: 200
+        rot_y: 200
+        rot_z: 200
     Ki_Gains:
         trans_x: 0
         trans_y: 0
@@ -130,27 +130,27 @@ sim_hw:
         rot_y: 0
         rot_z: 0
     null_Kp_Gains:
-        left_wam/base_yaw_joint: 30
-        left_wam/shoulder_pitch_joint: 0
-        left_wam/shoulder_yaw_joint: 0
-        left_wam/elbow_pitch_joint: 30
-        left_wam/wrist_yaw_joint: 30
+        left_wam/base_yaw_joint: 50
+        left_wam/shoulder_pitch_joint: 50
+        left_wam/shoulder_yaw_joint: 50
+        left_wam/elbow_pitch_joint: 50
+        left_wam/wrist_yaw_joint: 0
         left_wam/wrist_pitch_joint: 0
-        left_wam/palm_yaw_joint: 0
+        left_wam/palm_yaw_joint: 100
     null_Kv_Gains:
-        left_wam/base_yaw_joint: 5
-        left_wam/shoulder_pitch_joint: 0
-        left_wam/shoulder_yaw_joint: 0
-        left_wam/elbow_pitch_joint: 5
-        left_wam/wrist_yaw_joint: 5
+        left_wam/base_yaw_joint: 10
+        left_wam/shoulder_pitch_joint: 10
+        left_wam/shoulder_yaw_joint: 10
+        left_wam/elbow_pitch_joint: 10
+        left_wam/wrist_yaw_joint: 0
         left_wam/wrist_pitch_joint: 0
-        left_wam/palm_yaw_joint: 0
+        left_wam/palm_yaw_joint: 10
     rest_posture:
-        left_wam/base_yaw_joint: -1.6
+        left_wam/base_yaw_joint: 0
         left_wam/shoulder_pitch_joint: 0
-        left_wam/shoulder_yaw_joint: 0
-        left_wam/elbow_pitch_joint: 1.5
-        left_wam/wrist_yaw_joint: -2
+        left_wam/shoulder_yaw_joint:  0
+        left_wam/elbow_pitch_joint: 0
+        left_wam/wrist_yaw_joint: 0
         left_wam/wrist_pitch_joint: 0
         left_wam/palm_yaw_joint: 0
     zero_posture:

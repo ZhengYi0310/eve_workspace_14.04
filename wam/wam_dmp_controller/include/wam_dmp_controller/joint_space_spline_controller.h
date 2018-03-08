@@ -72,6 +72,8 @@ namespace wam_dmp_controller
             boost::scoped_ptr<QuinticSplineSegment<double> > spline_seg_;
             double time_;
 
+            int spline_count_; // for debug
+
             boost::mutex p2p_traj_mutex_;
     };
 }

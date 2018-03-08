@@ -111,7 +111,9 @@ namespace wam_dmp_controller
 
     		// chain required to move the reference point of jacobians
     		KDL::Chain extended_chain_;
-
+            
+            // For debug purpose 
+            boost::scoped_ptr<Eigen::IOFormat> print_fmt_;
     		// these matrices are sparse and initialized in init()
     		Eigen::MatrixXd ws_E_, ws_E_dot_;
 

@@ -25,7 +25,7 @@ namespace wam_dmp_controller
       }
     }
 
-    lambda = svd.matrixV() * S * svd.matrixU().transpose();
+    lambda = svd.matrixV() * S.transpose() * svd.matrixU().transpose();
   }
 } // namespace ahl_ctrl
 

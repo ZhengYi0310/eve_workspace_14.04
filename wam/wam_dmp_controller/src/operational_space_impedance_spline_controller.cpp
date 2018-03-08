@@ -11,7 +11,7 @@
 #include <angles/angles.h>
 #include <geometry_msgs/WrenchStamped.h>
 
-#define DEFAULT_P2P_TRAJ_DURATION 5.0
+#define DEFAULT_P2P_TRAJ_DURATION 10.0
 #define P2P_COEFF_3 10.0
 #define P2P_COEFF_4 -15.0 
 #define P2P_COEFF_5 6.0
@@ -110,11 +110,13 @@ namespace wam_dmp_controller
 
         for(int i=0; i<3; i++)
             p2p_traj_const_(0, i) = p_ws_ee.data[i];
-        p2p_traj_const_(0, 3) = gamma;
+        p2p_traj_const_(0, 3) = alpha;
         p2p_traj_const_(0, 4) = beta;
-        p2p_traj_const_(0, 5) = alpha;
+        p2p_traj_const_(0, 5) = gamma;
         prev_trans_setpoint_ << p_ws_ee.x(), p_ws_ee.y(), p_ws_ee.z();
-        prev_rot_setpoint_ << gamma, beta, alpha;
+        prev_rot_setpoint_ << alpha, beta, gamma;
+
+        ROS_INFO("default: x:%f  y:%f  z:%f  rot_x:%f  rot_y:%f  rot_z:%f  ", p_ws_ee.x(), p_ws_ee.y(), p_ws_ee.z(), alpha, beta, gamma);
 
         // reset the time
         time_ = p2p_traj_spline_duration_;
@@ -231,8 +233,10 @@ namespace wam_dmp_controller
 
         // get rotation
         res.command.orientation.roll = prev_rot_setpoint_[0];
-        res.command.orientation.yaw = prev_rot_setpoint_[1];
-        res.command.orientation.pitch = prev_rot_setpoint_[2];
+        res.command.orientation.pitch = prev_rot_setpoint_[1];
+        res.command.orientation.yaw = prev_rot_setpoint_[2];
+
+        //ROS_INFO("get current set point: x:%f  y:%f  z:%f  rot_x:%f  rot_y:%f  rot_z:%f ", prev_trans_setpoint_[0], prev_trans_setpoint_[1], prev_trans_setpoint_[2], prev_rot_setpoint_[0], prev_rot_setpoint_[1], prev_rot_setpoint_[2]);
 
         // get elapsed time
         res.command.elapsed_time = time_;
@@ -305,11 +309,11 @@ namespace wam_dmp_controller
 
         // evaluate constants alpha, beta and gamma trajectories
         double alpha_cmd, beta_cmd, gamma_cmd;
-        KDL::Rotation::EulerZYX(desired_rot(2),
+        KDL::Rotation::EulerZYX(desired_rot(0),
 			                    desired_rot(1),
-			                    desired_rot(0)).GetEulerZYX(alpha_cmd, beta_cmd, gamma_cmd);
+			                    desired_rot(2)).GetEulerZYX(alpha_cmd, beta_cmd, gamma_cmd);
         Eigen::Vector3d des_attitude_fixed;
-        des_attitude_fixed << gamma_cmd, beta_cmd, alpha_cmd;
+        des_attitude_fixed << alpha_cmd, beta_cmd, gamma_cmd;
         for (int i=0; i<3; i++)
         {
             double error = angles::normalize_angle(des_attitude_fixed(i) - prev_rot_setpoint_(i));

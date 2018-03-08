@@ -66,7 +66,7 @@ bool QNode::init() {
                        &barrett_controller_switcher::QNode::cartesian_error_callback, this);
     */
     ros::Duration(3).sleep();
-    is_jointpos_controller_active_ = false;
+    is_jointpos_controller_active_ = true;
     is_cartpos_controller_active_ = false;
         return true;
 }
@@ -183,11 +183,11 @@ void QNode::get_cart_error(geometry_msgs::Vector3& trans_err, wam_dmp_controller
 
 void QNode::get_trajectories_progress()
 {
-   get_current_cmd<wam_dmp_controller::JointPosSpline,\
-                   wam_dmp_controller::JointPosSplineMsg>(progress_joint_);
+   if (is_jointpos_controller_active_)
+        get_current_cmd<wam_dmp_controller::JointPosSpline, wam_dmp_controller::JointPosSplineMsg>(progress_joint_);
 
-  get_current_cmd<wam_dmp_controller::PoseRPYCommand,\
-                  wam_dmp_controller::PoseRPYCmd>(progress_cart_);
+   if (is_cartpos_controller_active_)
+        get_current_cmd<wam_dmp_controller::PoseRPYCommand, wam_dmp_controller::PoseRPYCmd>(progress_cart_);
   /*
   get_current_cmd<lwr_force_position_controllers::HybridImpedanceCommandTrajForce,\
           lwr_force_position_controllers::HybridImpedanceCommandTrajForceMsg>(progress_hybrid_force_);

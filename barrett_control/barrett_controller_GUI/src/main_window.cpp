@@ -886,7 +886,7 @@ void MainWindow::fill_cart_pos_fields()
 
   ui.CartPosXText->setText(QString::number(cart_pos_curr_goal.position.x,'f', 3));
   ui.CartPosYText->setText(QString::number(cart_pos_curr_goal.position.y,'f', 3));
-  ui.CartPosZText->setText(QString::number(cart_pos_curr_goal.position.y,'f', 3));
+  ui.CartPosZText->setText(QString::number(cart_pos_curr_goal.position.z,'f', 3));
   ui.CartPosRollText->setText(QString::number(cart_pos_curr_goal.orientation.roll,'f', 3));
   ui.CartPosPitchText->setText(QString::number(cart_pos_curr_goal.orientation.pitch,'f', 3));
   ui.CartPosYawText->setText(QString::number(cart_pos_curr_goal.orientation.yaw,'f', 3));

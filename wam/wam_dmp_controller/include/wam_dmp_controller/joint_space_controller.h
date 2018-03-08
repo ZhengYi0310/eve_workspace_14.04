@@ -18,6 +18,7 @@
 #include <wam_dmp_controller/GetJointPos.h>
 #include <wam_dmp_controller/GetJointGains.h>
 #include <wam_dmp_controller/GoHome.h>
+#include <wam_dmp_controller/PoseRPY.h>
 #include <control_toolbox/pid.h>
 
 #include <boost/scoped_ptr.hpp>
@@ -79,6 +80,11 @@ namespace wam_dmp_controller
             ros::ServiceServer go_home_service_;
 
             std::vector<control_toolbox::Pid> pid_controllers_;
+
+            boost::scoped_ptr<KDL::ChainFkSolverPos_recursive> ee_fk_solver_; 
+            KDL::Frame ee_fk_frame_;
+            KDL::Vector p_ws_ee_;
+            double alpha_, beta_, gamma_;
         
 		    KDL::JntArray cmd_states_;
 		    int cmd_flag_;	// discriminate if a user command arrived
@@ -99,6 +105,7 @@ namespace wam_dmp_controller
             Commands command_struct_;
             realtime_tools::RealtimeBuffer<Commands> command_buffer_;
             boost::scoped_ptr<realtime_tools::RealtimePublisher<wam_dmp_controller::SetJointPosStampedMsg> > pub_q_des_, pub_qdot_des_, pub_qdotdot_des_, pub_q_err_;
+            boost::scoped_ptr<realtime_tools::RealtimePublisher<wam_dmp_controller::PoseRPY> > curr_cart_pos_;
 	    };
 }
 

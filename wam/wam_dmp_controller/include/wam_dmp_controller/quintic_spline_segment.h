@@ -223,6 +223,7 @@ void QuinticSplineSegment<ScalarType>::init(const Time&  start_time,
   // Time data
   start_time_ = start_time;
   duration_   = end_time - start_time;
+  //std::cout << "The new trajectory has duration " << duration_ << "s!" << std::endl;
 
   // Spline coefficients
   coefs_.resize(dim);
@@ -230,7 +231,8 @@ void QuinticSplineSegment<ScalarType>::init(const Time&  start_time,
   typedef typename std::vector<SplineCoefficients>::iterator Iterator;
   if (!has_velocity)
   {
-    // Linear interpolation
+    // Linear interpolation 
+    //std::cout << "Compute Linear Coeff" << std::endl;
     for(Iterator coefs_it = coefs_.begin(); coefs_it != coefs_.end(); ++coefs_it)
     {
       const typename std::vector<Scalar>::size_type id = std::distance(coefs_.begin(), coefs_it);
@@ -247,7 +249,7 @@ void QuinticSplineSegment<ScalarType>::init(const Time&  start_time,
     for(Iterator coefs_it = coefs_.begin(); coefs_it != coefs_.end(); ++coefs_it)
     {
       const typename std::vector<Scalar>::size_type id = std::distance(coefs_.begin(), coefs_it);
-
+      //std::cout << "Compute Cubic Coeff" << std::endl;
       computeCoefficients(start_state.position[id], start_state.velocity[id],
                           end_state.position[id],   end_state.velocity[id],
                           duration_,
@@ -260,7 +262,7 @@ void QuinticSplineSegment<ScalarType>::init(const Time&  start_time,
     for(Iterator coefs_it = coefs_.begin(); coefs_it != coefs_.end(); ++coefs_it)
     {
       const typename std::vector<Scalar>::size_type id = std::distance(coefs_.begin(), coefs_it);
-
+      //std::cout << "Compute Quintic Coeff" << std::endl;
       computeCoefficients(start_state.position[id], start_state.velocity[id], start_state.acceleration[id],
                           end_state.position[id],   end_state.velocity[id],   end_state.acceleration[id],
                           duration_,
