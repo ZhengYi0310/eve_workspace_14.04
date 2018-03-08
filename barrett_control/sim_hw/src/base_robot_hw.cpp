@@ -122,7 +122,8 @@ namespace sim_hw
         // GET TRANSMISSIONS THAT BELONG TO THIS LWR 4+ ARM
         if (!parseTransmissionsFromURDF(urdf_string_))
         {
-            std::cout << "base_robot_hw: " << "Error parsing URDF in barrett_hw.\n" << std::endl;
+            //std::cout << "base_robot_hw: " << "Error parsing URDF in barrett_hw.\n" << std::endl;
+            ROS_ERROR("base_robot_hw: Error parsing URDF in %s.", robot_namespace_.c_str());
             return;
         }
         std::cout << "Registering interfaces..." << std::endl;        

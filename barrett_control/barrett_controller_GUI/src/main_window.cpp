@@ -668,6 +668,7 @@ void MainWindow::update_joints_state()
   // get new joints state
   qnode.get_joints_state(joints_position);
 
+
   labels_list.push_back(ui.Joint1Position_Val);
   labels_list.push_back(ui.Joint4Position_Val);
   labels_list.push_back(ui.Joint7Position_Val);
@@ -676,6 +677,15 @@ void MainWindow::update_joints_state()
   labels_list.push_back(ui.Joint6Position_Val);
   labels_list.push_back(ui.Joint5Position_Val); // <-- ORDERING HERE IS IMPORTANT
 
+  /*
+  labels_list.push_back(ui.Joint1Position_Val);
+  labels_list.push_back(ui.Joint2Position_Val);
+  labels_list.push_back(ui.Joint4Position_Val);
+  labels_list.push_back(ui.Joint5Position_Val);
+  labels_list.push_back(ui.Joint6Position_Val);
+  labels_list.push_back(ui.Joint7Position_Val);
+  labels_list.push_back(ui.Joint3Position_Val); // <-- ORDERING HERE IS IMPORTANT
+  */
   for (int i=0; i<7; i++)
     labels_list.at(i)->setText(QString::number(joints_position.at(i), 'f', 3));
     //labels_list.at(i)->setText(QString::number(180.0/3.14 * joints_position.at(i), 'f', 3));

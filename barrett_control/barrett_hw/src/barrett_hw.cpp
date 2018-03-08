@@ -478,6 +478,8 @@ namespace barrett_hw
     void BarrettWAMHW::write_wam(const ros::Time time, const ros::Duration period, boost::shared_ptr<BarrettWAMHW::WamDevice<DOF> > device)
     {
         BARRETT_UNITS_TEMPLATE_TYPEDEFS(DOF);
+
+        enforceLimits(period);
         
         //first disconnect the Exposed system and jtSum 
         barrett::systems::disconnect(device->jtSum->getInput(JT_INPUT));
@@ -567,7 +569,7 @@ int main (int argc, char** argv)
     signal(SIGHUP, quitRequested);
     
     // Construct the wam structure 
-    ros::NodeHandle barrett_nh("barrett");
+    ros::NodeHandle barrett_nh("barrett_hw");
     barrett_hw::BarrettWAMHW barrett_robot(barrett_nh);
           
     // Timer variables 

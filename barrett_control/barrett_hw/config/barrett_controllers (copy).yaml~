@@ -1,0 +1,172 @@
+
+barrett_hw:
+  # CONTROLLERS USED IN THE EXAMPLE
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 100 
+
+  joint_space_controller:
+    publish_rate: 100.0
+    type: wam_dmp_controller/JointSpaceController
+    root_link: lwr_1_link
+    tip_link: lwr_7_link
+    Kp_Gains_copy:
+        lwr_a1_joint: 900
+        lwr_a2_joint: 2500
+        lwr_e1_joint: 600
+        lwr_a3_joint: 500
+        lwr_a4_joint: 50
+        lwr_a5_joint: 50
+        lwr_a6_joint: 8
+    Kp_Gains:
+        lwr_a1_joint: 300
+        lwr_a2_joint: 250
+        lwr_e1_joint: 100
+        lwr_a3_joint: 40
+        lwr_a4_joint: 20
+        lwr_a5_joint: 30
+        lwr_a6_joint: 30
+    Kv_Gains_copy:
+        lwr_a1_joint: 10
+        lwr_a2_joint: 20
+        lwr_e1_joint: 5
+        lwr_a3_joint: 1
+        lwr_a4_joint: 0.5
+        lwr_a5_joint: 0.5
+        lwr_a6_joint: 0.05
+    Kv_Gains:
+        lwr_a1_joint: 2.5
+        lwr_a2_joint: 5
+        lwr_e1_joint: 2
+        lwr_a3_joint: 2
+        lwr_a4_joint: 2
+        lwr_a5_joint: 1
+        lwr_a6_joint: 1
+    Ki_Gains:
+        lwr_a1_joint: 2.5
+        lwr_a2_joint: 5
+        lwr_e1_joint: 2
+        lwr_a3_joint: 0.5
+        lwr_a4_joint: 0.5
+        lwr_a5_joint: 0.5
+        lwr_a6_joint: 1
+    home_pos:
+        lwr_a1_joint: 1.574388859
+        lwr_a2_joint: -1.629941524
+        lwr_e1_joint: -0.06294470833
+        lwr_a3_joint: 0.3082449174
+        lwr_a4_joint: -0.04514964065
+        lwr_a5_joint: -0.2571394599
+        lwr_a6_joint: -0.5003674773
+
+  joint_space_spline_controller:
+    publish_rate: 100 
+    type: wam_dmp_controller/JointSpaceSplineController
+    root_link: lwr_1_link
+    tip_link: lwr_7_link
+    Kp_Gains_copy:
+        lwr_a1_joint: 900
+        lwr_a2_joint: 2500
+        lwr_e1_joint: 600
+        lwr_a3_joint: 500
+        lwr_a4_joint: 50
+        lwr_a5_joint: 50
+        lwr_a6_joint: 8
+    Kp_Gains:
+        lwr_a1_joint: 300
+        lwr_a2_joint: 250
+        lwr_e1_joint: 100
+        lwr_a3_joint: 40
+        lwr_a4_joint: 20
+        lwr_a5_joint: 30
+        lwr_a6_joint: 30
+    Kv_Gains_copy:
+        lwr_a1_joint: 10
+        lwr_a2_joint: 20
+        lwr_e1_joint: 5
+        lwr_a3_joint: 1
+        lwr_a4_joint: 0.5
+        lwr_a5_joint: 0.5
+        lwr_a6_joint: 0.05
+    Kv_Gains:
+        lwr_a1_joint: 2.5
+        lwr_a2_joint: 5
+        lwr_e1_joint: 2
+        lwr_a3_joint: 2
+        lwr_a4_joint: 2
+        lwr_a5_joint: 1
+        lwr_a6_joint: 1
+    Ki_Gains:
+        lwr_a1_joint: 2.5
+        lwr_a2_joint: 5
+        lwr_e1_joint: 2
+        lwr_a3_joint: 0.5
+        lwr_a4_joint: 0.5
+        lwr_a5_joint: 0.5
+        lwr_a6_joint: 1
+    home_pos:
+        lwr_a1_joint: 1.574388859
+        lwr_a2_joint: -1.629941524
+        lwr_e1_joint: -0.06294470833
+        lwr_a3_joint: 0.3082449174
+        lwr_a4_joint: -0.04514964065
+        lwr_a5_joint: -0.2571394599
+        lwr_a6_joint: -0.5003674773
+
+  pid_spline_controller:
+    publish_rate: 100 
+    type: wam_dmp_controller/PIDSplineController
+    root_link: lwr_1_link
+    tip_link: lwr_7_link
+    Kp_Gains:
+        lwr_a1_joint: 900
+        lwr_a2_joint: 2500
+        lwr_e1_joint: 600
+        lwr_a3_joint: 500
+        lwr_a4_joint: 50
+        lwr_a5_joint: 50
+        lwr_a6_joint: 8
+    Kv_Gains:
+        left_wam/base_yaw_joint: 10
+        left_wam/shoulder_pitch_joint: 20
+        left_wam/shoulder_yaw_joint: 5
+        left_wam/elbow_pitch_joint: 1
+        left_wam/wrist_yaw_joint: 0.5
+        left_wam/wrist_pitch_joint: 0.5
+        left_wam/palm_yaw_joint: 0.05
+    Ki_Gains:
+        left_wam/base_yaw_joint: 2.5
+        left_wam/shoulder_pitch_joint: 5
+        left_wam/shoulder_yaw_joint: 2
+        left_wam/elbow_pitch_joint: 0.5
+        left_wam/wrist_yaw_joint: 0.5
+        left_wam/wrist_pitch_joint: 0.5
+        left_wam/palm_yaw_joint: 1
+    home_pos:
+        left_wam/base_yaw_joint: 1.574388859
+        left_wam/shoulder_pitch_joint: -1.629941524
+        left_wam/shoulder_yaw_joint: -0.06294470833
+        left_wam/elbow_pitch_joint: 0.3082449174
+        left_wam/wrist_yaw_joint: -0.04514964065
+        left_wam/wrist_pitch_joint: -0.2571394599
+        left_wam/palm_yaw_joint: -0.5003674773
+
+  joint_impedance_controller:
+    type: wam_dmp_controller/JointImpedanceController
+    root_link: lwr_1_link
+    tip_link: lwr_7_link
+    stiffness_gains: 300
+    damping_gains: .7
+
+  gravity_compensation_controller:
+    type: wam_dmp_controller/GravityCompensation
+    root_link: lwr_1_link
+    tip_link: lwr_7_link
+
+  arm_state_controller: 
+    type: wam_dmp_controller/ArmStateController
+    root_link: lwr_1_link
+    tip_link: lwr_7_link
+    publish_rate: 100
+    
+     

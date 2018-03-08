@@ -88,9 +88,9 @@ add_executable(barrett_hw src/barrett_hw.cpp)
 target_link_libraries(barrett_hw base_robot_hw xenomai native rtdm ${BARRETT_LIBRARIES} ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
 add_dependencies(barrett_hw ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-#add_executable(wam_server_ll src/wam_server_ll.cpp)
-#target_link_libraries(wam_server_ll xenomai native rtdm ${BARRETT_LIBRARIES} ${catkin_LIBRARIES})
-#add_dependencies(wam_server_ll ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_executable(wam_server src/wam_server_copy.cpp)
+target_link_libraries(wam_server xenomai native rtdm ${BARRETT_LIBRARIES} ${catkin_LIBRARIES})
+add_dependencies(wam_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_executable(check_kdl_parser src/check_kdl_parser.cpp )
 target_link_libraries(check_kdl_parser wam_server_lib xenomai native rtdm ${BARRETT_LIBRARIES} ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})

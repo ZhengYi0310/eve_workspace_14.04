@@ -181,7 +181,6 @@ namespace wam_dmp_controller
     	    p_ws_ee_ = R_ws_base_ * (ee_fk_frame.p - p_base_ws_);
 
     	    R_ws_ee_.GetEulerZYX(alpha, beta, gamma);
-
     	    // evaluate the transformation matrix between 
     	    // the geometric and analytical jacobian TA
     	    //
@@ -500,13 +499,15 @@ namespace wam_dmp_controller
     	if(use_simulation_)
       	    {
                 //tau_ = C.data - command_filter_ * ws_J_ee_dot.data * joint_msr_states_.qdot.data; //+ G.data;
-                tau_ = C.data - command_filter_ * ws_JA_ee_dot * joint_msr_states_.qdot.data; //+ G.data;
+                tau_ = C.data;// - command_filter_ * ws_JA_ee_dot * joint_msr_states_.qdot.data; //+ G.data;
             }
     	else  // gravity handled by the hardware interface itself when not using simulation
             {
                 //tau_ = C.data - command_filter_ * ws_J_ee_dot.data * joint_msr_states_.qdot.data;
                 tau_ = C.data - command_filter_ * ws_JA_ee_dot * joint_msr_states_.qdot.data; //+ G.data;
             }
+
+        //std::cout << "Coriolis !!!!" <<C.data.format(*print_fmt_) << std::endl;
         
         //ROS_INFO("COMPUTING TAU!!!!!!");
         /////////////////////////////////////////////
@@ -534,6 +535,7 @@ namespace wam_dmp_controller
         }
         tau_rot_ = rot_xyzdotdot_des_ws_ + Kp_.block(3, 3, 3, 3) * rot_xyz_error_ + Kv_.block(3, 3, 3, 3) * (rot_xyzdot_des_ws_ - rot_xyzdot_ws_);
         F_unit_.block(0, 0, 3, 1) = tau_trans_;
+        //F_unit_.block(0, 0, 3, 1) = Eigen::Vector3d::Zero();
         F_unit_.block(3, 0, 3, 1) = tau_rot_;
         //F_unit_.block(3, 0, 3, 1) = Eigen::Vector3d::Zero();
         /* 
@@ -600,9 +602,12 @@ namespace wam_dmp_controller
         }
         */
         // ROS_INFO("TAU_NULL WITH F_UNIT COMPUTED!!!!!");
-        // Consider the nullspace controller here 
+        // Consider the nullspace controller here
+        
         tau_null_ = (Eigen::MatrixXd::Identity(kdl_chain_.getNrOfJoints(), kdl_chain_.getNrOfJoints()) - base_J_ee.data.transpose() * J_dyn_inv_.transpose()) * M.data * (null_Kp_ * (q_rest_ - joint_msr_states_.q.data) - null_Kv_ * joint_msr_states_.qdot.data);
-        tau_ += tau_null_;
+        //std::cout << "nullspace torque!!!!" <<tau_null_.format(*print_fmt_) << std::endl;
+       
+        //tau_ += tau_null_;
         //ROS_INFO("TAU_NULL COMPUTED!!!!!");
 
         //

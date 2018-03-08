@@ -4,12 +4,12 @@
   <arg name="BUS_LEFT" default="/etc/barrett/default.conf"/>
 
   <!-- Config / Bus -->
-  <param name="barrett/busses/rtcan_left/config" value="$(arg CONFIG_LEFT)"/>
-  <param name="barrett/busses/rtcan_left/bus" value="$(arg BUS_LEFT)"/>
+  <param name="barrett_hw/busses/rtcan_left/config" value="$(arg CONFIG_LEFT)"/>
+  <param name="barrett_hw/busses/rtcan_left/bus" value="$(arg BUS_LEFT)"/>
 
   <!-- Realtime parameter -->
-  <param name="barrett/verbose" value="true"/>
-  <param name="barrett/period" value="0.004" type="double"/>
+  <param name="barrett_hw/verbose" value="true"/>
+  <param name="barrett_hw/period" value="0.004" type="double"/>
 
   <!-- Products -->
   <rosparam ns="barrett">

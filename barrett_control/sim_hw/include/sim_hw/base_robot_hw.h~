@@ -27,7 +27,7 @@
 #include <kdl/chaindynparam.hpp> //this to compute the gravity verctor
 #include <kdl_parser/kdl_parser.hpp>
 
-namespace barrett_hw
+namespace sim_hw
 {
     class BaseRobotHW: public hardware_interface::RobotHW
     {

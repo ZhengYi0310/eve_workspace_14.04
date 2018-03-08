@@ -402,8 +402,8 @@
 			</collision>
 		</link>
 		
-		<xacro:kuka_lwr_gazebo name="${name}"/> 
-		<xacro:kuka_lwr_transmission name="${name}"/> 
+		<xacro:kuka_lwr_gazebo name="sim_hw"/> 
+		<xacro:kuka_lwr_transmission name="lwr"/> 
 
 	</xacro:macro>
 

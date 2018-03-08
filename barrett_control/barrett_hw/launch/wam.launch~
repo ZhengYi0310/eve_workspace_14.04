@@ -1,0 +1,128 @@
+<launch>
+  <!-- Launch several pieces of barrett hardware -->
+  <arg name="CONFIG_LEFT" default="/etc/barrett/default.conf"/>
+  <arg name="BUS_LEFT" default="/etc/barrett/default.conf"/>
+
+  <!-- Config / Bus -->
+  <param name="barrett/busses/rtcan_left/config" value="$(arg CONFIG_LEFT)"/>
+  <param name="barrett/busses/rtcan_left/bus" value="$(arg BUS_LEFT)"/>
+
+  <!-- Realtime parameter -->
+  <param name="barrett/verbose" value="true"/>
+  <param name="barrett/period" value="0.004" type="double"/>
+
+  <!-- Products -->
+  <rosparam ns="barrett">
+    urdf_file_path: /home/robot/yzheng_ws/src/barrett_control/barrett_model/robots/wam7_bhand.urdf
+    product_names:
+    -  "wam_left"
+    - "bhand_left"
+    products:
+      wam_left:
+        bus: "rtcan_left"
+        type: "wam"
+        tip_joint: "left_wam/palm_yaw_joint"
+        tip_segment: "left_wam/wrist_palm_link"
+        root_segment: "left_wam/base_link"
+      bhand_left:
+        bus: "rtcan_left"
+        type: "hand"
+        tactile: false
+  </rosparam>
+
+  <!-- Launch several pieces of barrett hardware -->
+
+  
+  <!-- <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"> -->
+  <!--   <param name="/use_gui" value="true"/> --> 
+  <!--   <rosparam param="/source_list">["/joint_states"]</rosparam> --> 
+  <!--   <remap from="joint_states" to="JSP/joint_states" /> --> 
+  <!--   <remap from="robot_description" to="barrett/robot_description_yi" /> -->
+  <!-- </node> --> 
+  
+  <param name="barrett/can_dev_name" value="rtcan0"/>
+
+  <!-- LAUNCH INTERFACE -->
+	
+  <!-- in case you have different robot configurations -->
+  <arg name="robot_name" default="sim_wam7_bhand"/>
+
+  <!-- the default is the simulator -->
+  <arg name="use_barrett_hw_sim" default="false"/>
+	
+  <!-- set the parameters for the real interface -->
+
+  <arg name="controllers" default="joint_trajectory_controller"/>
+  <arg name="stopped_controllers" default="gravity_compensation_controller one_task_inverse_kinematics"/>
+
+  <!-- in case you want to load moveit from here, it might be hard with the real HW though -->
+  <arg name="load_moveit" default="false"/>
+
+  <!-- set some ros tools -->
+  <arg name="use_rviz" default="false"/>
+  <arg name="gui" default="false" />
+  <arg name="rvizconfig" default="$(find barrett_model)/urdf.rviz" />
+
+  <!-- LAUNCH IMPLEMENTATION -->
+
+  <!-- the urdf/sdf parameter -->
+  <!-- WAM Parameters -->
+  <include ns="barrett_hw" file="$(find barrett_model)/launch/xacrodisplay.launch">
+       <arg name="robot_name" value="left_wam" />  
+  </include>
+  <param name="use_gui" value="$(arg gui)"/>
+	
+  <!-- joint and robot state publishers of the full robot description -->
+  <!-- <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"> -->
+  <!--        <param name="/use_gui" value="true"/> -->
+          <!-- <rosparam param="source_list">[/joint_states]</rosparam> --> 
+  <!--        <remap from="robot_description" to="barrett_hw/robot_description_yi" /> -->
+  <!-- </node> --> 
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"> 
+     	<remap from="robot_description" to="barrett_hw/robot_description_yi" /> 
+  </node> 
+	
+  <group if="$(arg use_rviz)">
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true"> 
+     		<remap from="robot_description" to="barrett_hw/robot_description_yi" /> 
+  	</node> 
+  </group>
+
+  <!-- robot simulation uses the full robot description -->
+  <group if="$(arg use_barrett_hw_sim)">
+		<!-- spawn the robot in gazebo -->
+		<node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param barrett_hw/robot_description_yi -urdf -model $(arg robot_name)" respawn="false" output="screen" /> 
+			<!-- -J left_wam/base_yaw_joint 1.574388859 -->
+      			<!-- -J left_wam/shoulder_pitch_joint -1.629941524 -->
+      			<!-- -J left_wam/shoulder_yaw_joint -0.06294470833 -->
+      			<!-- -J left_wam/elbow_pitch_joint 0.3082449174 -->
+      			<!-- -J left_wam/wrist_yaw_joint -0.04514964065 -->
+      			<!-- -J left_wam/wrist_pitch_joint -0.2571394599 -->
+      			<!-- -J lleft_wam/palm_yaw_joint -0.5003674773"  -->
+                
+
+		<!-- enable/disable gui at will, the rviz listens to the simulation -->
+		<include file="$(find gazebo_ros)/launch/empty_world.launch">
+			<arg name="world_name" value="$(find barrett_model)/worlds/simple_environment.world"/>
+			<arg name="paused" value="false"/>
+			<arg name="use_sim_time" value="true"/>
+			<arg name="gui" value="true"/>
+			<arg name="headless" value="false"/>
+			<arg name="debug" value="false"/>
+
+		</include>
+  </group>
+
+  <!-- load robotHW configurations to rosparam server -->
+  <!-- <rosparam command="load" file="$(find barrett_hw)/config/hw_interface.yaml"/> -->
+
+  <!-- load all controller configurations to rosparam server -->
+  <rosparam file="$(find barrett_hw)/config/controllers.yaml" command="load"/>
+
+  <!-- real robot and controllers -->
+  <node pkg="barrett_hw" type="barrett_hw" name="barrett_hw" output="screen"/> 
+
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"  args="barrett_hw/joint_state_controller barrett_hw/joint_space_spline_controller --shutdown-timeout 2"/>
+  <node name="controller_stopper" pkg="controller_manager" type="spawner" args="--stopped barrett_hw/joint_impedance_controller --shutdown-timeout 2" />
+
+</launch>

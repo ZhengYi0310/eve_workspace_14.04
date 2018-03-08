@@ -25,8 +25,8 @@
 
 	<!-- the urdf/sdf parameter -->
 	<!-- WAM Parameters -->
-  	<include ns="sim_hw" file="$(find barrett_model)/launch/xacrodisplay_sim.launch">
-        	<arg name="robot_name" value="left_wam" />  
+  	<include ns="sim_hw" file="$(find lwr_description)/launch/xacrodisplay_sim.launch">
+        	<arg name="robot_name" value="lwr" /> 
         </include>
 	<param name="use_gui" value="$(arg gui)"/>
 	
@@ -80,7 +80,7 @@
 	<!-- real robot and controllers -->
         
 	<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"  args="sim_hw/joint_space_spline_controller sim_hw/joint_state_controller  --shutdown-timeout 2"/>
-	<node name="controller_stopper" pkg="controller_manager" type="spawner" args="--stopped sim_hw/operational_space_impedance_spline_controller  --shutdown-timeout 2" />
+	<node name="controller_stopper" pkg="controller_manager" type="spawner" args="--stopped sim_hw/joint_impedance_controller sim_hw/operational_space_impedance_spline_controller  --shutdown-timeout 2" />
    
 
        

@@ -1,0 +1,245 @@
+sim_hw:
+  # CONTROLLERS USED IN THE EXAMPLE
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 100 
+
+  joint_space_controller:
+    publish_rate: 100.0
+    type: wam_dmp_controller/JointSpaceController
+    root_link: lwr_base_link
+    tip_link: lwr_7_link
+    Kp_Gains_copy:
+        lwr_a1_joint: 900
+        lwr_a2_joint: 2500
+        lwr_e1_joint: 600
+        lwr_a3_joint: 500
+        lwr_a4_joint: 50
+        lwr_a5_joint: 50
+        lwr_a6_joint: 8
+    Kp_Gains:
+        lwr_a1_joint: 900
+        lwr_a2_joint: 900
+        lwr_e1_joint: 900
+        lwr_a3_joint: 900
+        lwr_a4_joint: 900
+        lwr_a5_joint: 900
+        lwr_a6_joint: 900
+    Kv_Gains_copy:
+        lwr_a1_joint: 10
+        lwr_a2_joint: 20
+        lwr_e1_joint: 5
+        lwr_a3_joint: 1
+        lwr_a4_joint: 0.5
+        lwr_a5_joint: 0.5
+        lwr_a6_joint: 0.05
+    Kv_Gains:
+        lwr_a1_joint: 2.5
+        lwr_a2_joint: 5
+        lwr_e1_joint: 2
+        lwr_a3_joint: 2
+        lwr_a4_joint: 2
+        lwr_a5_joint: 1
+        lwr_a6_joint: 1
+    Ki_Gains:
+        lwr_a1_joint: 2.5
+        lwr_a2_joint: 5
+        lwr_e1_joint: 2
+        lwr_a3_joint: 0.5
+        lwr_a4_joint: 0.5
+        lwr_a5_joint: 0.5
+        lwr_a6_joint: 1
+    home_pos:
+        lwr_a1_joint: 1.574388859
+        lwr_a2_joint: -1.629941524
+        lwr_e1_joint: -0.06294470833
+        lwr_a3_joint: 0.3082449174
+        lwr_a4_joint: -0.04514964065
+        lwr_a5_joint: -0.2571394599
+        lwr_a6_joint: -0.5003674773
+
+  joint_space_spline_controller:
+    publish_rate: 100 
+    type: wam_dmp_controller/JointSpaceSplineController
+    root_link: lwr_base_link
+    tip_link: lwr_7_link
+    Kp_Gains_copy:
+        lwr_a1_joint: 250
+        lwr_a2_joint: 220
+        lwr_e1_joint: 150
+        lwr_a3_joint: 150
+        lwr_a4_joint: 90
+        lwr_a5_joint: 40
+        lwr_a6_joint: 15
+    Kp_Gains:
+        lwr_a1_joint: 300
+        lwr_a2_joint: 300
+        lwr_e1_joint: 300
+        lwr_a3_joint: 300
+        lwr_a4_joint: 300
+        lwr_a5_joint: 300
+        lwr_a6_joint: 300
+    Kv_Gains_copy:
+        lwr_a1_joint: 10
+        lwr_a2_joint: 20
+        lwr_e1_joint: 5
+        lwr_a3_joint: 1
+        lwr_a4_joint: 0.5
+        lwr_a5_joint: 0.5
+        lwr_a6_joint: 0.05
+    Kv_Gains:
+        lwr_a1_joint: 0.3
+        lwr_a2_joint: 0.3
+        lwr_e1_joint: 0.3
+        lwr_a3_joint: 0.3
+        lwr_a4_joint: 0.3
+        lwr_a5_joint: 0.3
+        lwr_a6_joint: 0.3
+    Ki_Gains:
+        lwr_a1_joint: 10
+        lwr_a2_joint: 10
+        lwr_e1_joint: 6
+        lwr_a3_joint: 5
+        lwr_a4_joint: 5
+        lwr_a5_joint: 5
+        lwr_a6_joint: 2
+    home_pos:
+        lwr_a1_joint: 1.574388859
+        lwr_a2_joint: -1.629941524
+        lwr_e1_joint: -0.06294470833
+        lwr_a3_joint: 0.3082449174
+        lwr_a4_joint: -0.04514964065
+        lwr_a5_joint: -0.2571394599
+        lwr_a6_joint: -0.5003674773
+
+  pid_spline_controller:
+    publish_rate: 100 
+    type: wam_dmp_controller/PIDSplineController
+    root_link: lwr_base_link
+    tip_link: lwr_7_link
+    Kp_Gains:
+        lwr_a1_joint: 900
+        lwr_a2_joint: 2500
+        lwr_e1_joint: 600
+        lwr_a3_joint: 500
+        lwr_a4_joint: 50
+        lwr_a5_joint: 50
+        lwr_a6_joint: 8
+    Kv_Gains:
+        lwr_a1_joint: 10
+        lwr_a2_joint: 20
+        lwr_e1_joint: 5
+        lwr_a3_joint: 1
+        lwr_a4_joint: 0.5
+        lwr_a5_joint: 0.5
+        lwr_a6_joint: 0.05
+    Ki_Gains:
+        lwr_a1_joint: 2.5
+        lwr_a2_joint: 5
+        lwr_e1_joint: 2
+        lwr_a3_joint: 0.5
+        lwr_a4_joint: 0.5
+        lwr_a5_joint: 0.5
+        lwr_a6_joint: 1
+    home_pos:
+        lwr_a1_joint: 1.574388859
+        lwr_a2_joint: -1.629941524
+        lwr_e1_joint: -0.06294470833
+        lwr_a3_joint: 0.3082449174
+        lwr_a4_joint: -0.04514964065
+        lwr_a5_joint: -0.2571394599
+        lwr_a6_joint: -0.5003674773
+
+  operational_space_impedance_spline_controller:
+    use_simulation_: true
+    external_force_estimation_: false
+    publish_rate: 100 
+    type: wam_dmp_controller/OperationalSpaceImpedanceSplineController
+    root_link: lwr_base_link
+    tip_link: lwr_7_link
+    p_wrist_ee: [0, 0, 0]
+    p_base_ws: [0, 0, 0]    
+    p_sensor_cp: [0, 0, 0]
+    ws_base_angles: [0, 0, 0]
+    Kp_Gains:
+        trans_x: 1200
+        trans_y: 1200
+        trans_z: 1200
+        rot_x: 1200
+        rot_y: 1200
+        rot_z: 1200
+    Kv_Gains:
+        trans_x: 10
+        trans_y: 10
+        trans_z: 10
+        rot_x: 10
+        rot_y: 10
+        rot_z: 10
+    Ki_Gains:
+        trans_x: 0
+        trans_y: 0
+        trans_z: 0
+        rot_x: 0
+        rot_y: 0
+        rot_z: 0
+    null_Kp_Gains:
+        lwr_a1_joint: 3
+        lwr_a2_joint: 3
+        lwr_e1_joint: 3
+        lwr_a3_joint: 3
+        lwr_a4_joint: 0
+        lwr_a5_joint: 0
+        lwr_a6_joint: 0
+    null_Kv_Gains:
+        lwr_a1_joint: 10
+        lwr_a2_joint: 10
+        lwr_e1_joint: 10
+        lwr_a3_joint: 10
+        lwr_a4_joint: 0
+        lwr_a5_joint: 0
+        lwr_a6_joint: 0
+    rest_posture:
+        lwr_a1_joint: 0
+        lwr_a2_joint: 0
+        lwr_e1_joint: 0
+        lwr_a3_joint: 0
+        lwr_a4_joint: 0
+        lwr_a5_joint: 0
+        lwr_a6_joint: 0
+    zero_posture:
+        lwr_a1_joint: 0
+        lwr_a2_joint: 0
+        lwr_e1_joint: 0
+        lwr_a3_joint: 0
+        lwr_a4_joint: 0
+        lwr_a5_joint: 0
+        lwr_a6_joint: 0
+    SISE:
+        state_dim: 7
+        input_dim: 14
+        measurement_dim: 7
+        W: [0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15]
+        V: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        x0: [1.574388859, -1.629941524, -0.06294470833, 0.3082449174, -0.04514964065, -0.2571394599, -0.5003674773]
+        P_xx_0: [0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05]
+        M_gain_: [0, 0, 0, 0, 0, 0, 0]
+
+  joint_impedance_controller:
+    type: wam_dmp_controller/JointImpedanceController
+    root_link: lwr_base_link
+    tip_link: lwr_7_link
+    stiffness_gains: 300
+    damping_gains: .7
+
+  gravity_compensation_controller:
+    type: wam_dmp_controller/GravityCompensation
+    root_link: lwr_base_link
+    tip_link: lwr_7_link
+
+  arm_state_controller: 
+    type: wam_dmp_controller/ArmStateController
+    root_link: lwr_base_link
+    tip_link: lwr_7_link
+    publish_rate: 100
+    
+     

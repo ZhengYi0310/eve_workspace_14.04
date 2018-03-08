@@ -72,8 +72,8 @@
       <child link="${prefix}/shoulder_yaw_link"/>
       <origin xyz="0 0 0.346" rpy="${rpy}"/>
       <axis xyz="0 0 1"/>
-      <limit effort="25" lower="-2.6" upper="2.6" velocity="2.0"/>
-      <dynamics damping="${1.8*b}" friction="0"/>
+      <limit effort="40" lower="-2.6" upper="2.6" velocity="2.0"/>
+      <dynamics damping="${1.8*b}" friction="1"/>
     </joint>
     <gazebo reference="${prefix}/base_yaw_joint">
       <xacro:gz_joint/>
@@ -82,7 +82,7 @@
     <link name="${prefix}/shoulder_yaw_link" >
       <inertial>
         <origin xyz="-.00443422 -.00066489 -0.1289039 " />
-        <mass value="5.0" />
+        <mass value="10.7677" />
         <inertia
           ixx=".13488033"  ixy="-0.00012485"   ixz="0.00213041"
                            iyy=".09046330"    iyz="-.00068555"
@@ -112,8 +112,8 @@
       <child link="${prefix}/shoulder_pitch_link"/>
       <origin xyz="0 0 0" rpy="${-PI/2} 0 0"/>
       <axis xyz="0 0 1"/>
-      <limit effort="30" lower="-2.0" upper="2.0" velocity="2.0"/>
-      <dynamics damping="${0.5*b}" friction="0"/>
+      <limit effort="40" lower="-2.0" upper="2.0" velocity="2.0"/>
+      <dynamics damping="${0.5*b}" friction="1"/>
     </joint>
     <gazebo reference="${prefix}/shoulder_pitch_joint">
       <xacro:gz_joint/>
@@ -152,8 +152,8 @@
       <child link="${prefix}/upper_arm_link"/>
       <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
       <axis xyz="0 0 1"/>
-      <limit effort="15" lower="-2.8" upper="2.8" velocity="2.0"/>
-      <dynamics damping="${1.5*b}" friction="0"/>
+      <limit effort="40" lower="-2.8" upper="2.8" velocity="2.0"/>
+      <dynamics damping="${1.5*b}" friction="1"/>
     </joint>
     <gazebo reference="${prefix}/shoulder_yaw_joint">
       <xacro:gz_joint/>
@@ -162,7 +162,7 @@
     <link name="${prefix}/upper_arm_link" >
       <inertial>
         <origin xyz="0.00683258580000000 0.000033090000000 0.392492300000000" />
-        <mass value="2.20228141" />
+        <mass value="1.8023" />
         <inertia
           ixx=".05911077"  ixy="-0.00000738"  ixz="-0.00249612"
                            iyy="0.05927043"   iyz="0.00001767"
@@ -193,15 +193,15 @@
       <child link="${prefix}/forearm_link"/>
       <origin xyz="0.045 0 0.55" rpy="${-PI/2} 0 0"/>
       <axis xyz="0 0 1"/>
-      <limit effort="15" lower="-0.9" upper="${PI}" velocity="2.00"/>
-      <dynamics damping="${0.8*b}" friction="0"/>
+      <limit effort="40" lower="-0.9" upper="${PI}" velocity="2.00"/>
+      <dynamics damping="${0.8*b}" friction="1"/>
     </joint>
     <gazebo reference="${prefix}/elbow_pitch_joint">
       <xacro:gz_joint/>
     </gazebo>
     <link name="${prefix}/forearm_link" >
       <inertial>
-        <mass value="0.50016804" />
+        <mass value="2.17266212" />
         <origin xyz="-0.04001488 -.14271662 -.00022942 " rpy="0 0 0" />
         <inertia
           ixx="0.01491672" ixy="0.001506040000000" ixz="0.000017410000000"
@@ -249,8 +249,8 @@
       <child link="${prefix}/wrist_yaw_link"/>
       <origin xyz="-0.045 -0.3 0" rpy="${rpy}"/>
       <axis xyz="0 0 1"/>
-      <limit effort="5" lower="-4.76" upper="1.24" velocity="2.0"/>
-      <dynamics damping="${0.5*b}" friction="0"/>
+      <limit effort="40" lower="-4.76" upper="1.24" velocity="2.0"/>
+      <dynamics damping="${0.5*b}" friction="1"/>
     </joint>
     <gazebo reference="${prefix}/wrist_yaw_joint">
       <xacro:gz_joint/>
@@ -258,7 +258,7 @@
     <link name="${prefix}/wrist_yaw_link" >
       <inertial>
         <origin xyz="0.00008921 0.00435824 -0.00511217 " />
-        <mass value="1.05376019" />
+        <mass value="0.35655692" />
         <inertia  ixx="0.00005029" ixy="0.00000020"  ixz="0.00007582"
           iyy="0.00007582"  iyz="-0.00000359"
           izz="0.00006270" />
@@ -289,8 +289,8 @@
       <child link="${prefix}/wrist_pitch_link"/>
       <origin xyz="0 0 0" rpy="${-PI/2} 0 0"/>
       <axis xyz="0 0 1"/>
-      <limit effort="5" lower="-1.6" upper="1.6" velocity="2.00"/>
-      <dynamics damping="${0.1*b}" friction="0"/>
+      <limit effort="40" lower="-1.6" upper="1.6" velocity="2.00"/>
+      <dynamics damping="${0.1*b}" friction="1"/>
     </joint>
     <gazebo reference="${prefix}/wrist_pitch_joint">
       <xacro:gz_joint/>
@@ -298,7 +298,7 @@
     <link name="${prefix}/wrist_pitch_link" >
       <inertial>
         <origin xyz="-0.00012262 -0.02468336 -0.01703194 " rpy="0 0 0" />
-        <mass value="0.51797364" />
+        <mass value="0.40915886" />
         <inertia
           ixx="0.00055516"  ixy="0.00000061"  ixz="-0.00000074"
           iyy="0.00024367"  iyz="-0.00004590"
@@ -329,8 +329,8 @@
       <child link="${prefix}/wrist_palm_link"/>
       <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
       <axis xyz="0 0 1"/>
-      <limit effort="5" lower="-3.0" upper="3.0" velocity="2.00"/><!-- 2.95 is a limit taken in from 3 due to saftey and differences between arms. -->
-      <dynamics damping="${0.1*b}" friction="0"/>
+      <limit effort="40" lower="-3.0" upper="3.0" velocity="2.00"/><!-- 2.95 is a limit taken in from 3 due to saftey and differences between arms. -->
+      <dynamics damping="${0.1*b}" friction="1"/>
     </joint>
     <gazebo reference="${prefix}/palm_yaw_joint">
       <xacro:gz_joint/>
@@ -338,7 +338,7 @@
     <link name="${prefix}/wrist_palm_link" >
       <inertial>
         <origin xyz="0.0 0.0 0.055" rpy="0 0 0" />
-        <mass value="0.08286134" />
+        <mass value="0.07548270" />
         <inertia  ixx="0.00010859" ixy="0.00000000"  ixz="-0.00000000"
           iyy="0.00020683"  iyz="-0.0000000"
           izz="0.00010851" />

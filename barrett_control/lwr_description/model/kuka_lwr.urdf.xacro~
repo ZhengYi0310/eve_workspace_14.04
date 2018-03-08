@@ -350,7 +350,7 @@
 				<geometry>
 					<mesh filename="package://lwr_description/meshes/lwr4plus/visual/link_6.STL"/>
 				</geometry>
-			<material name="Kuka/Grey"/>
+				<material name="Kuka/Grey"/>
 			</visual>
 			<collision>
 			<origin xyz="0 -0.01 0" rpy="0 0 ${M_PI}"/>
@@ -391,7 +391,7 @@
 				<geometry>
 					<mesh filename="package://lwr_description/meshes/lwr4plus/visual/link_7.STL"/>
 				</geometry>
-			<material name="Kuka/DarkGrey"/>
+				<material name="Kuka/DarkGrey"/>
 			</visual>
 
 			<collision>
@@ -402,8 +402,8 @@
 			</collision>
 		</link>
 		
-		<xacro:kuka_lwr_gazebo name="${name}"/> 
-		<xacro:kuka_lwr_transmission name="${name}"/> 
+		<xacro:kuka_lwr_gazebo name="sim_hw"/> 
+		<xacro:kuka_lwr_transmission name="sim_hw"/> 
 
 	</xacro:macro>
 

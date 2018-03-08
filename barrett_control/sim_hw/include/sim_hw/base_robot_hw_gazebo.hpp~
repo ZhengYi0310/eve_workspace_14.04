@@ -126,7 +126,7 @@ namespace sim_hw
                             // tau = k (q_FRI - q_msr) + tau_FRI + D(q_msr) + f_dyn(q_msr)
                             const double stiffness_effort = 0.0;//10.0*( joint_position_command_[j] - joint_position_[j] ); // joint_stiffness_command_[j]*( joint_position_command_[j] - joint_position_[j] );
           //double damping_effort = joint_damping_command_[j]*( joint_velocity_[j] );
-                            const double effort = gravity_effort_(j); //+ stiffness_effort + joint_effort_command_[j];
+                            const double effort = stiffness_effort + joint_effort_command_[j]+ gravity_effort_(j);
                             //std::cout << "write joint impedance!!!!";
                             sim_joints_[j]->SetForce(0, effort);
                         }

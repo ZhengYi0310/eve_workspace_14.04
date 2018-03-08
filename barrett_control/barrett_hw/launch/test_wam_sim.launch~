@@ -25,8 +25,8 @@
 
 	<!-- the urdf/sdf parameter -->
 	<!-- WAM Parameters -->
-  	<include ns="barrett_hw" file="$(find barrett_model)/launch/xacrodisplay.launch">
-        	<arg name="robot_name" value="left_wam" />  
+  	<include ns="barrett_hw" file="$(find lwr_description)/launch/xacrodisplay.launch">
+        	<!-- <arg name="robot_name" value="left_wam" /> -->  
         </include>
 	<param name="use_gui" value="$(arg gui)"/>
 	
@@ -79,8 +79,8 @@
 
 	<!-- real robot and controllers -->
         
-	<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"  args="barrett_hw/joint_state_controller barrett_hw/joint_space_spline_controller --shutdown-timeout 2"/>
-	<node name="controller_stopper" pkg="controller_manager" type="spawner" args="--stopped barrett_hw/joint_impedance_controller --shutdown-timeout 2" />
+	<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"  args="barrett_hw/joint_state_controller --shutdown-timeout 2"/>
+	
    
 
        

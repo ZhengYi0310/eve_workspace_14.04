@@ -66,7 +66,7 @@
     robot_states_publisher:
       type: barrett_hw/RobotStatesPublisher
       publish_rate: 50
-      tactile: true
+      tactile: false
     #left_wam/base_yaw_joint:
     #  type: wam_dmp_controller/JointPositionController
 

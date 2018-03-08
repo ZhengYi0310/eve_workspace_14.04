@@ -3,7 +3,11 @@
   <world name="default">
     <include>
       <uri>model://ground_plane</uri>
+      <plugin name="gravity_compensation" filename="libGravityCompensationPlugin.so">
+            <uri>model://ground_plane</uri>
+      </plugin>
     </include>
+    
     <include>
       <uri>model://sun</uri>
     </include>

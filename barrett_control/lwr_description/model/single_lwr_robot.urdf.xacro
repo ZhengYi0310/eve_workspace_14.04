@@ -3,7 +3,13 @@
 
 	<!-- Include all models -->
 	<xacro:include filename="$(find lwr_description)/model/kuka_lwr.urdf.xacro"/>
+        
+        <link name="world"/>
 
+          <joint name="fixed" type="fixed">
+          <parent link="world"/>
+          <child link="box1"/>
+        </joint>
 	<!-- and assemble your robot -->
 	<link name="box1">
 		<visual>

@@ -4,7 +4,7 @@
 	<xacro:macro name="kuka_lwr_gazebo" params="name">
 
 		<gazebo>
-			<plugin name="${name}_lwr_hw_sim" filename="libbase_robot_hw_gazebo_plugin.so">
+			<plugin name="${name}_lwr_hw_sim" filename="libsim_robot_hw_gazebo_plugin.so">
 				<robotNamespace>${name}</robotNamespace>
 			</plugin>
 		</gazebo>
@@ -46,7 +46,7 @@
 
 		<gazebo reference="${name}_7_link">
 			<gravity>true</gravity>
-			<material>Gazebo/Grey</material>
+			<material>Gazebo/Red</material>
 		</gazebo>
 
 	</xacro:macro>
