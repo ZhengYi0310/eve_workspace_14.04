@@ -526,7 +526,7 @@ namespace sim_hw
 
         // this depends on how the world frame is set, in all our setups, world has always positive z pointing up.
         gravity_ = KDL::Vector::Zero();
-        gravity_(2) = -9.81;
+        gravity_(1) = -9.81;
 
         // Extract the chain from the tree
         if(!kdl_tree.getChain(root_name, tip_name, robot_chain_))

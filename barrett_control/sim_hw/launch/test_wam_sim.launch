@@ -16,7 +16,7 @@
 	<arg name="load_moveit" default="false"/>
 
 	<!-- set some ros tools -->
-	<arg name="use_rviz" default="false"/>
+	<arg name="use_rviz" default="true"/>
 	<arg name="gui" default="false" />
 
         <arg name="rvizconfig" default="$(find barrett_model)/urdf.rviz" />
@@ -64,7 +64,7 @@
 			<arg name="world_name" value="$(find barrett_model)/worlds/simple_environment.world"/>
 			<arg name="paused" value="false"/>
 			<arg name="use_sim_time" value="true"/>
-			<arg name="gui" value="true"/>
+			<arg name="gui" value="false"/>
 			<arg name="headless" value="false"/>
 			<arg name="debug" value="false"/>
 

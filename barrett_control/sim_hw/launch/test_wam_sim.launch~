@@ -16,7 +16,7 @@
 	<arg name="load_moveit" default="false"/>
 
 	<!-- set some ros tools -->
-	<arg name="use_rviz" default="false"/>
+	<arg name="use_rviz" default="true"/>
 	<arg name="gui" default="false" />
 
         <arg name="rvizconfig" default="$(find barrett_model)/urdf.rviz" />
@@ -25,8 +25,8 @@
 
 	<!-- the urdf/sdf parameter -->
 	<!-- WAM Parameters -->
-  	<include ns="sim_hw" file="$(find lwr_description)/launch/xacrodisplay_sim.launch">
-        	<arg name="robot_name" value="lwr" /> 
+  	<include ns="sim_hw" file="$(find barrett_model)/launch/xacrodisplay_sim.launch">
+        	<arg name="robot_name" value="left_wam" /> 
         </include>
 	<param name="use_gui" value="$(arg gui)"/>
 	
@@ -64,7 +64,7 @@
 			<arg name="world_name" value="$(find barrett_model)/worlds/simple_environment.world"/>
 			<arg name="paused" value="false"/>
 			<arg name="use_sim_time" value="true"/>
-			<arg name="gui" value="true"/>
+			<arg name="gui" value="false"/>
 			<arg name="headless" value="false"/>
 			<arg name="debug" value="false"/>
 

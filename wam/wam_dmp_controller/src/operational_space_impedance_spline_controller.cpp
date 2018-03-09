@@ -46,6 +46,10 @@ namespace wam_dmp_controller
         rot_dot_des_        = Eigen::Vector3d::Zero();
         rot_dotdot_des_     = Eigen::Vector3d::Zero();
 
+        prev_setpoint_state_.reset(new PosVelAccState<double>(6));
+        curr_setpoint_state_.reset(new PosVelAccState<double>(6));
+        spline_count_ = 0;
+
         return true;
     }
 
@@ -116,8 +120,25 @@ namespace wam_dmp_controller
         prev_trans_setpoint_ << p_ws_ee.x(), p_ws_ee.y(), p_ws_ee.z();
         prev_rot_setpoint_ << alpha, beta, gamma;
 
-        ROS_INFO("default: x:%f  y:%f  z:%f  rot_x:%f  rot_y:%f  rot_z:%f  ", p_ws_ee.x(), p_ws_ee.y(), p_ws_ee.z(), alpha, beta, gamma);
+        for (int i = 0; i < 3; i++)
+        {
+            prev_setpoint_state_->position[i]     = prev_trans_setpoint_[i];
+            curr_setpoint_state_->position[i]     = prev_trans_setpoint_[i];
+            prev_setpoint_state_->position[i + 3]     = prev_rot_setpoint_[i];
+            curr_setpoint_state_->position[i + 3]     = prev_rot_setpoint_[i];
+        }
 
+        for (int i = 0; i < 6; i++)
+        {
+            prev_setpoint_state_->velocity[i]     = 0.0;
+            prev_setpoint_state_->acceleration[i] = 0.0; 
+            curr_setpoint_state_->velocity[i]     = 0.0;
+            curr_setpoint_state_->acceleration[i] = 0.0; 
+        }
+
+        ROS_INFO("default: x:%f  y:%f  z:%f  rot_x:%f  rot_y:%f  rot_z:%f  ", p_ws_ee.x(), p_ws_ee.y(), p_ws_ee.z(), alpha, beta, gamma);
+        // reset the time
+        spline_seg_.reset(new QuinticSplineSegment<double>(0, *prev_setpoint_state_, p2p_traj_spline_duration_, *curr_setpoint_state_));
         // reset the time
         time_ = p2p_traj_spline_duration_;
 
@@ -210,11 +231,31 @@ namespace wam_dmp_controller
         command_struct_.rot_xyz_command_[1] = req.command.orientation.yaw;
         command_struct_.rot_xyz_command_[2] = req.command.orientation.pitch;
 
+        for (int i = 0; i < 3; i++)
+        {
+            
+            curr_setpoint_state_->position[i] = command_struct_.trans_xyz_command_[i];
+            curr_setpoint_state_->position[i + 3] = command_struct_.rot_xyz_command_[i];
+        }
+
         p2p_traj_mutex_.lock();
 
         p2p_traj_spline_duration_ = req.command.p2p_traj_duration;
+        curr_setpoint_state_->velocity = std::vector<double>(6, 0.0);
+        curr_setpoint_state_->acceleration = std::vector<double>(6, 0.0);
         //command_buffer_.writeFromNonRT(command_struct_); Don't do this when set a spline!!!!!! 
-        eval_point_to_point_traj_constants(command_struct_.trans_xyz_command_, command_struct_.rot_xyz_command_, p2p_traj_spline_duration_);
+        //eval_point_to_point_traj_constants(command_struct_.trans_xyz_command_, command_struct_.rot_xyz_command_, p2p_traj_spline_duration_);
+
+        spline_seg_.reset(new QuinticSplineSegment<double>(0, *prev_setpoint_state_, p2p_traj_spline_duration_, *curr_setpoint_state_));
+        
+        for (int i = 0; i < 6; i++)
+        { 
+            prev_setpoint_state_->position[i] = curr_setpoint_state_->position[i];
+            prev_setpoint_state_->velocity[i] = curr_setpoint_state_->velocity[i];
+            prev_setpoint_state_->acceleration[i] = curr_setpoint_state_->acceleration[i];
+            
+        } 
+
         time_ = 0;
 
         p2p_traj_mutex_.unlock();
@@ -260,7 +301,20 @@ namespace wam_dmp_controller
             time_ = p2p_traj_spline_duration_;
             //run_spline_ = false;
         }
+
+        PosVelAccState<double> des_state; 
+        spline_seg_->sample(time_, des_state);
+        for (int i = 0; i < 3; i++)
+        {
+            trans_des[i] = des_state.position[i];
+            trans_dot_des[i] = des_state.velocity[i];
+            trans_dotdot_des_[i] = des_state.acceleration[i];
+            rot_des[i] = des_state.position[i + 3];
+            rot_dot_des[i] = des_state.velocity[i + 3];
+            rot_dotdot_des_[i] = des_state.acceleration[i + 3];
+        }
         //ROS_INFO("TIME SET!!!!!!!!!!!!!!11");
+        /*
         for (int i=0; i<3; i++)
         {
 	        trans_des[i] = p2p_traj_const_(0, i) + p2p_traj_const_(1, i) * pow(time_, 3) + \
@@ -283,6 +337,7 @@ namespace wam_dmp_controller
 	        rot_dotdot_des[i] = 3 * 2 *  p2p_traj_const_(1, i + 3) * time_ + \
                              4 * 3 * p2p_traj_const_(2, i + 3) * pow(time_, 2) + 5 * 4 * p2p_traj_const_(3, i + 3) * pow(time_, 3);
         }
+        */
         p2p_traj_mutex_.unlock();
     }
 

@@ -499,7 +499,7 @@ namespace wam_dmp_controller
     	if(use_simulation_)
       	    {
                 //tau_ = C.data - command_filter_ * ws_J_ee_dot.data * joint_msr_states_.qdot.data; //+ G.data;
-                tau_ = C.data;// - command_filter_ * ws_JA_ee_dot * joint_msr_states_.qdot.data; //+ G.data;
+                tau_ = C.data - command_filter_ * ws_JA_ee_dot * joint_msr_states_.qdot.data; //+ G.data;
             }
     	else  // gravity handled by the hardware interface itself when not using simulation
             {

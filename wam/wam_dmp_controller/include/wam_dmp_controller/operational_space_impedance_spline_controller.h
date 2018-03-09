@@ -10,6 +10,7 @@
 
 #include "wam_dmp_controller/operational_space_impedance_controller.h"
 #include <wam_dmp_controller/PoseRPYCommand.h>
+#include "wam_dmp_controller/quintic_spline_segment.h"
 //#include <wam_dmp_controller/GainsCommand.h>
 #include <geometry_msgs/WrenchStamped.h>
 #include <boost/thread/mutex.hpp>
@@ -68,6 +69,11 @@ namespace wam_dmp_controller
             Eigen::MatrixXf p2p_traj_const_;
             Eigen::Vector3d prev_trans_setpoint_;
             Eigen::Vector3d prev_rot_setpoint_;
+
+            boost::scoped_ptr<PosVelAccState<double> > prev_setpoint_state_;
+            boost::scoped_ptr<PosVelAccState<double> > curr_setpoint_state_;
+            boost::scoped_ptr<QuinticSplineSegment<double> > spline_seg_;
+            double spline_count_;
             double time_;
                 
             //boost::shared_ptr<OperationalSpaceImpedanceController> ops_imp_controller_;
