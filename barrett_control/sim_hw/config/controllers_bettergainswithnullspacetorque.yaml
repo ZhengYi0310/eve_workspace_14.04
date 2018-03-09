@@ -131,7 +131,7 @@ sim_hw:
         rot_z: 0
     null_Kp_Gains:
         left_wam/base_yaw_joint: 0.8
-        left_wam/shoulder_pitch_joint: 0.8
+        left_wam/shoulder_pitch_joint: 0
         left_wam/shoulder_yaw_joint: 0.8
         left_wam/elbow_pitch_joint: 0.8
         left_wam/wrist_yaw_joint: 0
@@ -139,7 +139,7 @@ sim_hw:
         left_wam/palm_yaw_joint: 0
     null_Kv_Gains:
         left_wam/base_yaw_joint: 0.1
-        left_wam/shoulder_pitch_joint: 0.1
+        left_wam/shoulder_pitch_joint: 0
         left_wam/shoulder_yaw_joint: 0.1
         left_wam/elbow_pitch_joint: 0.1
         left_wam/wrist_yaw_joint: 0
@@ -147,7 +147,7 @@ sim_hw:
         left_wam/palm_yaw_joint: 0
     rest_posture:
         left_wam/base_yaw_joint: 1.5
-        left_wam/shoulder_pitch_joint: -1.62
+        left_wam/shoulder_pitch_joint: 0
         left_wam/shoulder_yaw_joint:  0
         left_wam/elbow_pitch_joint: 0
         left_wam/wrist_yaw_joint: 0
