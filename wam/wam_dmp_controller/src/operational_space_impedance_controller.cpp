@@ -594,7 +594,7 @@ namespace wam_dmp_controller
         F_unit_.block(3, 0, 3, 1) = tau_rot_;
         */
        
-        tau_ += command_filter_ * F_unit_;
+        tau_ = command_filter_ * F_unit_;
         /*
         for (int i = 0; i < 7; i++)
         {
@@ -607,7 +607,7 @@ namespace wam_dmp_controller
         tau_null_ = (Eigen::MatrixXd::Identity(kdl_chain_.getNrOfJoints(), kdl_chain_.getNrOfJoints()) - base_J_ee.data.transpose() * J_dyn_inv_.transpose()) * M.data * (null_Kp_ * (q_rest_ - joint_msr_states_.q.data) - null_Kv_ * joint_msr_states_.qdot.data);
         //std::cout << "nullspace torque!!!!" <<tau_null_.format(*print_fmt_) << std::endl;
        
-        //tau_ += tau_null_;
+        tau_ += tau_null_;
         //ROS_INFO("TAU_NULL COMPUTED!!!!!");
 
         //
