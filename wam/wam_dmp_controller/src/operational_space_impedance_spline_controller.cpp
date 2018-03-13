@@ -55,7 +55,8 @@ namespace wam_dmp_controller
 
     void OperationalSpaceImpedanceSplineController::starting(const ros::Time& time)
     {
-        //ROS_INFO("OperationalSpaceImpedanceSplineController IS RUNNING!!!!!!");
+        ROS_INFO("OperationalSpaceImpedanceSplineController IS RUNNING!!!!!!");
+        
         OperationalSpaceImpedanceController::starting(time);
         /*
             Important!!!!!!!!!!!!!!!!!!!
@@ -67,6 +68,7 @@ namespace wam_dmp_controller
         // set default trajectory 
         set_default_pos_traj();
         //ROS_INFO("default traj set!!!!");
+        
     }
 
     void OperationalSpaceImpedanceSplineController::update(const ros::Time& time, const ros::Duration& period)
@@ -136,7 +138,7 @@ namespace wam_dmp_controller
             curr_setpoint_state_->acceleration[i] = 0.0; 
         }
 
-        ROS_INFO("default: x:%f  y:%f  z:%f  rot_x:%f  rot_y:%f  rot_z:%f  ", p_ws_ee.x(), p_ws_ee.y(), p_ws_ee.z(), alpha, beta, gamma);
+        //ROS_INFO("default: x:%f  y:%f  z:%f  rot_x:%f  rot_y:%f  rot_z:%f  ", p_ws_ee.x(), p_ws_ee.y(), p_ws_ee.z(), alpha, beta, gamma);
         // reset the time
         spline_seg_.reset(new QuinticSplineSegment<double>(0, *prev_setpoint_state_, p2p_traj_spline_duration_, *curr_setpoint_state_));
         // reset the time

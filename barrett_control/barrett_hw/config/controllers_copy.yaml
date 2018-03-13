@@ -1,12 +1,12 @@
-sim_hw:
+barrett_hw:
   # CONTROLLERS USED IN THE EXAMPLE
   joint_state_controller:
     type: joint_state_controller/JointStateController
-    publish_rate: 20 
+    publish_rate: 100 
 
   joint_space_spline_controller:
     use_simulation_: true
-    publish_rate: 20 
+    publish_rate: 100 
     type: wam_dmp_controller/JointSpaceSplineController
     root_link: left_wam/base_link
     tip_link: left_wam/wrist_palm_link
@@ -100,7 +100,7 @@ sim_hw:
   operational_space_impedance_spline_controller:
     use_simulation_: true
     external_force_estimation_: false
-    publish_rate: 20 
+    publish_rate: 100 
     type: wam_dmp_controller/OperationalSpaceImpedanceSplineController
     root_link: left_wam/base_link
     tip_link: left_wam/wrist_palm_link
@@ -109,58 +109,58 @@ sim_hw:
     p_sensor_cp: [0, 0, 0]
     ws_base_angles: [0, 0, 0]
     Kp_Gains:
-        trans_x: 100.0
-        trans_y: 100.0
-        trans_z: 100.0
-        rot_x: 100.0
-        rot_y: 100.0
-        rot_z: 100.0
+        trans_x: 300
+        trans_y: 300
+        trans_z: 300
+        rot_x: 50
+        rot_y: 50
+        rot_z: 50
     Kv_Gains:
-        trans_x: 0.4
-        trans_y: 0.4
-        trans_z: 0.4
-        rot_x: 0.4
-        rot_y: 0.4
-        rot_z: 0.4
+        trans_x: 10
+        trans_y: 10
+        trans_z: 10
+        rot_x: 10
+        rot_y: 10
+        rot_z: 10
     Ki_Gains:
-        trans_x: 0.0
-        trans_y: 0.0
-        trans_z: 0.0
-        rot_x: 0.0
-        rot_y: 0.0
-        rot_z: 0.0
+        trans_x: 0
+        trans_y: 0
+        trans_z: 0
+        rot_x: 0
+        rot_y: 0
+        rot_z: 0
     null_Kp_Gains:
-        left_wam/base_yaw_joint: 0.18
-        left_wam/shoulder_pitch_joint: 1.0
-        left_wam/shoulder_yaw_joint: 1.0
-        left_wam/elbow_pitch_joint: 1.0
-        left_wam/wrist_yaw_joint: 0.0
-        left_wam/wrist_pitch_joint: 0.0
-        left_wam/palm_yaw_joint: 0.0
+        left_wam/base_yaw_joint: 30
+        left_wam/shoulder_pitch_joint: 30
+        left_wam/shoulder_yaw_joint: 30
+        left_wam/elbow_pitch_joint: 30
+        left_wam/wrist_yaw_joint: 0
+        left_wam/wrist_pitch_joint: 0
+        left_wam/palm_yaw_joint: 0
     null_Kv_Gains:
-        left_wam/base_yaw_joint: 0.018
-        left_wam/shoulder_pitch_joint: 0.1
-        left_wam/shoulder_yaw_joint: 0.1
-        left_wam/elbow_pitch_joint: 0.1
-        left_wam/wrist_yaw_joint: 0.0
-        left_wam/wrist_pitch_joint: 0.0
-        left_wam/palm_yaw_joint: 0.0
+        left_wam/base_yaw_joint: 6
+        left_wam/shoulder_pitch_joint: 6
+        left_wam/shoulder_yaw_joint: 6
+        left_wam/elbow_pitch_joint: 6
+        left_wam/wrist_yaw_joint: 0
+        left_wam/wrist_pitch_joint: 0
+        left_wam/palm_yaw_joint: 0
     rest_posture:
-        left_wam/base_yaw_joint: 1.574388859
-        left_wam/shoulder_pitch_joint: -1.629941524
-        left_wam/shoulder_yaw_joint:  0.0
-        left_wam/elbow_pitch_joint: 0.0
-        left_wam/wrist_yaw_joint: 0.0
-        left_wam/wrist_pitch_joint: 0.0
-        left_wam/palm_yaw_joint: 0.0
+        left_wam/base_yaw_joint: 1.5
+        left_wam/shoulder_pitch_joint: -1.62
+        left_wam/shoulder_yaw_joint:  0
+        left_wam/elbow_pitch_joint: 0
+        left_wam/wrist_yaw_joint: 0
+        left_wam/wrist_pitch_joint: 0
+        left_wam/palm_yaw_joint: 0
     zero_posture:
-        left_wam/base_yaw_joint: 0.0
-        left_wam/shoulder_pitch_joint: 0.0
-        left_wam/shoulder_yaw_joint: 0.0
-        left_wam/elbow_pitch_joint: 0.0
-        left_wam/wrist_yaw_joint: 0.0
-        left_wam/wrist_pitch_joint: 0.0
-        left_wam/palm_yaw_joint: 0.0
+        left_wam/base_yaw_joint: 0
+        left_wam/shoulder_pitch_joint: 0
+        left_wam/shoulder_yaw_joint: 0
+        left_wam/elbow_pitch_joint: 0
+        left_wam/wrist_yaw_joint: 0
+        left_wam/wrist_pitch_joint: 0
+        left_wam/palm_yaw_joint: 0
     SISE:
         state_dim: 7
         input_dim: 14

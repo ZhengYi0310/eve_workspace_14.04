@@ -35,7 +35,7 @@
   
 
   <!-- WAM Parameters -->
-  <include ns="barrett" file="$(find barrett_model)/launch/xacrodisplay.launch"/>
+  <include ns="barrett_hw" file="$(find barrett_model)/launch/xacrodisplay.launch"/>
   
   <arg name="rvizconfig" default="$(find barrett_model)/urdf.rviz" /> 
   <!-- <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"> -->

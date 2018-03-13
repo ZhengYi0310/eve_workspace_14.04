@@ -210,14 +210,14 @@ namespace wam_dmp_controller
             // control law
             last_vel_error_(i) = joint_des_states_.qdot(i) - joint_msr_states_.qdot(i);
             last_pos_error_(i) = joint_des_states_.q(i) - joint_msr_states_.q(i);
-            pid_cmd_(i) = Kv_(i)*(joint_des_states_.qdot(i) - joint_msr_states_.qdot(i)) + Kp_(i)*(joint_des_states_.q(i) - joint_msr_states_.q(i)) + joint_des_states_.qdotdot(i);
-            //pid_cmd_(i) = pid_controllers_[i].computeCommand(joint_des_states_.q(i) - joint_msr_states_.q(i), joint_des_states_.qdot(i) - joint_msr_states_.qdot(i), period);
-            cg_cmd_(i) = C_(i);
+            //pid_cmd_(i) = Kv_(i)*(joint_des_states_.qdot(i) - joint_msr_states_.qdot(i)) + Kp_(i)*(joint_des_states_.q(i) - joint_msr_states_.q(i)) + joint_des_states_.qdotdot(i);
+            pid_cmd_(i) = pid_controllers_[i].computeCommand(joint_des_states_.q(i) - joint_msr_states_.q(i), joint_des_states_.qdot(i) - joint_msr_states_.qdot(i), period);
+            //cg_cmd_(i) = C_(i);
             //cg_cmd_(i) = G_(i);
            
         }
-        tau_cmd_.data = M_.data * pid_cmd_.data;
-        //tau_cmd_.data = pid_cmd_.data;
+        //tau_cmd_.data = M_.data * pid_cmd_.data;
+        tau_cmd_.data = pid_cmd_.data;
         KDL::Add(tau_cmd_,cg_cmd_,tau_cmd_);
         
         for(size_t i=0; i<joint_handles_.size(); i++)

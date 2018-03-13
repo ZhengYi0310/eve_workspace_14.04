@@ -4,15 +4,15 @@
   <arg name="BUS_LEFT" default="/etc/barrett/default.conf"/>
 
   <!-- Config / Bus -->
-  <param name="barrett/busses/rtcan_left/config" value="$(arg CONFIG_LEFT)"/>
-  <param name="barrett/busses/rtcan_left/bus" value="$(arg BUS_LEFT)"/>
+  <param name="barrett_hw/busses/rtcan_left/config" value="$(arg CONFIG_LEFT)"/>
+  <param name="barrett_hw/busses/rtcan_left/bus" value="$(arg BUS_LEFT)"/>
 
   <!-- Realtime parameter -->
-  <param name="barrett/verbose" value="true"/>
-  <param name="barrett/period" value="0.004" type="double"/>
+  <param name="barrett_hw/verbose" value="true"/>
+  <param name="barrett_hw/period" value="0.004" type="double"/>
 
   <!-- Products -->
-  <rosparam ns="barrett">
+  <rosparam ns="barrett_hw">
     urdf_file_path: /home/robot/yzheng_ws/src/barrett_control/barrett_model/robots/wam7_bhand.urdf
     product_names:
     -  "wam_left"
@@ -59,7 +59,7 @@
   <arg name="load_moveit" default="false"/>
 
   <!-- set some ros tools -->
-  <arg name="use_rviz" default="false"/>
+  <arg name="use_rviz" default="true"/>
   <arg name="gui" default="false" />
   <arg name="rvizconfig" default="$(find barrett_model)/urdf.rviz" />
 
@@ -123,6 +123,6 @@
   <node pkg="barrett_hw" type="barrett_hw" name="barrett_hw" output="screen"/> 
 
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"  args="barrett_hw/joint_state_controller barrett_hw/joint_space_spline_controller --shutdown-timeout 2"/>
-  <node name="controller_stopper" pkg="controller_manager" type="spawner" args="--stopped barrett_hw/joint_impedance_controller --shutdown-timeout 2" />
+  <node name="controller_stopper" pkg="controller_manager" type="spawner" args="--stopped barrett_hw/joint_impedance_controller barrett_hw/operational_space_impedance_spline_controller  --shutdown-timeout 2" />
 
 </launch>

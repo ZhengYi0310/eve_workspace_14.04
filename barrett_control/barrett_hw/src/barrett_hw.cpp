@@ -298,7 +298,7 @@ namespace barrett_hw
         }
 
         //Compensate the gravity here
-        barrett::systems::forceConnect(wam_device->gravityCompensator->output, wam_device->jtSum->getInput(GRAVITY_INPUT));        
+        barrett::systems::connect(wam_device->gravityCompensator->output, wam_device->jtSum->getInput(GRAVITY_INPUT));        
          
         return wam_device;
     }
@@ -395,6 +395,8 @@ namespace barrett_hw
         }
         */
         
+        
+        
         // Get raw state 
         //Eigen::Matrix<double, DOF, 1> 
         const jp_type raw_positions = (device->Wam->getLowLevelWam()).getJointPositions();
@@ -482,7 +484,7 @@ namespace barrett_hw
         enforceLimits(period);
         
         //first disconnect the Exposed system and jtSum 
-        barrett::systems::disconnect(device->jtSum->getInput(JT_INPUT));
+        //barrett::systems::disconnect(device->jtSum->getInput(JT_INPUT));
 
         enforceLimits(period); // IMPORTANT SAFETY MEASURE!!!!!!!!!!!!!!!!!!
         
@@ -503,7 +505,7 @@ namespace barrett_hw
                     //device->joint_effort_cmds(i) = 0.0;
                 }
                 device->ExposedOutput->setValue(device->joint_effort_cmds);
-                barrett::systems::connect(device->ExposedOutput->output, device->jtSum->getInput(JT_INPUT));
+                //barrett::systems::connect(device->ExposedOutput->output, device->jtSum->getInput(JT_INPUT));
 
             case JOINT_EFFORT:
                 //DO STUFF HERE 
@@ -559,7 +561,8 @@ int main (int argc, char** argv)
     
     // Set up real time task 
     mlockall(MCL_CURRENT | MCL_FUTURE);
-    
+    RT_TASK task;
+    rt_task_shadow( &task, "GroupWAM", 99, 0 ); 
     // initialize ROS 
     ros::init(argc, argv, "wam_server", ros::init_options::NoSigintHandler);
     
